@@ -1,7 +1,11 @@
 const { PrismaClient } = require('@prisma/client')
+const { PrismaPg } = require('@prisma/adapter-pg')
+const pg = require('pg')
 const bcrypt = require('bcryptjs')
 
-const prisma = new PrismaClient()
+const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL })
+const adapter = new PrismaPg(pool)
+const prisma = new PrismaClient({ adapter })
 
 async function main() {
   const adminEmail = 'guy@kolio.ai'
@@ -47,8 +51,9 @@ async function main() {
 main()
   .catch((e) => {
     console.error('Seed error:', e.message)
-    process.exit(0) // Don't fail container start
+    process.exit(0)
   })
   .finally(async () => {
     await prisma.$disconnect()
+    await pool.end()
   })
