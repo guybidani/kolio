@@ -76,6 +76,14 @@ export async function requireAdmin(): Promise<SessionUser> {
   return session
 }
 
+export async function requireRole(...roles: string[]): Promise<SessionUser> {
+  const session = await requireAuth()
+  // System admins bypass role checks
+  if (session.isAdmin) return session
+  if (!roles.includes(session.role)) throw new Error('Forbidden')
+  return session
+}
+
 export async function getCurrentUser() {
   const session = await getSession()
   if (!session) return null

@@ -45,7 +45,19 @@ Identify who is the salesperson and who is the prospect. Track the conversation 
 - **Pain points**: explicit problems mentioned and implicit ones revealed through context
 - **Decision-making dynamics**: Is this the decision maker? Who else is involved?
 
-### Step 5: Score and provide feedback
+### Step 5: Compute advanced metrics
+- **Talk-to-listen ratio**: Estimate percentage of time the rep talks vs the prospect. Use speaker turns and segment lengths from the transcript.
+- **Filler words**: Count Hebrew fillers ("אממ", "אהה", "כאילו", "בעצם", "נכון?") and English fillers ("um", "uh", "like", "you know", "right?") used by the rep.
+- **Question count**: How many questions did the rep ask during the call?
+- **Longest monologue**: Estimate the longest uninterrupted stretch of rep speech, in seconds.
+- **Silence gaps**: Estimate number of pauses longer than 3 seconds.
+- **Energy score**: Rate 1-10 based on enthusiasm, pace variation, vocal engagement.
+- **Competitor mentions**: List any competitor names mentioned, with context.
+- **Pricing discussion**: Did price come up? At what point? How was it handled?
+- **Next steps clarity**: Did the call end with clear next steps? Rate 1-10.
+- **Customer sentiment trajectory**: Was the prospect positive/negative/neutral at the start, middle, and end of the call?
+
+### Step 6: Score and provide feedback
 All feedback must reference SPECIFIC moments in the call. Never give generic advice.
 
 BAD feedback: "You should handle objections better"
@@ -136,6 +148,33 @@ Return a single JSON object with the following structure. All free-text fields m
     "materials_to_prepare": ["string"],
     "objections_to_preempt": ["string"],
     "closing_strategy": "string"
+  },
+  "advanced_metrics": {
+    "talk_ratio_rep": 0-100,
+    "talk_ratio_customer": 0-100,
+    "filler_word_count": 0,
+    "question_count": 0,
+    "longest_monologue_seconds": 0,
+    "silence_gaps": 0,
+    "energy_score": 1-10,
+    "next_steps_score": 1-10,
+    "competitor_mentions": [
+      {
+        "name": "string",
+        "context": "string",
+        "timestamp": "string"
+      }
+    ],
+    "pricing_discussion": {
+      "mentioned": true/false,
+      "timestamp": "string | null",
+      "handling": "string"
+    },
+    "sentiment_trajectory": {
+      "start": "positive | negative | neutral",
+      "middle": "positive | negative | neutral",
+      "end": "positive | negative | neutral"
+    }
   },
   "missed_opportunities": ["string"],
   "spin_analysis": {

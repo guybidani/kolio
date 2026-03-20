@@ -1,6 +1,8 @@
 import { StatsOverview } from '@/components/dashboard/stats-overview'
 import { RepLeaderboard } from '@/components/dashboard/rep-leaderboard'
 import { CallCard } from '@/components/dashboard/call-card'
+import { BadgesDisplay } from '@/components/dashboard/badges'
+import { StreaksDisplay } from '@/components/dashboard/streaks'
 
 // Mock data for development - in production, queries hit the real DB
 const MOCK_CALLS = [
@@ -49,6 +51,19 @@ const MOCK_REPS = [
   { id: 'rep-4', name: 'נועה שמיר', avatarUrl: null, totalCalls: 29, avgScore: 6.2, trend: 0.8 },
 ]
 
+// Mock badges data
+const MOCK_BADGES = [
+  { type: 'FIRST_CALL', name: 'שיחה ראשונה', description: 'העלית את השיחה הראשונה שלך לניתוח', earnedAt: new Date(Date.now() - 30 * 86400000).toISOString() },
+  { type: 'PERFECT_SCORE', name: 'ציון מושלם', description: 'קיבלת ציון 90+ בשיחה', earnedAt: new Date(Date.now() - 7 * 86400000).toISOString() },
+  { type: 'STREAK_7', name: 'רצף שבועי', description: '7 ימים רצופים של שיחות', earnedAt: new Date(Date.now() - 3 * 86400000).toISOString() },
+]
+
+// Mock streaks data
+const MOCK_STREAKS = [
+  { type: 'DAILY_CALLS', currentCount: 5, bestCount: 12, isAtRisk: false },
+  { type: 'HIGH_SCORE', currentCount: 3, bestCount: 8, isAtRisk: false },
+]
+
 export default async function DashboardPage() {
   return (
     <div className="space-y-6">
@@ -79,10 +94,13 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div>
+        <div className="space-y-6">
           <RepLeaderboard reps={MOCK_REPS} />
+          <StreaksDisplay streaks={MOCK_STREAKS} />
         </div>
       </div>
+
+      <BadgesDisplay earned={MOCK_BADGES} />
     </div>
   )
 }

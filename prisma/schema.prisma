@@ -15,6 +15,7 @@ enum Plan {
 
 enum UserRole {
   ADMIN
+  CEO
   MANAGER
   REP
   VIEWER
@@ -42,6 +43,35 @@ enum CallSource {
   GOOGLE_DRIVE
 }
 
+enum BadgeType {
+  REP_OF_THE_WEEK
+  PERFECT_SCORE
+  STREAK_7
+  STREAK_30
+  OBJECTION_MASTER
+  DISCOVERY_PRO
+  CLOSER
+  MOST_IMPROVED
+  FIRST_CALL
+  HUNDRED_CALLS
+}
+
+enum StreakType {
+  DAILY_CALLS
+  HIGH_SCORE
+  IMPROVEMENT
+}
+
+enum NotificationType {
+  LOW_SCORE
+  HIGH_SCORE
+  BADGE_EARNED
+  WEEKLY_REPORT
+  COACHING_TIP
+  STREAK_AT_RISK
+  TEAM_MILESTONE
+}
+
 model Organization {
   id               String   @id @default(cuid())
   name             String
@@ -60,6 +90,7 @@ model Organization {
   playbooks        Playbook[]
   weeklyReports    WeeklyReport[]
   pbxIntegrations  PbxIntegration[]
+  badges           Badge[]
 }
 
 model User {
@@ -76,6 +107,10 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  managedReps    Rep[]    @relation("ManagedReps")
+  repProfile     Rep?     @relation("RepUser")
+  notifications  Notification[]
+
   @@unique([orgId, email])
   @@index([orgId])
 }
@@ -89,13 +124,21 @@ model Rep {
   extension  String?
   avatarUrl  String?
   isActive   Boolean  @default(true)
+  managerId  String?
+  manager    User?    @relation("ManagedReps", fields: [managerId], references: [id])
+  teamId     String?
+  userId     String?  @unique
+  user       User?    @relation("RepUser", fields: [userId], references: [id])
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   calls      Call[]
+  badges     Badge[]
+  streaks    Streak[]
 
   @@index([orgId])
   @@index([orgId, extension])
+  @@index([managerId])
 }
 
 model Call {
@@ -133,6 +176,19 @@ model Call {
   spinAnalysis   Json?
   internalInsights Json?
   talkRatio      Json?
+
+  // Advanced analytics fields
+  competitorMentions  Json?
+  pricingDiscussion   Json?
+  sentimentTrajectory Json?
+  fillerWordCount     Int?
+  questionCount       Int?
+  longestMonologue    Int?
+  silenceGaps         Int?
+  talkRatioRep        Float?
+  talkRatioCustomer   Float?
+  energyScore         Float?
+  nextStepsScore      Float?
 
   source         CallSource    @default(MANUAL_UPLOAD)
   externalId     String?
@@ -196,4 +252,49 @@ model PbxIntegration {
   updatedAt   DateTime @updatedAt
 
   @@index([orgId])
+}
+
+model Badge {
+  id          String    @id @default(cuid())
+  orgId       String
+  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  repId       String
+  rep         Rep       @relation(fields: [repId], references: [id], onDelete: Cascade)
+  type        BadgeType
+  name        String
+  description String
+  earnedAt    DateTime  @default(now())
+  weekOf      DateTime?
+
+  @@index([orgId, repId])
+  @@index([orgId, weekOf])
+}
+
+model Streak {
+  id           String     @id @default(cuid())
+  orgId        String
+  repId        String
+  rep          Rep        @relation(fields: [repId], references: [id], onDelete: Cascade)
+  type         StreakType
+  currentCount Int        @default(0)
+  bestCount    Int        @default(0)
+  lastDate     DateTime
+
+  @@unique([orgId, repId, type])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  orgId     String
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  body      String
+  data      Json?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([userId, read])
+  @@index([orgId, createdAt])
 }

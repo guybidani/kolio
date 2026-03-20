@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { enqueueWeeklyReport } from '@/lib/queue'
+import { can } from '@/lib/permissions'
 
 export async function GET() {
   try {
@@ -15,6 +16,11 @@ export async function GET() {
     })
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    const rbacUser = { id: user.id, role: user.role, orgId: user.orgId, isAdmin: user.isAdmin }
+    if (!can(rbacUser, 'reports:read')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     const reports = await db.weeklyReport.findMany({
@@ -40,7 +46,12 @@ export async function POST() {
     const user = await db.user.findUnique({
       where: { id: session.id },
     })
-    if (!user || (user.role !== 'ADMIN' && user.role !== 'MANAGER')) {
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    const rbacUser = { id: user.id, role: user.role, orgId: user.orgId, isAdmin: user.isAdmin }
+    if (!can(rbacUser, 'reports:generate')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 

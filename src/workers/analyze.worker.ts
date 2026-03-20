@@ -6,6 +6,9 @@ const connection = {
 import { db } from '@/lib/db'
 import { Prisma } from '@prisma/client'
 import { analyzeCallTranscript } from '@/lib/openai'
+import { checkAndAwardBadges } from '@/lib/badges'
+import { updateStreaks } from '@/lib/streaks'
+import { notifyCallEvent } from '@/lib/notifications'
 import type { CallAnalysis } from '@/types'
 
 interface AnalyzeJobData {
@@ -74,6 +77,18 @@ Keywords: ${JSON.stringify(playbook.keywords)}`
         internalInsights: toJson(analysis._internal),
         coachingTips: toJson(analysis.improvement_points?.map((p) => p.suggested_behavior)),
         talkRatio: Prisma.JsonNull,
+        // Advanced analytics fields
+        fillerWordCount: analysis.advanced_metrics?.filler_word_count ?? null,
+        questionCount: analysis.advanced_metrics?.question_count ?? null,
+        longestMonologue: analysis.advanced_metrics?.longest_monologue_seconds ?? null,
+        silenceGaps: analysis.advanced_metrics?.silence_gaps ?? null,
+        talkRatioRep: analysis.advanced_metrics?.talk_ratio_rep ?? null,
+        talkRatioCustomer: analysis.advanced_metrics?.talk_ratio_customer ?? null,
+        energyScore: analysis.advanced_metrics?.energy_score ?? null,
+        nextStepsScore: analysis.advanced_metrics?.next_steps_score ?? null,
+        competitorMentions: toJson(analysis.advanced_metrics?.competitor_mentions),
+        pricingDiscussion: toJson(analysis.advanced_metrics?.pricing_discussion),
+        sentimentTrajectory: toJson(analysis.advanced_metrics?.sentiment_trajectory),
         processedAt: new Date(),
       },
     })
@@ -88,6 +103,21 @@ Keywords: ${JSON.stringify(playbook.keywords)}`
           objectionBank: toJson([...currentBank, ...playbookWorthy]),
         },
       })
+    }
+
+    // Gamification: award badges, update streaks, send notifications
+    const overallScore = analysis.scores?.overall ?? null
+    if (call.repId) {
+      try {
+        const [badges] = await Promise.all([
+          checkAndAwardBadges(callId, orgId, call.repId),
+          updateStreaks(call.repId, orgId, overallScore),
+        ])
+        await notifyCallEvent(callId, orgId, call.repId, overallScore, badges)
+      } catch (gamificationError) {
+        // Don't fail the analysis if gamification fails
+        console.error('[Analyze] Gamification error:', gamificationError)
+      }
     }
 
     return { callId, score: analysis.scores?.overall }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { can } from '@/lib/permissions'
 
 export async function GET() {
   try {
@@ -11,13 +12,32 @@ export async function GET() {
 
     const user = await db.user.findUnique({
       where: { id: session.id },
+      include: { repProfile: { select: { id: true } } },
     })
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
+    const rbacUser = { id: user.id, role: user.role, orgId: user.orgId, isAdmin: user.isAdmin }
+
+    if (!can(rbacUser, 'reps:read') && !can(rbacUser, 'reps:read:own')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    // Build where clause based on permissions
+    const where: Record<string, unknown> = { orgId: user.orgId, isActive: true }
+
+    // REP can only see themselves
+    if (!can(rbacUser, 'reps:read')) {
+      if (user.repProfile) {
+        where.id = user.repProfile.id
+      } else {
+        return NextResponse.json([])
+      }
+    }
+
     const reps = await db.rep.findMany({
-      where: { orgId: user.orgId, isActive: true },
+      where,
       include: {
         _count: { select: { calls: true } },
         calls: {
@@ -68,7 +88,12 @@ export async function POST(req: Request) {
     const user = await db.user.findUnique({
       where: { id: session.id },
     })
-    if (!user || (user.role !== 'ADMIN' && user.role !== 'MANAGER')) {
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    const rbacUser = { id: user.id, role: user.role, orgId: user.orgId, isAdmin: user.isAdmin }
+    if (!can(rbacUser, 'reps:manage')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
@@ -94,6 +119,8 @@ export async function POST(req: Request) {
         name: sanitizedName,
         phone: sanitizedPhone,
         extension: sanitizedExtension,
+        // If manager is creating, set themselves as manager
+        ...(user.role === 'MANAGER' ? { managerId: user.id } : {}),
       },
     })
 

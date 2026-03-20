@@ -1,5 +1,5 @@
 export type Plan = 'TRIAL' | 'STARTER' | 'PRO' | 'ENTERPRISE'
-export type UserRole = 'ADMIN' | 'MANAGER' | 'REP' | 'VIEWER'
+export type UserRole = 'ADMIN' | 'CEO' | 'MANAGER' | 'REP' | 'VIEWER'
 export type CallDirection = 'INBOUND' | 'OUTBOUND' | 'UNKNOWN'
 export type CallStatus = 'UPLOADED' | 'TRANSCRIBING' | 'TRANSCRIBED' | 'ANALYZING' | 'COMPLETE' | 'FAILED'
 export type CallSource = 'PBX_WEBHOOK' | 'MANUAL_UPLOAD' | 'MOBILE_APP' | 'GOOGLE_DRIVE'
@@ -74,6 +74,31 @@ export interface CallAnalysis {
     objections_to_preempt: string[]
     closing_strategy: string
   }
+  advanced_metrics?: {
+    talk_ratio_rep: number
+    talk_ratio_customer: number
+    filler_word_count: number
+    question_count: number
+    longest_monologue_seconds: number
+    silence_gaps: number
+    energy_score: number
+    next_steps_score: number
+    competitor_mentions: Array<{
+      name: string
+      context: string
+      timestamp: string
+    }>
+    pricing_discussion: {
+      mentioned: boolean
+      timestamp: string | null
+      handling: string
+    }
+    sentiment_trajectory: {
+      start: 'positive' | 'negative' | 'neutral'
+      middle: 'positive' | 'negative' | 'neutral'
+      end: 'positive' | 'negative' | 'neutral'
+    }
+  }
   missed_opportunities: string[]
   spin_analysis: {
     situation_questions_asked: string
@@ -123,3 +148,26 @@ export interface DashboardStats {
   scoreChange: number
   topRep: RepStats | null
 }
+
+export type BadgeType =
+  | 'REP_OF_THE_WEEK'
+  | 'PERFECT_SCORE'
+  | 'STREAK_7'
+  | 'STREAK_30'
+  | 'OBJECTION_MASTER'
+  | 'DISCOVERY_PRO'
+  | 'CLOSER'
+  | 'MOST_IMPROVED'
+  | 'FIRST_CALL'
+  | 'HUNDRED_CALLS'
+
+export type StreakType = 'DAILY_CALLS' | 'HIGH_SCORE' | 'IMPROVEMENT'
+
+export type NotificationType =
+  | 'LOW_SCORE'
+  | 'HIGH_SCORE'
+  | 'BADGE_EARNED'
+  | 'WEEKLY_REPORT'
+  | 'COACHING_TIP'
+  | 'STREAK_AT_RISK'
+  | 'TEAM_MILESTONE'

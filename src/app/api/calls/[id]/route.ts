@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { can, canAccessCall } from '@/lib/permissions'
 
 export async function GET(
   req: Request,
@@ -14,6 +15,7 @@ export async function GET(
 
     const user = await db.user.findUnique({
       where: { id: session.id },
+      include: { repProfile: { select: { id: true } } },
     })
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
@@ -30,6 +32,18 @@ export async function GET(
 
     if (!call) {
       return NextResponse.json({ error: 'Call not found' }, { status: 404 })
+    }
+
+    // RBAC: check if user can access this specific call
+    const rbacUser = {
+      id: user.id,
+      role: user.role,
+      orgId: user.orgId,
+      isAdmin: user.isAdmin,
+      repProfileId: user.repProfile?.id ?? null,
+    }
+    if (!canAccessCall(rbacUser, call)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     return NextResponse.json(call)
@@ -52,7 +66,12 @@ export async function PATCH(
     const user = await db.user.findUnique({
       where: { id: session.id },
     })
-    if (!user || (user.role !== 'ADMIN' && user.role !== 'MANAGER')) {
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    const rbacUser = { id: user.id, role: user.role, orgId: user.orgId, isAdmin: user.isAdmin }
+    if (!can(rbacUser, 'calls:write')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 

@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { uploadAudio, getAudioKey } from '@/lib/r2'
 import { enqueueCallProcessing } from '@/lib/queue'
+import { can } from '@/lib/permissions'
 
 export const runtime = 'nodejs'
 
@@ -56,10 +57,15 @@ export async function POST(req: Request) {
 
     const user = await db.user.findUnique({
       where: { id: session.id },
-      include: { org: true },
+      include: { org: true, repProfile: { select: { id: true } } },
     })
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    const rbacUser = { id: user.id, role: user.role, orgId: user.orgId, isAdmin: user.isAdmin }
+    if (!can(rbacUser, 'calls:upload')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     const formData = await req.formData()

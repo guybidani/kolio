@@ -19,6 +19,15 @@ import {
   Users,
   UserPlus,
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+const ROLE_COLORS: Record<string, string> = {
+  ADMIN: 'bg-red-500/10 text-red-400 border-red-500/20',
+  CEO: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+  MANAGER: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+  REP: 'bg-green-500/10 text-green-400 border-green-500/20',
+  VIEWER: 'bg-white/5 text-white/50 border-white/10',
+}
 
 interface Org {
   id: string
@@ -27,6 +36,11 @@ interface Org {
   plan: string
   _count: { users: number; calls: number; reps: number }
   createdAt: string
+}
+
+interface ManagedRep {
+  id: string
+  name: string
 }
 
 interface User {
@@ -38,6 +52,7 @@ interface User {
   isActive: boolean
   orgId: string
   org: { id: string; name: string; slug: string }
+  managedReps: ManagedRep[]
   createdAt: string
 }
 
@@ -62,6 +77,7 @@ export default function AdminPage() {
   const [userOrgId, setUserOrgId] = useState('')
   const [userRole, setUserRole] = useState('VIEWER')
   const [userIsAdmin, setUserIsAdmin] = useState(false)
+  const [userManagerId, setUserManagerId] = useState('')
   const [userError, setUserError] = useState('')
 
   const fetchData = useCallback(async () => {
@@ -96,6 +112,11 @@ export default function AdminPage() {
   useEffect(() => {
     fetchData()
   }, [fetchData])
+
+  // Get managers for the selected org (for assigning to REPs)
+  const managersForOrg = users.filter(
+    (u) => u.orgId === userOrgId && (u.role === 'MANAGER' || u.role === 'ADMIN')
+  )
 
   async function createOrg(e: React.FormEvent) {
     e.preventDefault()
@@ -133,6 +154,7 @@ export default function AdminPage() {
         orgId: userOrgId,
         role: userRole,
         isAdmin: userIsAdmin,
+        managerId: userRole === 'REP' && userManagerId ? userManagerId : undefined,
       }),
     })
 
@@ -149,6 +171,7 @@ export default function AdminPage() {
     setUserOrgId('')
     setUserRole('VIEWER')
     setUserIsAdmin(false)
+    setUserManagerId('')
     fetchData()
   }
 
@@ -248,9 +271,17 @@ export default function AdminPage() {
                   <div>
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium text-white">{user.name}</p>
+                      <Badge
+                        className={cn(
+                          'text-xs border',
+                          ROLE_COLORS[user.role] || ROLE_COLORS.VIEWER
+                        )}
+                      >
+                        {user.role}
+                      </Badge>
                       {user.isAdmin && (
                         <Badge className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs">
-                          Admin
+                          System Admin
                         </Badge>
                       )}
                       {!user.isActive && (
@@ -260,7 +291,10 @@ export default function AdminPage() {
                       )}
                     </div>
                     <p className="text-xs text-white/30">
-                      {user.email} | {user.org.name} | {user.role}
+                      {user.email} | {user.org.name}
+                      {user.managedReps.length > 0 && (
+                        <> | Manages: {user.managedReps.map((r) => r.name).join(', ')}</>
+                      )}
                     </p>
                   </div>
                 </div>
@@ -371,11 +405,34 @@ export default function AdminPage() {
                 className="w-full rounded-md bg-white/5 border border-white/10 text-white px-3 py-2 text-sm"
               >
                 <option value="ADMIN">Admin</option>
+                <option value="CEO">CEO</option>
                 <option value="MANAGER">Manager</option>
                 <option value="REP">Rep</option>
                 <option value="VIEWER">Viewer</option>
               </select>
             </div>
+
+            {/* Show manager assignment when creating a REP */}
+            {userRole === 'REP' && managersForOrg.length > 0 && (
+              <div>
+                <label className="text-sm font-medium text-white/70 mb-1 block">
+                  Assign Manager
+                </label>
+                <select
+                  value={userManagerId}
+                  onChange={(e) => setUserManagerId(e.target.value)}
+                  className="w-full rounded-md bg-white/5 border border-white/10 text-white px-3 py-2 text-sm"
+                >
+                  <option value="">No manager</option>
+                  {managersForOrg.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name} ({m.role})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"

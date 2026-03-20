@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard,
+  BarChart3,
   Phone,
   Users,
   BookOpen,
@@ -12,26 +13,58 @@ import {
   Menu,
   LogOut,
   Shield,
+  Crown,
+  type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { Logo } from '@/components/ui/logo'
-import { useState, useEffect } from 'react'
+import { Badge } from '@/components/ui/badge'
+import { useState, useEffect, useMemo } from 'react'
+import { getVisibleNavItems, type NavSection } from '@/lib/permissions'
+import type { UserRole } from '@/types'
 
-const navItems = [
-  { href: '/dashboard', label: 'סקירה כללית', icon: LayoutDashboard },
-  { href: '/dashboard/calls', label: 'שיחות', icon: Phone },
-  { href: '/dashboard/reps', label: 'נציגים', icon: Users },
-  { href: '/dashboard/playbook', label: 'Playbook', icon: BookOpen },
-  { href: '/dashboard/upload', label: 'העלאת שיחה', icon: Upload },
-  { href: '/dashboard/settings', label: 'הגדרות', icon: Settings },
+interface NavItem {
+  href: string
+  label: string
+  icon: LucideIcon
+  section: NavSection
+}
+
+const allNavItems: NavItem[] = [
+  { href: '/dashboard', label: 'Overview', icon: LayoutDashboard, section: 'dashboard' },
+  { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3, section: 'analytics' },
+  { href: '/dashboard/executive', label: 'Executive', icon: Crown, section: 'dashboard' },
+  { href: '/dashboard/calls', label: 'Calls', icon: Phone, section: 'calls' },
+  { href: '/dashboard/reps', label: 'Reps', icon: Users, section: 'reps' },
+  { href: '/dashboard/playbook', label: 'Playbook', icon: BookOpen, section: 'playbook' },
+  { href: '/dashboard/upload', label: 'Upload Call', icon: Upload, section: 'upload' },
+  { href: '/dashboard/settings', label: 'Settings', icon: Settings, section: 'settings' },
+  { href: '/dashboard/admin', label: 'Admin', icon: Shield, section: 'admin' },
 ]
+
+const ROLE_COLORS: Record<string, string> = {
+  ADMIN: 'bg-red-500/10 text-red-400 border-red-500/20',
+  CEO: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+  MANAGER: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+  REP: 'bg-green-500/10 text-green-400 border-green-500/20',
+  VIEWER: 'bg-white/5 text-white/50 border-white/10',
+}
+
+const ROLE_LABELS: Record<string, string> = {
+  ADMIN: 'Admin',
+  CEO: 'CEO',
+  MANAGER: 'Manager',
+  REP: 'Rep',
+  VIEWER: 'Viewer',
+}
 
 interface UserInfo {
   name: string
   email: string
+  role: string
   isAdmin: boolean
   org: { name: string }
 }
@@ -48,15 +81,17 @@ function NavContent() {
       .catch(() => {})
   }, [])
 
+  const visibleItems = useMemo(() => {
+    if (!user) return []
+    const visibleSections = getVisibleNavItems(user.role as UserRole, user.isAdmin)
+    return allNavItems.filter((item) => visibleSections.includes(item.section))
+  }, [user])
+
   async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST' })
     router.push('/login')
     router.refresh()
   }
-
-  const allNavItems = user?.isAdmin
-    ? [...navItems, { href: '/dashboard/admin', label: 'Admin', icon: Shield }]
-    : navItems
 
   return (
     <div className="flex h-full flex-col">
@@ -77,7 +112,7 @@ function NavContent() {
       <Separator className="bg-white/10" />
 
       <nav className="flex-1 space-y-1 p-4">
-        {allNavItems.map((item) => {
+        {visibleItems.map((item) => {
           const isActive =
             pathname === item.href ||
             (item.href !== '/dashboard' && pathname.startsWith(item.href))
@@ -105,7 +140,17 @@ function NavContent() {
         {user && (
           <div className="flex items-center justify-between">
             <div className="min-w-0">
-              <p className="text-sm font-medium text-white truncate">{user.name}</p>
+              <div className="flex items-center gap-2 mb-0.5">
+                <p className="text-sm font-medium text-white truncate">{user.name}</p>
+                <Badge
+                  className={cn(
+                    'text-[10px] px-1.5 py-0 border shrink-0',
+                    ROLE_COLORS[user.role] || ROLE_COLORS.VIEWER
+                  )}
+                >
+                  {ROLE_LABELS[user.role] || user.role}
+                </Badge>
+              </div>
               <p className="text-xs text-white/30 truncate">{user.email}</p>
             </div>
             <Button

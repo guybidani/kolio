@@ -1,15 +1,21 @@
 import { NextResponse } from 'next/server'
-import { requireAdmin, hashPassword } from '@/lib/auth'
+import { requireAuth, requireAdmin, hashPassword } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { can, canCreateUserWithRole } from '@/lib/permissions'
+import type { UserRole } from '@/types'
 
 export const runtime = 'nodejs'
 
 export async function GET() {
   try {
-    await requireAdmin()
+    const session = await requireAdmin()
 
     const users = await db.user.findMany({
-      include: { org: { select: { id: true, name: true, slug: true } } },
+      include: {
+        org: { select: { id: true, name: true, slug: true } },
+        repProfile: { select: { id: true } },
+        managedReps: { select: { id: true, name: true } },
+      },
       orderBy: { createdAt: 'desc' },
     })
 
@@ -23,6 +29,8 @@ export async function GET() {
         isActive: u.isActive,
         orgId: u.orgId,
         org: u.org,
+        repProfileId: u.repProfile?.id ?? null,
+        managedReps: u.managedReps,
         createdAt: u.createdAt,
       }))
     )
@@ -40,9 +48,21 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    await requireAdmin()
+    const session = await requireAuth()
 
-    const { email, password, name, orgId, role, isAdmin } = await req.json()
+    const rbacUser = {
+      id: session.id,
+      role: session.role,
+      orgId: session.orgId,
+      isAdmin: session.isAdmin,
+    }
+
+    // Must have users:manage permission
+    if (!can(rbacUser, 'users:manage')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    const { email, password, name, orgId, role, isAdmin, managerId } = await req.json()
 
     if (!email || !password || !name || !orgId) {
       return NextResponse.json(
@@ -58,6 +78,29 @@ export async function POST(req: Request) {
       )
     }
 
+    // Validate role
+    const validRoles: UserRole[] = ['ADMIN', 'CEO', 'MANAGER', 'REP', 'VIEWER']
+    const userRole = (validRoles.includes(role) ? role : 'VIEWER') as UserRole
+
+    // Check if creator can create this role
+    if (!canCreateUserWithRole(rbacUser, userRole)) {
+      return NextResponse.json(
+        { error: `You cannot create users with the ${userRole} role` },
+        { status: 403 }
+      )
+    }
+
+    // Non-admin managers can only create users in their own org
+    if (!session.isAdmin && session.orgId !== orgId) {
+      return NextResponse.json(
+        { error: 'You can only create users in your own organization' },
+        { status: 403 }
+      )
+    }
+
+    // Only system admins can set the isAdmin flag
+    const setIsAdmin = session.isAdmin ? isAdmin === true : false
+
     // Verify org exists
     const org = await db.organization.findUnique({ where: { id: orgId } })
     if (!org) {
@@ -70,10 +113,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Email already in use' }, { status: 400 })
     }
 
-    const passwordHash = await hashPassword(password)
+    // If role is REP and managerId provided, validate it
+    if (userRole === 'REP' && managerId) {
+      const manager = await db.user.findFirst({
+        where: {
+          id: managerId,
+          orgId,
+          role: { in: ['ADMIN', 'MANAGER'] },
+        },
+      })
+      if (!manager) {
+        return NextResponse.json({ error: 'Manager not found in organization' }, { status: 400 })
+      }
+    }
 
-    const validRoles = ['ADMIN', 'MANAGER', 'REP', 'VIEWER']
-    const userRole = validRoles.includes(role) ? role : 'VIEWER'
+    const passwordHash = await hashPassword(password)
 
     const user = await db.user.create({
       data: {
@@ -82,10 +136,22 @@ export async function POST(req: Request) {
         passwordHash,
         orgId,
         role: userRole,
-        isAdmin: isAdmin === true,
+        isAdmin: setIsAdmin,
       },
       include: { org: { select: { id: true, name: true, slug: true } } },
     })
+
+    // If role is REP, auto-create a linked Rep profile
+    if (userRole === 'REP') {
+      await db.rep.create({
+        data: {
+          orgId,
+          name: name.trim(),
+          userId: user.id,
+          managerId: managerId || (session.role === 'MANAGER' ? session.id : null),
+        },
+      })
+    }
 
     return NextResponse.json({
       id: user.id,
