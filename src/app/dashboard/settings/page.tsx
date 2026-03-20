@@ -3,11 +3,9 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Settings,
-  CreditCard,
   Link2,
   Shield,
   Copy,
@@ -20,7 +18,7 @@ export default function SettingsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-white">הגדרות</h1>
-        <p className="text-white/40">ניהול ארגון, חיוב ואינטגרציות</p>
+        <p className="text-white/40">ניהול ארגון ואינטגרציות</p>
       </div>
 
       <Tabs defaultValue="general">
@@ -28,10 +26,6 @@ export default function SettingsPage() {
           <TabsTrigger value="general" className="data-[state=active]:bg-white/10">
             <Settings className="h-4 w-4 ml-1" />
             כללי
-          </TabsTrigger>
-          <TabsTrigger value="billing" className="data-[state=active]:bg-white/10">
-            <CreditCard className="h-4 w-4 ml-1" />
-            חיוב
           </TabsTrigger>
           <TabsTrigger value="integrations" className="data-[state=active]:bg-white/10">
             <Link2 className="h-4 w-4 ml-1" />
@@ -81,59 +75,6 @@ export default function SettingsPage() {
                 </p>
               </div>
               <Button variant="outline" className="border-white/10 text-white/60 hover:bg-white/5">חידוש Secret</Button>
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="billing" className="mt-6 space-y-4">
-          <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
-            <div className="p-5 pb-3">
-              <h3 className="text-base font-semibold text-white">התוכנית הנוכחית</h3>
-            </div>
-            <div className="px-5 pb-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-bold text-white">Trial</h3>
-                    <Badge className="bg-amber-500/10 text-amber-400 border border-amber-500/20">14 ימים נותרו</Badge>
-                  </div>
-                  <p className="text-sm text-white/40">
-                    3 נציגים, 50 שיחות בחודש
-                  </p>
-                </div>
-                <Button className="bg-indigo-600 hover:bg-indigo-500 text-white">שדרוג תוכנית</Button>
-              </div>
-
-              <Separator className="my-4 bg-white/10" />
-
-              <div className="grid gap-4 sm:grid-cols-3">
-                <div className="text-center p-4 rounded-lg border border-white/10 bg-white/[0.03]">
-                  <p className="text-2xl font-bold text-white">23</p>
-                  <p className="text-sm text-white/40">שיחות החודש</p>
-                  <p className="text-xs text-white/30">מתוך 50</p>
-                </div>
-                <div className="text-center p-4 rounded-lg border border-red-500/20 bg-red-500/5">
-                  <p className="text-2xl font-bold text-white">4</p>
-                  <p className="text-sm text-white/40">נציגים פעילים</p>
-                  <p className="text-xs text-red-400">מתוך 3 (חריגה!)</p>
-                </div>
-                <div className="text-center p-4 rounded-lg border border-white/10 bg-white/[0.03]">
-                  <p className="text-2xl font-bold text-white">14</p>
-                  <p className="text-sm text-white/40">ימים נותרו</p>
-                  <p className="text-xs text-white/30">בניסיון חינם</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
-            <div className="p-5 pb-3">
-              <h3 className="text-base font-semibold text-white">היסטוריית חיובים</h3>
-            </div>
-            <div className="px-5 pb-5">
-              <p className="text-sm text-white/30 text-center py-4">
-                אין חיובים עדיין - אתם בתקופת ניסיון
-              </p>
             </div>
           </div>
         </TabsContent>
@@ -193,9 +134,7 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <Separator className="bg-white/10" />
-
-              <div>
+              <div className="border-t border-white/10 pt-4">
                 <h4 className="text-sm font-medium text-white mb-2">מרכזיות מחוברות</h4>
                 <div className="flex items-center gap-3 p-3 rounded-lg border border-white/10 bg-white/[0.03]">
                   <Badge className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">פעיל</Badge>

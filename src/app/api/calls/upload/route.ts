@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { getSession } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { uploadAudio, getAudioKey } from '@/lib/r2'
 import { enqueueCallProcessing } from '@/lib/queue'
+
+export const runtime = 'nodejs'
 
 // Allowed MIME types for audio uploads
 const ALLOWED_MIME_TYPES = new Set([
@@ -47,13 +49,13 @@ function isAudioContent(buffer: Buffer): boolean {
 
 export async function POST(req: Request) {
   try {
-    const { userId } = await auth()
-    if (!userId) {
+    const session = await getSession()
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { id: session.id },
       include: { org: true },
     })
     if (!user) {

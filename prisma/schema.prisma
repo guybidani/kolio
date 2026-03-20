@@ -49,8 +49,6 @@ model Organization {
   plan             Plan     @default(TRIAL)
   planSeats        Int      @default(3)
   trialEndsAt      DateTime?
-  stripeCustomerId String?  @unique
-  stripeSubId      String?
   settings         Json     @default("{}")
   webhookSecret    String   @default(uuid())
   createdAt        DateTime @default(now())
@@ -65,16 +63,18 @@ model Organization {
 }
 
 model User {
-  id          String   @id @default(cuid())
-  orgId       String
-  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  email       String
-  name        String
-  role        UserRole @default(VIEWER)
-  clerkUserId String   @unique
-  avatarUrl   String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(cuid())
+  orgId        String
+  org          Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         UserRole @default(VIEWER)
+  isAdmin      Boolean  @default(false)
+  isActive     Boolean  @default(true)
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@unique([orgId, email])
   @@index([orgId])

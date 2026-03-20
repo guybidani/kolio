@@ -1,17 +1,17 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { getSession } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { enqueueWeeklyReport } from '@/lib/queue'
 
 export async function GET() {
   try {
-    const { userId } = await auth()
-    if (!userId) {
+    const session = await getSession()
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { id: session.id },
     })
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
@@ -32,13 +32,13 @@ export async function GET() {
 
 export async function POST() {
   try {
-    const { userId } = await auth()
-    if (!userId) {
+    const session = await getSession()
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { id: session.id },
     })
     if (!user || (user.role !== 'ADMIN' && user.role !== 'MANAGER')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })

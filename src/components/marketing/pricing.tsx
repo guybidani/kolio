@@ -110,7 +110,7 @@ export function Pricing() {
                   </li>
                 ))}
               </ul>
-              <Link href="/sign-up" className="mt-8 block">
+              <Link href="/login" className="mt-8 block">
                 <Button
                   className={`w-full ${
                     plan.popular

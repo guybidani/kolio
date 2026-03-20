@@ -8,12 +8,7 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'img.clerk.com',
-      },
-    ],
+    remotePatterns: [],
   },
   // BullMQ and IORedis use Node.js APIs not available in Edge runtime
   serverExternalPackages: ['bullmq', 'ioredis'],

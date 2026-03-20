@@ -1,8 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { UserButton, OrganizationSwitcher } from '@clerk/nextjs'
+import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard,
   Phone,
@@ -11,13 +10,15 @@ import {
   Settings,
   Upload,
   Menu,
+  LogOut,
+  Shield,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { Logo } from '@/components/ui/logo'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const navItems = [
   { href: '/dashboard', label: 'סקירה כללית', icon: LayoutDashboard },
@@ -28,8 +29,34 @@ const navItems = [
   { href: '/dashboard/settings', label: 'הגדרות', icon: Settings },
 ]
 
+interface UserInfo {
+  name: string
+  email: string
+  isAdmin: boolean
+  org: { name: string }
+}
+
 function NavContent() {
   const pathname = usePathname()
+  const router = useRouter()
+  const [user, setUser] = useState<UserInfo | null>(null)
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then((r) => (r.ok ? r.json() : null))
+      .then(setUser)
+      .catch(() => {})
+  }, [])
+
+  async function handleLogout() {
+    await fetch('/api/auth/logout', { method: 'POST' })
+    router.push('/login')
+    router.refresh()
+  }
+
+  const allNavItems = user?.isAdmin
+    ? [...navItems, { href: '/dashboard/admin', label: 'Admin', icon: Shield }]
+    : navItems
 
   return (
     <div className="flex h-full flex-col">
@@ -39,21 +66,18 @@ function NavContent() {
         </Link>
       </div>
 
-      <div className="px-4 mb-4">
-        <OrganizationSwitcher
-          appearance={{
-            elements: {
-              rootBox: 'w-full',
-              organizationSwitcherTrigger: 'w-full justify-start',
-            },
-          }}
-        />
-      </div>
+      {user && (
+        <div className="px-4 mb-4">
+          <div className="rounded-lg bg-white/5 border border-white/10 px-3 py-2">
+            <p className="text-sm font-medium text-white truncate">{user.org.name}</p>
+          </div>
+        </div>
+      )}
 
       <Separator className="bg-white/10" />
 
       <nav className="flex-1 space-y-1 p-4">
-        {navItems.map((item) => {
+        {allNavItems.map((item) => {
           const isActive =
             pathname === item.href ||
             (item.href !== '/dashboard' && pathname.startsWith(item.href))
@@ -78,15 +102,23 @@ function NavContent() {
       <Separator className="bg-white/10" />
 
       <div className="p-4">
-        <UserButton
-          appearance={{
-            elements: {
-              rootBox: 'w-full',
-              userButtonTrigger: 'w-full justify-start',
-            },
-          }}
-          showName
-        />
+        {user && (
+          <div className="flex items-center justify-between">
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-white truncate">{user.name}</p>
+              <p className="text-xs text-white/30 truncate">{user.email}</p>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white/40 hover:text-white/80 hover:bg-white/5 shrink-0"
+              onClick={handleLogout}
+              title="Logout"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   )

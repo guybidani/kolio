@@ -21,10 +21,10 @@ export default function MarketingLayout({
             <Link href="#pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:block">
               תמחור
             </Link>
-            <Link href="/sign-in">
+            <Link href="/login">
               <Button variant="ghost">התחברות</Button>
             </Link>
-            <Link href="/sign-up">
+            <Link href="/login">
               <Button>התחילו בחינם</Button>
             </Link>
           </nav>

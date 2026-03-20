@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { Inter, Heebo, Geist_Mono } from 'next/font/google'
-import { ClerkProvider } from '@clerk/nextjs'
 import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
@@ -41,17 +40,15 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <ClerkProvider>
-      <html
-        lang="he"
-        dir="rtl"
-        className={`dark ${inter.variable} ${heebo.variable} ${geistMono.variable} h-full antialiased`}
-      >
-        <body className="min-h-full flex flex-col bg-background text-foreground">
-          {children}
-          <Toaster position="top-center" richColors />
-        </body>
-      </html>
-    </ClerkProvider>
+    <html
+      lang="he"
+      dir="rtl"
+      className={`dark ${inter.variable} ${heebo.variable} ${geistMono.variable} h-full antialiased`}
+    >
+      <body className="min-h-full flex flex-col bg-background text-foreground">
+        {children}
+        <Toaster position="top-center" richColors />
+      </body>
+    </html>
   )
 }
