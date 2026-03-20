@@ -21,8 +21,8 @@ const typeConfig = {
 
 export function ActionItemsCard({ items }: ActionItemsCardProps) {
   return (
-    <div className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-6">
-      <h3 className="text-base font-semibold text-white flex items-center gap-2 mb-5">
+    <div className="rounded-2xl bg-muted/50 backdrop-blur-xl border border-border p-6">
+      <h3 className="text-base font-semibold text-foreground flex items-center gap-2 mb-5">
         <ListTodo className="h-4 w-4 text-emerald-400" />
         פעולות נדרשות
       </h3>
@@ -33,7 +33,7 @@ export function ActionItemsCard({ items }: ActionItemsCardProps) {
           return (
             <div
               key={i}
-              className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
+              className="flex items-start gap-3 p-3 rounded-xl bg-muted/30 border border-border/50 hover:bg-muted/50 transition-colors cursor-pointer"
             >
               <div className={cn('flex h-7 w-7 shrink-0 items-center justify-center rounded-lg', config.bg)}>
                 <Icon className={cn('h-3.5 w-3.5', config.color)} />
@@ -44,12 +44,12 @@ export function ActionItemsCard({ items }: ActionItemsCardProps) {
                     {config.label}
                   </span>
                   {item.rep && (
-                    <span className="text-xs text-white/40">
+                    <span className="text-xs text-muted-foreground">
                       — {item.rep}
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-white/70">{item.action}</p>
+                <p className="text-sm text-foreground/70">{item.action}</p>
               </div>
             </div>
           )

@@ -23,9 +23,9 @@ export function CoachingPanel({ analysis }: CoachingPanelProps) {
   return (
     <div className="space-y-4">
       {/* Scores Overview */}
-      <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
+      <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden">
         <div className="p-5 pb-3">
-          <h3 className="text-base font-semibold text-white flex items-center gap-2">
+          <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
             <Target className="h-4 w-4 text-indigo-400" />
             ציונים
           </h3>
@@ -34,31 +34,31 @@ export function CoachingPanel({ analysis }: CoachingPanelProps) {
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
               <ScoreBadge score={scores.overall} size="lg" showLabel />
-              <p className="text-xs text-white/40 mt-1">כולל</p>
+              <p className="text-xs text-muted-foreground mt-1">כולל</p>
             </div>
             <div className="text-center">
               <ScoreBadge score={scores.discovery} size="md" />
-              <p className="text-xs text-white/40 mt-1">דיסקברי</p>
+              <p className="text-xs text-muted-foreground mt-1">דיסקברי</p>
             </div>
             <div className="text-center">
               <ScoreBadge score={scores.objection_handling} size="md" />
-              <p className="text-xs text-white/40 mt-1">התנגדויות</p>
+              <p className="text-xs text-muted-foreground mt-1">התנגדויות</p>
             </div>
             <div className="text-center">
               <ScoreBadge score={scores.closing} size="md" />
-              <p className="text-xs text-white/40 mt-1">סגירה</p>
+              <p className="text-xs text-muted-foreground mt-1">סגירה</p>
             </div>
             <div className="text-center">
               <ScoreBadge score={scores.rapport} size="md" />
-              <p className="text-xs text-white/40 mt-1">ראפור</p>
+              <p className="text-xs text-muted-foreground mt-1">ראפור</p>
             </div>
             <div className="text-center">
               <ScoreBadge score={scores.value_communication} size="md" />
-              <p className="text-xs text-white/40 mt-1">העברת ערך</p>
+              <p className="text-xs text-muted-foreground mt-1">העברת ערך</p>
             </div>
           </div>
           {analysis.scores_reasoning && (
-            <p className="mt-4 text-sm text-white/40 border-t border-white/10 pt-3">
+            <p className="mt-4 text-sm text-muted-foreground border-t border-border pt-3">
               {analysis.scores_reasoning}
             </p>
           )}
@@ -67,20 +67,20 @@ export function CoachingPanel({ analysis }: CoachingPanelProps) {
 
       {/* Coaching Tabs */}
       <Tabs defaultValue="retention" className="w-full">
-        <TabsList className="w-full grid grid-cols-4 bg-white/5 border border-white/10">
-          <TabsTrigger value="retention" className="text-xs data-[state=active]:bg-white/10">
+        <TabsList className="w-full grid grid-cols-4 bg-muted/50 border border-border">
+          <TabsTrigger value="retention" className="text-xs data-[state=active]:bg-muted">
             <ThumbsUp className="h-3 w-3 ml-1" />
             חוזקות
           </TabsTrigger>
-          <TabsTrigger value="improvement" className="text-xs data-[state=active]:bg-white/10">
+          <TabsTrigger value="improvement" className="text-xs data-[state=active]:bg-muted">
             <AlertTriangle className="h-3 w-3 ml-1" />
             לשיפור
           </TabsTrigger>
-          <TabsTrigger value="objections" className="text-xs data-[state=active]:bg-white/10">
+          <TabsTrigger value="objections" className="text-xs data-[state=active]:bg-muted">
             <MessageSquare className="h-3 w-3 ml-1" />
             התנגדויות
           </TabsTrigger>
-          <TabsTrigger value="next" className="text-xs data-[state=active]:bg-white/10">
+          <TabsTrigger value="next" className="text-xs data-[state=active]:bg-muted">
             <Lightbulb className="h-3 w-3 ml-1" />
             המשך
           </TabsTrigger>
@@ -92,13 +92,13 @@ export function CoachingPanel({ analysis }: CoachingPanelProps) {
               <div className="flex items-start gap-2">
                 <ThumbsUp className="h-4 w-4 text-emerald-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-sm text-white">{point.what}</p>
-                  <p className="text-xs text-white/40 mt-1">
+                  <p className="font-medium text-sm text-foreground">{point.what}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
                     {point.when_in_call}
                   </p>
-                  <p className="text-sm text-white/60 mt-1">{point.why_effective}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{point.why_effective}</p>
                   {point.quote && (
-                    <blockquote className="mt-2 border-r-2 border-emerald-500/40 pr-3 text-sm italic text-white/40">
+                    <blockquote className="mt-2 border-r-2 border-emerald-500/40 pr-3 text-sm italic text-muted-foreground">
                       &ldquo;{point.quote}&rdquo;
                     </blockquote>
                   )}
@@ -113,7 +113,7 @@ export function CoachingPanel({ analysis }: CoachingPanelProps) {
             </div>
           ))}
           {(!retention_points || retention_points.length === 0) && (
-            <p className="text-sm text-white/50 text-center py-4">
+            <p className="text-sm text-muted-foreground text-center py-4">
               אין נקודות חוזק לשיחה זו
             </p>
           )}
@@ -126,7 +126,7 @@ export function CoachingPanel({ analysis }: CoachingPanelProps) {
                 <AlertTriangle className="h-4 w-4 text-orange-400 mt-0.5 flex-shrink-0" />
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-medium text-sm text-white">{point.what}</p>
+                    <p className="font-medium text-sm text-foreground">{point.what}</p>
                     <Badge
                       variant="outline"
                       className={`text-xs ${
@@ -140,11 +140,11 @@ export function CoachingPanel({ analysis }: CoachingPanelProps) {
                       {point.impact === 'high' ? 'השפעה גבוהה' : point.impact === 'medium' ? 'השפעה בינונית' : 'השפעה נמוכה'}
                     </Badge>
                   </div>
-                  <p className="text-xs text-white/40 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     {point.when_in_call}
                   </p>
                   {point.quote_current && (
-                    <blockquote className="mt-2 border-r-2 border-red-500/30 pr-3 text-sm italic text-white/40">
+                    <blockquote className="mt-2 border-r-2 border-red-500/30 pr-3 text-sm italic text-muted-foreground">
                       &ldquo;{point.quote_current}&rdquo;
                     </blockquote>
                   )}
@@ -161,7 +161,7 @@ export function CoachingPanel({ analysis }: CoachingPanelProps) {
             </div>
           ))}
           {(!improvement_points || improvement_points.length === 0) && (
-            <p className="text-sm text-white/50 text-center py-4">
+            <p className="text-sm text-muted-foreground text-center py-4">
               אין נקודות לשיפור לשיחה זו
             </p>
           )}
@@ -169,12 +169,12 @@ export function CoachingPanel({ analysis }: CoachingPanelProps) {
 
         <TabsContent value="objections" className="mt-4 space-y-3">
           {objections_detected?.map((obj, i) => (
-            <div key={i} className="rounded-xl bg-white/5 border border-white/10 p-3">
+            <div key={i} className="rounded-xl bg-muted/50 border border-border p-3">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="font-medium text-sm text-white">{obj.objection}</p>
+                  <p className="font-medium text-sm text-foreground">{obj.objection}</p>
                   <div className="flex items-center gap-2 mt-1">
-                    <Badge variant="outline" className="text-xs bg-white/5 border-white/10 text-white/60">
+                    <Badge variant="outline" className="text-xs bg-muted/50 border-border text-muted-foreground">
                       {obj.type}
                     </Badge>
                     <Badge
@@ -196,7 +196,7 @@ export function CoachingPanel({ analysis }: CoachingPanelProps) {
                         : 'לא אפקטיבי'}
                     </Badge>
                   </div>
-                  <p className="text-sm text-white/50 mt-2">{obj.how_handled}</p>
+                  <p className="text-sm text-muted-foreground mt-2">{obj.how_handled}</p>
                   {obj.suggested_response && (
                     <div className="mt-2 bg-indigo-500/5 rounded-lg p-2 border border-indigo-500/20">
                       <p className="text-xs font-medium text-indigo-400 mb-1">
@@ -212,7 +212,7 @@ export function CoachingPanel({ analysis }: CoachingPanelProps) {
             </div>
           ))}
           {(!objections_detected || objections_detected.length === 0) && (
-            <p className="text-sm text-white/50 text-center py-4">
+            <p className="text-sm text-muted-foreground text-center py-4">
               לא זוהו התנגדויות בשיחה
             </p>
           )}
@@ -220,27 +220,27 @@ export function CoachingPanel({ analysis }: CoachingPanelProps) {
 
         <TabsContent value="next" className="mt-4 space-y-3">
           {next_call_prep && (
-            <div className="rounded-xl bg-white/5 border border-white/10 p-4 space-y-4">
+            <div className="rounded-xl bg-muted/50 border border-border p-4 space-y-4">
               {next_call_prep.recommended_callback && (
                 <div>
-                  <h4 className="text-sm font-medium text-white mb-1">מתי להתקשר חזרה</h4>
-                  <p className="text-sm text-white/50">
+                  <h4 className="text-sm font-medium text-foreground mb-1">מתי להתקשר חזרה</h4>
+                  <p className="text-sm text-muted-foreground">
                     {next_call_prep.recommended_callback}
                   </p>
                 </div>
               )}
               {next_call_prep.opening_line && (
                 <div>
-                  <h4 className="text-sm font-medium text-white mb-1">משפט פתיחה מוצע</h4>
-                  <p className="text-sm bg-white/5 rounded-lg p-2 text-white/60 border border-white/10">
+                  <h4 className="text-sm font-medium text-foreground mb-1">משפט פתיחה מוצע</h4>
+                  <p className="text-sm bg-muted/50 rounded-lg p-2 text-muted-foreground border border-border">
                     &ldquo;{next_call_prep.opening_line}&rdquo;
                   </p>
                 </div>
               )}
               {next_call_prep.key_points_to_address?.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-medium text-white mb-1">נקודות לכיסוי</h4>
-                  <ul className="list-disc list-inside text-sm text-white/50 space-y-1">
+                  <h4 className="text-sm font-medium text-foreground mb-1">נקודות לכיסוי</h4>
+                  <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
                     {next_call_prep.key_points_to_address.map((p, i) => (
                       <li key={i}>{p}</li>
                     ))}
@@ -249,8 +249,8 @@ export function CoachingPanel({ analysis }: CoachingPanelProps) {
               )}
               {next_call_prep.closing_strategy && (
                 <div>
-                  <h4 className="text-sm font-medium text-white mb-1">אסטרטגיית סגירה</h4>
-                  <p className="text-sm text-white/50">
+                  <h4 className="text-sm font-medium text-foreground mb-1">אסטרטגיית סגירה</h4>
+                  <p className="text-sm text-muted-foreground">
                     {next_call_prep.closing_strategy}
                   </p>
                 </div>
@@ -260,9 +260,9 @@ export function CoachingPanel({ analysis }: CoachingPanelProps) {
 
           {/* SPIN Analysis */}
           {spin_analysis && (
-            <div className="rounded-xl bg-white/5 border border-white/10 overflow-hidden">
+            <div className="rounded-xl bg-muted/50 border border-border overflow-hidden">
               <div className="p-4 pb-2">
-                <h4 className="text-sm font-medium text-white">ניתוח SPIN</h4>
+                <h4 className="text-sm font-medium text-foreground">ניתוח SPIN</h4>
               </div>
               <div className="px-4 pb-4 space-y-3 text-sm">
                 {(['situation', 'problem', 'implication', 'need_payoff'] as const).map(
@@ -278,14 +278,14 @@ export function CoachingPanel({ analysis }: CoachingPanelProps) {
 
                     return (
                       <div key={type}>
-                        <h5 className="font-medium text-white">{labels[type]}</h5>
+                        <h5 className="font-medium text-foreground">{labels[type]}</h5>
                         {asked && (
-                          <p className="text-white/40 text-xs mt-0.5">
+                          <p className="text-muted-foreground text-xs mt-0.5">
                             <span className="text-emerald-400">נשאלו:</span> {asked}
                           </p>
                         )}
                         {missing && (
-                          <p className="text-white/40 text-xs mt-0.5">
+                          <p className="text-muted-foreground text-xs mt-0.5">
                             <span className="text-orange-400">חסרות:</span> {missing}
                           </p>
                         )}

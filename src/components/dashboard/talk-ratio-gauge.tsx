@@ -30,13 +30,13 @@ export function TalkRatioGauge({ repRatio, customerRatio, repName }: TalkRatioGa
   const repColor = getZoneColor(repPct)
 
   return (
-    <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 p-5">
-      <h3 className="text-base font-semibold text-white mb-4">יחס דיבור/הקשבה</h3>
+    <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border p-5">
+      <h3 className="text-base font-semibold text-foreground mb-4">יחס דיבור/הקשבה</h3>
 
       <div className="space-y-4">
         {/* Main gauge bar */}
         <div className="relative">
-          <div className="flex h-8 rounded-full overflow-hidden bg-white/5">
+          <div className="flex h-8 rounded-full overflow-hidden bg-muted/50">
             <div
               className={`${repColor} transition-all duration-500 flex items-center justify-center`}
               style={{ width: `${repPct}%` }}
@@ -57,15 +57,15 @@ export function TalkRatioGauge({ repRatio, customerRatio, repName }: TalkRatioGa
 
           {/* Ideal zone markers */}
           <div className="absolute top-0 h-full pointer-events-none" style={{ left: '40%' }}>
-            <div className="h-full border-r border-dashed border-white/20" />
+            <div className="h-full border-r border-dashed border-border" />
           </div>
           <div className="absolute top-0 h-full pointer-events-none" style={{ left: '60%' }}>
-            <div className="h-full border-r border-dashed border-white/20" />
+            <div className="h-full border-r border-dashed border-border" />
           </div>
         </div>
 
         {/* Labels */}
-        <div className="flex justify-between text-xs text-white/40">
+        <div className="flex justify-between text-xs text-muted-foreground">
           <span>{repName || 'נציג'}</span>
           <span>לקוח</span>
         </div>
@@ -86,7 +86,7 @@ export function TalkRatioGauge({ repRatio, customerRatio, repName }: TalkRatioGa
         </div>
 
         {/* Ideal range note */}
-        <p className="text-xs text-white/50 text-center">
+        <p className="text-xs text-muted-foreground text-center">
           אזור ירוק: 40-60% דיבור נציג
         </p>
       </div>

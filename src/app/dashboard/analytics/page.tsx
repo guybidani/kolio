@@ -148,8 +148,8 @@ export default function AnalyticsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">אנליטיקס</h1>
-          <p className="text-white/40">ניתוח מעמיק של ביצועי הצוות</p>
+          <h1 className="text-2xl font-bold text-foreground">אנליטיקס</h1>
+          <p className="text-muted-foreground">ניתוח מעמיק של ביצועי הצוות</p>
         </div>
         <div className="flex gap-2">
           {(['daily', 'weekly', 'monthly'] as const).map((p) => (
@@ -159,7 +159,7 @@ export default function AnalyticsPage() {
               className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
                 period === p
                   ? 'bg-indigo-500 text-white'
-                  : 'bg-white/5 text-white/50 hover:text-white hover:bg-white/10'
+                  : 'bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted'
               }`}
             >
               {p === 'daily' ? 'יומי' : p === 'weekly' ? 'שבועי' : 'חודשי'}
@@ -169,7 +169,7 @@ export default function AnalyticsPage() {
       </div>
 
       {loading && (
-        <div className="text-center py-8 text-white/50">טוען נתונים...</div>
+        <div className="text-center py-8 text-muted-foreground">טוען נתונים...</div>
       )}
 
       <AdvancedStats

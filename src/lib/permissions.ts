@@ -192,8 +192,11 @@ export function canCreateUserWithRole(creator: RBACUser, targetRole: UserRole): 
 
   const creatorRole = creator.role as UserRole
 
-  // Only ADMIN can create CEO or ADMIN users
+  // Only system admin can create CEO or ADMIN users
   if (targetRole === 'ADMIN' || targetRole === 'CEO') return false
+
+  // Org ADMIN can create MANAGER, REP, and VIEWER
+  if (creatorRole === 'ADMIN' && (targetRole === 'MANAGER' || targetRole === 'REP' || targetRole === 'VIEWER')) return true
 
   // MANAGER can create REP and VIEWER
   if (creatorRole === 'MANAGER' && (targetRole === 'REP' || targetRole === 'VIEWER')) return true

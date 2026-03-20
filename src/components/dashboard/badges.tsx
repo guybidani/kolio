@@ -101,12 +101,12 @@ export function BadgesDisplay({ earned, className }: BadgesDisplayProps) {
   const earnedTypes = new Set(earned.map((b) => b.type))
 
   return (
-    <div className={cn('rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden', className)}>
+    <div className={cn('rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden', className)}>
       <div className="p-5 pb-3">
-        <h3 className="text-base font-semibold text-white flex items-center gap-2">
+        <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
           <Award className="h-4 w-4 text-amber-400" />
           תגים
-          <span className="text-xs text-white/50 font-normal">
+          <span className="text-xs text-muted-foreground font-normal">
             {earned.length}/{ALL_BADGES.length}
           </span>
         </h3>
@@ -126,19 +126,19 @@ export function BadgesDisplay({ earned, className }: BadgesDisplayProps) {
                   'group relative flex flex-col items-center gap-2 rounded-lg p-3 border transition-all duration-200',
                   isEarned
                     ? `${config.bgColor} ${config.borderColor} hover:scale-105`
-                    : 'bg-white/[0.02] border-white/5 opacity-40'
+                    : 'bg-muted/20 border-border/50 opacity-40'
                 )}
               >
                 <div
                   className={cn(
                     'flex h-10 w-10 items-center justify-center rounded-full',
-                    isEarned ? config.bgColor : 'bg-white/5'
+                    isEarned ? config.bgColor : 'bg-muted/50'
                   )}
                 >
                   <Icon
                     className={cn(
                       'h-5 w-5',
-                      isEarned ? config.color : 'text-white/40'
+                      isEarned ? config.color : 'text-muted-foreground'
                     )}
                   />
                 </div>
@@ -146,13 +146,13 @@ export function BadgesDisplay({ earned, className }: BadgesDisplayProps) {
                   <p
                     className={cn(
                       'text-xs font-medium leading-tight',
-                      isEarned ? 'text-white' : 'text-white/50'
+                      isEarned ? 'text-foreground' : 'text-muted-foreground'
                     )}
                   >
                     {badge.name}
                   </p>
                   {isEarned && earnedBadge && (
-                    <p className="text-[10px] text-white/50 mt-0.5">
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
                       {new Date(earnedBadge.earnedAt).toLocaleDateString('he-IL')}
                     </p>
                   )}

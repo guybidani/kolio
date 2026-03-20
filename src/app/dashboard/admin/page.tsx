@@ -18,6 +18,9 @@ import {
   Building2,
   Users,
   UserPlus,
+  Pencil,
+  UserX,
+  Phone,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -56,11 +59,32 @@ interface User {
   createdAt: string
 }
 
+interface Rep {
+  id: string
+  name: string
+  phone: string | null
+  extension: string | null
+  isActive: boolean
+  callCount: number
+  avgScore: number | null
+  lastCallDate: string | null
+  managerId: string | null
+  manager: { id: string; name: string } | null
+}
+
+interface CurrentUser {
+  id: string
+  isAdmin: boolean
+  role: string
+  orgId: string
+}
+
 export default function AdminPage() {
   const router = useRouter()
   const [orgs, setOrgs] = useState<Org[]>([])
   const [users, setUsers] = useState<User[]>([])
-  const [currentUser, setCurrentUser] = useState<{ isAdmin: boolean } | null>(null)
+  const [reps, setReps] = useState<Rep[]>([])
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null)
   const [loading, setLoading] = useState(true)
 
   // New org form
@@ -80,28 +104,60 @@ export default function AdminPage() {
   const [userManagerId, setUserManagerId] = useState('')
   const [userError, setUserError] = useState('')
 
+  // Edit user form
+  const [showEditUser, setShowEditUser] = useState(false)
+  const [editUserId, setEditUserId] = useState('')
+  const [editUserName, setEditUserName] = useState('')
+  const [editUserRole, setEditUserRole] = useState('')
+  const [editUserActive, setEditUserActive] = useState(true)
+  const [editUserError, setEditUserError] = useState('')
+
+  // Edit rep form
+  const [showEditRep, setShowEditRep] = useState(false)
+  const [editRepId, setEditRepId] = useState('')
+  const [editRepName, setEditRepName] = useState('')
+  const [editRepPhone, setEditRepPhone] = useState('')
+  const [editRepExtension, setEditRepExtension] = useState('')
+  const [editRepActive, setEditRepActive] = useState(true)
+  const [editRepError, setEditRepError] = useState('')
+
+  const isSystemAdmin = currentUser?.isAdmin === true
+  const isOrgAdmin = currentUser?.role === 'ADMIN'
+
   const fetchData = useCallback(async () => {
     try {
-      const [meRes, orgsRes, usersRes] = await Promise.all([
-        fetch('/api/auth/me'),
-        fetch('/api/admin/orgs'),
-        fetch('/api/admin/users'),
-      ])
-
+      const meRes = await fetch('/api/auth/me')
       if (!meRes.ok) {
         router.push('/login')
         return
       }
 
       const me = await meRes.json()
-      if (!me.isAdmin) {
+
+      // Allow system admins OR org ADMINs
+      if (!me.isAdmin && me.role !== 'ADMIN') {
         router.push('/dashboard')
         return
       }
       setCurrentUser(me)
 
-      if (orgsRes.ok) setOrgs(await orgsRes.json())
-      if (usersRes.ok) setUsers(await usersRes.json())
+      if (me.isAdmin) {
+        // System admin: fetch all orgs and users
+        const [orgsRes, usersRes] = await Promise.all([
+          fetch('/api/admin/orgs'),
+          fetch('/api/admin/users'),
+        ])
+        if (orgsRes.ok) setOrgs(await orgsRes.json())
+        if (usersRes.ok) setUsers(await usersRes.json())
+      } else {
+        // Org ADMIN: fetch only own org users and reps
+        const [usersRes, repsRes] = await Promise.all([
+          fetch(`/api/orgs/${me.orgId}/users`),
+          fetch(`/api/orgs/${me.orgId}/reps`),
+        ])
+        if (usersRes.ok) setUsers(await usersRes.json())
+        if (repsRes.ok) setReps(await repsRes.json())
+      }
     } catch (err) {
       console.error('Failed to load admin data', err)
     } finally {
@@ -115,8 +171,15 @@ export default function AdminPage() {
 
   // Get managers for the selected org (for assigning to REPs)
   const managersForOrg = users.filter(
-    (u) => u.orgId === userOrgId && (u.role === 'MANAGER' || u.role === 'ADMIN')
+    (u) =>
+      u.orgId === (isSystemAdmin ? userOrgId : currentUser?.orgId) &&
+      (u.role === 'MANAGER' || u.role === 'ADMIN')
   )
+
+  // Roles available for creation
+  const availableRoles = isSystemAdmin
+    ? ['ADMIN', 'CEO', 'MANAGER', 'REP', 'VIEWER']
+    : ['MANAGER', 'REP', 'VIEWER']
 
   async function createOrg(e: React.FormEvent) {
     e.preventDefault()
@@ -144,16 +207,26 @@ export default function AdminPage() {
     e.preventDefault()
     setUserError('')
 
-    const res = await fetch('/api/admin/users', {
+    const orgId = isSystemAdmin ? userOrgId : currentUser?.orgId
+    if (!orgId) {
+      setUserError('No organization selected')
+      return
+    }
+
+    const endpoint = isSystemAdmin
+      ? '/api/admin/users'
+      : `/api/orgs/${orgId}/users`
+
+    const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: userName,
         email: userEmail,
         password: userPassword,
-        orgId: userOrgId,
+        ...(isSystemAdmin ? { orgId } : {}),
         role: userRole,
-        isAdmin: userIsAdmin,
+        ...(isSystemAdmin ? { isAdmin: userIsAdmin } : {}),
         managerId: userRole === 'REP' && userManagerId ? userManagerId : undefined,
       }),
     })
@@ -175,6 +248,101 @@ export default function AdminPage() {
     fetchData()
   }
 
+  async function saveEditUser(e: React.FormEvent) {
+    e.preventDefault()
+    setEditUserError('')
+
+    const targetUser = users.find((u) => u.id === editUserId)
+    if (!targetUser) return
+
+    const orgId = targetUser.orgId
+    const res = await fetch(`/api/orgs/${orgId}/users/${editUserId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: editUserName,
+        role: editUserRole,
+        isActive: editUserActive,
+      }),
+    })
+
+    const data = await res.json()
+    if (!res.ok) {
+      setEditUserError(data.error)
+      return
+    }
+
+    setShowEditUser(false)
+    fetchData()
+  }
+
+  async function deactivateUser(userId: string) {
+    const targetUser = users.find((u) => u.id === userId)
+    if (!targetUser) return
+
+    if (!confirm('Are you sure you want to deactivate this user?')) return
+
+    const orgId = targetUser.orgId
+    const res = await fetch(`/api/orgs/${orgId}/users/${userId}`, {
+      method: 'DELETE',
+    })
+
+    if (!res.ok) {
+      const data = await res.json()
+      alert(data.error || 'Failed to deactivate user')
+      return
+    }
+
+    fetchData()
+  }
+
+  async function saveEditRep(e: React.FormEvent) {
+    e.preventDefault()
+    setEditRepError('')
+
+    const orgId = currentUser?.orgId
+    if (!orgId) return
+
+    const res = await fetch(`/api/orgs/${orgId}/reps/${editRepId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: editRepName,
+        phone: editRepPhone || null,
+        extension: editRepExtension || null,
+        isActive: editRepActive,
+      }),
+    })
+
+    const data = await res.json()
+    if (!res.ok) {
+      setEditRepError(data.error)
+      return
+    }
+
+    setShowEditRep(false)
+    fetchData()
+  }
+
+  function openEditUser(user: User) {
+    setEditUserId(user.id)
+    setEditUserName(user.name)
+    setEditUserRole(user.role)
+    setEditUserActive(user.isActive)
+    setEditUserError('')
+    setShowEditUser(true)
+  }
+
+  function openEditRep(rep: Rep) {
+    setEditRepId(rep.id)
+    setEditRepName(rep.name)
+    setEditRepPhone(rep.phone || '')
+    setEditRepExtension(rep.extension || '')
+    setEditRepActive(rep.isActive)
+    setEditRepError('')
+    setShowEditRep(true)
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -183,84 +351,96 @@ export default function AdminPage() {
     )
   }
 
-  if (!currentUser?.isAdmin) return null
+  if (!currentUser || (!isSystemAdmin && !isOrgAdmin)) return null
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <Shield className="h-6 w-6 text-indigo-400" />
         <div>
-          <h1 className="text-2xl font-bold text-white">ניהול מערכת</h1>
-          <p className="text-white/40">ניהול ארגונים ומשתמשים</p>
+          <h1 className="text-2xl font-bold text-white">
+            {isSystemAdmin ? 'System Administration' : 'Organization Management'}
+          </h1>
+          <p className="text-white/40">
+            {isSystemAdmin
+              ? 'Manage all organizations and users'
+              : 'Manage your organization users and reps'}
+          </p>
         </div>
       </div>
 
-      {/* Organizations */}
-      <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
-        <div className="p-5 pb-3 flex items-center justify-between">
-          <h3 className="text-base font-semibold text-white flex items-center gap-2">
-            <Building2 className="h-4 w-4 text-indigo-400" />
-            ארגונים ({orgs.length})
-          </h3>
-          <Button
-            size="sm"
-            className="bg-indigo-600 hover:bg-indigo-500 text-white"
-            onClick={() => setShowNewOrg(true)}
-          >
-            <Plus className="h-4 w-4 ml-1" />
-            ארגון חדש
-          </Button>
-        </div>
-        <div className="px-5 pb-5">
-          {orgs.length === 0 ? (
-            <p className="text-sm text-white/50 text-center py-4">אין ארגונים עדיין</p>
-          ) : (
-            <div className="space-y-2">
-              {orgs.map((org) => (
-                <div
-                  key={org.id}
-                  className="flex items-center justify-between p-3 rounded-lg border border-white/10 bg-white/[0.03]"
-                >
-                  <div>
-                    <p className="text-sm font-medium text-white">{org.name}</p>
-                    <p className="text-xs text-white/50">
-                      {org.slug} | {org._count.users} users | {org._count.calls} calls | {org._count.reps} reps
-                    </p>
-                  </div>
-                  <Badge className="bg-white/5 text-white/50 border border-white/10">
-                    {org.plan}
-                  </Badge>
-                </div>
-              ))}
+      {/* Organizations - only for system admins */}
+      {isSystemAdmin && (
+        <>
+          <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
+            <div className="p-5 pb-3 flex items-center justify-between">
+              <h3 className="text-base font-semibold text-white flex items-center gap-2">
+                <Building2 className="h-4 w-4 text-indigo-400" />
+                Organizations ({orgs.length})
+              </h3>
+              <Button
+                size="sm"
+                className="bg-indigo-600 hover:bg-indigo-500 text-white"
+                onClick={() => setShowNewOrg(true)}
+              >
+                <Plus className="h-4 w-4 ml-1" />
+                New Organization
+              </Button>
             </div>
-          )}
-        </div>
-      </div>
+            <div className="px-5 pb-5">
+              {orgs.length === 0 ? (
+                <p className="text-sm text-white/50 text-center py-4">No organizations yet</p>
+              ) : (
+                <div className="space-y-2">
+                  {orgs.map((org) => (
+                    <div
+                      key={org.id}
+                      className="flex items-center justify-between p-3 rounded-lg border border-white/10 bg-white/[0.03]"
+                    >
+                      <div>
+                        <p className="text-sm font-medium text-white">{org.name}</p>
+                        <p className="text-xs text-white/50">
+                          {org.slug} | {org._count.users} users | {org._count.calls} calls |{' '}
+                          {org._count.reps} reps
+                        </p>
+                      </div>
+                      <Badge className="bg-white/5 text-white/50 border border-white/10">
+                        {org.plan}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
 
-      <Separator className="bg-white/10" />
+          <Separator className="bg-white/10" />
+        </>
+      )}
 
       {/* Users */}
       <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
         <div className="p-5 pb-3 flex items-center justify-between">
           <h3 className="text-base font-semibold text-white flex items-center gap-2">
             <Users className="h-4 w-4 text-indigo-400" />
-            משתמשים ({users.length})
+            Users ({users.length})
           </h3>
           <Button
             size="sm"
             className="bg-indigo-600 hover:bg-indigo-500 text-white"
             onClick={() => {
-              if (orgs.length > 0) setUserOrgId(orgs[0].id)
+              if (isSystemAdmin && orgs.length > 0) setUserOrgId(orgs[0].id)
+              setUserRole('VIEWER')
               setShowNewUser(true)
             }}
           >
             <UserPlus className="h-4 w-4 ml-1" />
-            משתמש חדש
+            New User
           </Button>
         </div>
         <div className="px-5 pb-5">
           {users.length === 0 ? (
-            <p className="text-sm text-white/50 text-center py-4">אין משתמשים עדיין</p>
+            <p className="text-sm text-white/50 text-center py-4">No users yet</p>
           ) : (
             <div className="space-y-2">
               {users.map((user) => (
@@ -281,21 +461,42 @@ export default function AdminPage() {
                       </Badge>
                       {user.isAdmin && (
                         <Badge className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs">
-                          מנהל מערכת
+                          System Admin
                         </Badge>
                       )}
                       {!user.isActive && (
                         <Badge className="bg-red-500/10 text-red-400 border border-red-500/20 text-xs">
-                          לא פעיל
+                          Inactive
                         </Badge>
                       )}
                     </div>
                     <p className="text-xs text-white/50">
-                      {user.email} | {user.org.name}
-                      {user.managedReps.length > 0 && (
-                        <> | מנהל: {user.managedReps.map((r) => r.name).join(', ')}</>
+                      {user.email}
+                      {isSystemAdmin && user.org && <> | {user.org.name}</>}
+                      {user.managedReps?.length > 0 && (
+                        <> | Manages: {user.managedReps.map((r) => r.name).join(', ')}</>
                       )}
                     </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-white/50 hover:text-white hover:bg-white/10"
+                      onClick={() => openEditUser(user)}
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                    {user.id !== currentUser?.id && user.isActive && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-red-400/50 hover:text-red-400 hover:bg-red-500/10"
+                        onClick={() => deactivateUser(user.id)}
+                      >
+                        <UserX className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -304,15 +505,68 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* New Org Dialog */}
+      {/* Reps - for org admins */}
+      {!isSystemAdmin && reps.length > 0 && (
+        <>
+          <Separator className="bg-white/10" />
+          <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
+            <div className="p-5 pb-3 flex items-center justify-between">
+              <h3 className="text-base font-semibold text-white flex items-center gap-2">
+                <Phone className="h-4 w-4 text-indigo-400" />
+                Reps ({reps.length})
+              </h3>
+            </div>
+            <div className="px-5 pb-5">
+              <div className="space-y-2">
+                {reps.map((rep) => (
+                  <div
+                    key={rep.id}
+                    className="flex items-center justify-between p-3 rounded-lg border border-white/10 bg-white/[0.03] cursor-pointer hover:bg-white/[0.06] transition-colors"
+                    onClick={() => router.push(`/dashboard/reps/${rep.id}`)}
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium text-white">{rep.name}</p>
+                        {!rep.isActive && (
+                          <Badge className="bg-red-500/10 text-red-400 border border-red-500/20 text-xs">
+                            Inactive
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-white/50">
+                        {rep.callCount} calls
+                        {rep.avgScore !== null && <> | Avg: {rep.avgScore}</>}
+                        {rep.manager && <> | Manager: {rep.manager.name}</>}
+                      </p>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-white/50 hover:text-white hover:bg-white/10"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        openEditRep(rep)
+                      }}
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* New Org Dialog - system admins only */}
       <Dialog open={showNewOrg} onOpenChange={setShowNewOrg}>
-        <DialogContent className="bg-[#12121A] border-white/10 text-white">
+        <DialogContent className="bg-card border-border text-foreground">
           <DialogHeader>
-            <DialogTitle>יצירת ארגון</DialogTitle>
+            <DialogTitle>Create Organization</DialogTitle>
           </DialogHeader>
           <form onSubmit={createOrg} className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">שם</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">Name</label>
               <Input
                 value={orgName}
                 onChange={(e) => setOrgName(e.target.value)}
@@ -322,20 +576,23 @@ export default function AdminPage() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">מזהה</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">Slug</label>
               <Input
                 value={orgSlug}
-                onChange={(e) => setOrgSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                onChange={(e) =>
+                  setOrgSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))
+                }
                 placeholder="acme-corp"
                 required
                 className="bg-white/5 border-white/10 text-white"
               />
             </div>
-            {orgError && (
-              <p className="text-sm text-red-400">{orgError}</p>
-            )}
-            <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white">
-              צור
+            {orgError && <p className="text-sm text-red-400">{orgError}</p>}
+            <Button
+              type="submit"
+              className="w-full bg-indigo-600 hover:bg-indigo-500 text-white"
+            >
+              Create
             </Button>
           </form>
         </DialogContent>
@@ -343,13 +600,13 @@ export default function AdminPage() {
 
       {/* New User Dialog */}
       <Dialog open={showNewUser} onOpenChange={setShowNewUser}>
-        <DialogContent className="bg-[#12121A] border-white/10 text-white">
+        <DialogContent className="bg-card border-border text-foreground">
           <DialogHeader>
-            <DialogTitle>יצירת משתמש</DialogTitle>
+            <DialogTitle>Create User</DialogTitle>
           </DialogHeader>
           <form onSubmit={createUser} className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">שם</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">Name</label>
               <Input
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
@@ -359,7 +616,7 @@ export default function AdminPage() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">אימייל</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">Email</label>
               <Input
                 type="email"
                 value={userEmail}
@@ -370,45 +627,49 @@ export default function AdminPage() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">סיסמה</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">Password</label>
               <Input
                 type="password"
                 value={userPassword}
                 onChange={(e) => setUserPassword(e.target.value)}
-                placeholder="מינימום 8 תווים"
+                placeholder="Minimum 8 characters"
                 required
                 minLength={8}
                 className="bg-white/5 border-white/10 text-white"
               />
             </div>
+            {isSystemAdmin && (
+              <div>
+                <label className="text-sm font-medium text-white/70 mb-1 block">
+                  Organization
+                </label>
+                <select
+                  value={userOrgId}
+                  onChange={(e) => setUserOrgId(e.target.value)}
+                  required
+                  className="w-full rounded-md bg-white/5 border border-white/10 text-white px-3 py-2 text-sm"
+                >
+                  <option value="">Select organization...</option>
+                  {orgs.map((org) => (
+                    <option key={org.id} value={org.id}>
+                      {org.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">ארגון</label>
-              <select
-                value={userOrgId}
-                onChange={(e) => setUserOrgId(e.target.value)}
-                required
-                className="w-full rounded-md bg-white/5 border border-white/10 text-white px-3 py-2 text-sm"
-              >
-                <option value="">בחר ארגון...</option>
-                {orgs.map((org) => (
-                  <option key={org.id} value={org.id}>
-                    {org.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">תפקיד</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">Role</label>
               <select
                 value={userRole}
                 onChange={(e) => setUserRole(e.target.value)}
                 className="w-full rounded-md bg-white/5 border border-white/10 text-white px-3 py-2 text-sm"
               >
-                <option value="ADMIN">מנהל</option>
-                <option value="CEO">מנכ&quot;ל</option>
-                <option value="MANAGER">מנהל צוות</option>
-                <option value="REP">נציג</option>
-                <option value="VIEWER">צופה</option>
+                {availableRoles.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -416,14 +677,14 @@ export default function AdminPage() {
             {userRole === 'REP' && managersForOrg.length > 0 && (
               <div>
                 <label className="text-sm font-medium text-white/70 mb-1 block">
-                  שיוך מנהל
+                  Assign Manager
                 </label>
                 <select
                   value={userManagerId}
                   onChange={(e) => setUserManagerId(e.target.value)}
                   className="w-full rounded-md bg-white/5 border border-white/10 text-white px-3 py-2 text-sm"
                 >
-                  <option value="">ללא מנהל</option>
+                  <option value="">No manager</option>
                   {managersForOrg.map((m) => (
                     <option key={m.id} value={m.id}>
                       {m.name} ({m.role})
@@ -433,23 +694,136 @@ export default function AdminPage() {
               </div>
             )}
 
+            {isSystemAdmin && (
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="isAdmin"
+                  checked={userIsAdmin}
+                  onChange={(e) => setUserIsAdmin(e.target.checked)}
+                  className="rounded border-white/10"
+                />
+                <label htmlFor="isAdmin" className="text-sm text-white/70">
+                  System admin (can manage all organizations and users)
+                </label>
+              </div>
+            )}
+            {userError && <p className="text-sm text-red-400">{userError}</p>}
+            <Button
+              type="submit"
+              className="w-full bg-indigo-600 hover:bg-indigo-500 text-white"
+            >
+              Create User
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit User Dialog */}
+      <Dialog open={showEditUser} onOpenChange={setShowEditUser}>
+        <DialogContent className="bg-card border-border text-foreground">
+          <DialogHeader>
+            <DialogTitle>Edit User</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={saveEditUser} className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-white/70 mb-1 block">Name</label>
+              <Input
+                value={editUserName}
+                onChange={(e) => setEditUserName(e.target.value)}
+                required
+                className="bg-white/5 border-white/10 text-white"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-white/70 mb-1 block">Role</label>
+              <select
+                value={editUserRole}
+                onChange={(e) => setEditUserRole(e.target.value)}
+                className="w-full rounded-md bg-white/5 border border-white/10 text-white px-3 py-2 text-sm"
+              >
+                {availableRoles.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
-                id="isAdmin"
-                checked={userIsAdmin}
-                onChange={(e) => setUserIsAdmin(e.target.checked)}
+                id="editActive"
+                checked={editUserActive}
+                onChange={(e) => setEditUserActive(e.target.checked)}
                 className="rounded border-white/10"
               />
-              <label htmlFor="isAdmin" className="text-sm text-white/70">
-                מנהל מערכת (יכול לנהל את כל הארגונים והמשתמשים)
+              <label htmlFor="editActive" className="text-sm text-white/70">
+                Active
               </label>
             </div>
-            {userError && (
-              <p className="text-sm text-red-400">{userError}</p>
-            )}
-            <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white">
-              יצירת משתמש
+            {editUserError && <p className="text-sm text-red-400">{editUserError}</p>}
+            <Button
+              type="submit"
+              className="w-full bg-indigo-600 hover:bg-indigo-500 text-white"
+            >
+              Save Changes
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Rep Dialog */}
+      <Dialog open={showEditRep} onOpenChange={setShowEditRep}>
+        <DialogContent className="bg-card border-border text-foreground">
+          <DialogHeader>
+            <DialogTitle>Edit Rep</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={saveEditRep} className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-white/70 mb-1 block">Name</label>
+              <Input
+                value={editRepName}
+                onChange={(e) => setEditRepName(e.target.value)}
+                required
+                className="bg-white/5 border-white/10 text-white"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-white/70 mb-1 block">Phone</label>
+              <Input
+                value={editRepPhone}
+                onChange={(e) => setEditRepPhone(e.target.value)}
+                placeholder="Phone number"
+                className="bg-white/5 border-white/10 text-white"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-white/70 mb-1 block">Extension</label>
+              <Input
+                value={editRepExtension}
+                onChange={(e) => setEditRepExtension(e.target.value)}
+                placeholder="PBX extension"
+                className="bg-white/5 border-white/10 text-white"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="editRepActive"
+                checked={editRepActive}
+                onChange={(e) => setEditRepActive(e.target.checked)}
+                className="rounded border-white/10"
+              />
+              <label htmlFor="editRepActive" className="text-sm text-white/70">
+                Active
+              </label>
+            </div>
+            {editRepError && <p className="text-sm text-red-400">{editRepError}</p>}
+            <Button
+              type="submit"
+              className="w-full bg-indigo-600 hover:bg-indigo-500 text-white"
+            >
+              Save Changes
             </Button>
           </form>
         </DialogContent>

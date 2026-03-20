@@ -25,8 +25,8 @@ interface ScoreTrendChartProps {
 function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number }>; label?: string }) {
   if (!active || !payload?.length) return null
   return (
-    <div className="rounded-lg bg-[#1a1a2e] border border-white/10 px-3 py-2 shadow-xl">
-      <p className="text-xs text-white/50 mb-1">שבוע {label}</p>
+    <div className="rounded-lg bg-popover border border-border px-3 py-2 shadow-xl">
+      <p className="text-xs text-muted-foreground mb-1">שבוע {label}</p>
       <p className="text-sm font-semibold text-indigo-400">ציון: {payload[0].value}</p>
     </div>
   )
@@ -34,8 +34,8 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
 
 export function ScoreTrendChart({ data, targetScore = 75 }: ScoreTrendChartProps) {
   return (
-    <div className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-6">
-      <h3 className="text-base font-semibold text-white mb-6">מגמת ציון צוות</h3>
+    <div className="rounded-2xl bg-muted/50 backdrop-blur-xl border border-border p-6">
+      <h3 className="text-base font-semibold text-foreground mb-6">מגמת ציון צוות</h3>
       <div className="h-[280px]" dir="ltr">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
@@ -45,17 +45,17 @@ export function ScoreTrendChart({ data, targetScore = 75 }: ScoreTrendChartProps
                 <stop offset="95%" stopColor="#818cf8" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
             <XAxis
               dataKey="week"
-              tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 12 }}
-              axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+              tick={{ fill: 'var(--muted-foreground)', fontSize: 12 }}
+              axisLine={{ stroke: 'var(--border)' }}
               tickLine={false}
             />
             <YAxis
               domain={[40, 100]}
-              tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 12 }}
-              axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+              tick={{ fill: 'var(--muted-foreground)', fontSize: 12 }}
+              axisLine={{ stroke: 'var(--border)' }}
               tickLine={false}
             />
             <Tooltip content={<CustomTooltip />} />
@@ -79,7 +79,7 @@ export function ScoreTrendChart({ data, targetScore = 75 }: ScoreTrendChartProps
               strokeWidth={2.5}
               fill="url(#scoreGradient)"
               dot={{ r: 3, fill: '#818cf8', strokeWidth: 0 }}
-              activeDot={{ r: 5, fill: '#818cf8', stroke: '#0A0A0F', strokeWidth: 2 }}
+              activeDot={{ r: 5, fill: '#818cf8', stroke: 'var(--background)', strokeWidth: 2 }}
             />
           </AreaChart>
         </ResponsiveContainer>

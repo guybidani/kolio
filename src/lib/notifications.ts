@@ -30,11 +30,12 @@ export async function createNotification(
  */
 export async function getNotifications(
   userId: string,
+  orgId: string,
   options?: { unreadOnly?: boolean; limit?: number; offset?: number }
 ) {
   const { unreadOnly = false, limit = 20, offset = 0 } = options ?? {}
 
-  const where: Record<string, unknown> = { userId }
+  const where: Record<string, unknown> = { userId, orgId }
   if (unreadOnly) where.read = false
 
   const [notifications, total] = await Promise.all([
@@ -53,18 +54,18 @@ export async function getNotifications(
 /**
  * Get unread notification count for a user.
  */
-export async function getUnreadCount(userId: string): Promise<number> {
+export async function getUnreadCount(userId: string, orgId: string): Promise<number> {
   return db.notification.count({
-    where: { userId, read: false },
+    where: { userId, orgId, read: false },
   })
 }
 
 /**
  * Mark a single notification as read.
  */
-export async function markAsRead(notificationId: string, userId: string) {
+export async function markAsRead(notificationId: string, userId: string, orgId: string) {
   return db.notification.update({
-    where: { id: notificationId, userId },
+    where: { id: notificationId, userId, orgId },
     data: { read: true },
   })
 }
@@ -72,9 +73,9 @@ export async function markAsRead(notificationId: string, userId: string) {
 /**
  * Mark all notifications as read for a user.
  */
-export async function markAllRead(userId: string) {
+export async function markAllRead(userId: string, orgId: string) {
   return db.notification.updateMany({
-    where: { userId, read: false },
+    where: { userId, orgId, read: false },
     data: { read: true },
   })
 }

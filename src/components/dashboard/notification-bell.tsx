@@ -160,7 +160,7 @@ export function NotificationBell() {
       <Button
         variant="ghost"
         size="icon"
-        className="relative text-white/50 hover:text-white/80 hover:bg-white/5"
+        className="relative text-muted-foreground hover:text-foreground hover:bg-muted"
         onClick={() => setOpen(!open)}
         onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false) }}
         aria-expanded={open}
@@ -174,10 +174,10 @@ export function NotificationBell() {
       </Button>
 
       {open && (
-        <div role="menu" className="absolute left-0 top-full mt-2 w-80 rounded-xl bg-[#141420] border border-white/10 shadow-2xl z-50 overflow-hidden">
+        <div role="menu" className="absolute left-0 top-full mt-2 w-80 rounded-xl bg-card border border-border shadow-2xl z-50 overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-            <h3 className="text-sm font-semibold text-white">התראות</h3>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+            <h3 className="text-sm font-semibold text-foreground">התראות</h3>
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllRead}
@@ -192,21 +192,21 @@ export function NotificationBell() {
           {/* Notification list */}
           <div className="max-h-96 overflow-y-auto">
             {loading && notifications.length === 0 && (
-              <div className="p-4 text-center text-sm text-white/50">
+              <div className="p-4 text-center text-sm text-muted-foreground">
                 טוען...
               </div>
             )}
 
             {!loading && notifications.length === 0 && (
               <div className="p-8 text-center">
-                <Bell className="h-8 w-8 text-white/10 mx-auto mb-2" />
-                <p className="text-sm text-white/50">אין התראות</p>
+                <Bell className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">אין התראות</p>
               </div>
             )}
 
             {notifications.map((notification) => {
               const Icon = TYPE_ICONS[notification.type] || Bell
-              const color = TYPE_COLORS[notification.type] || 'text-white/40'
+              const color = TYPE_COLORS[notification.type] || 'text-muted-foreground'
               const href = getNotificationHref(notification)
 
               return (
@@ -217,7 +217,7 @@ export function NotificationBell() {
                     'w-full flex items-start gap-3 px-4 py-3 text-right transition-colors',
                     !notification.read
                       ? 'bg-indigo-500/5 hover:bg-indigo-500/10'
-                      : 'hover:bg-white/5',
+                      : 'hover:bg-muted',
                     href && 'cursor-pointer'
                   )}
                 >
@@ -228,7 +228,7 @@ export function NotificationBell() {
                     <div className="flex items-center gap-2">
                       <p className={cn(
                         'text-sm truncate',
-                        !notification.read ? 'font-semibold text-white' : 'text-white/70'
+                        !notification.read ? 'font-semibold text-foreground' : 'text-foreground/70'
                       )}>
                         {notification.title}
                       </p>
@@ -236,10 +236,10 @@ export function NotificationBell() {
                         <span className="h-2 w-2 rounded-full bg-indigo-400 shrink-0" />
                       )}
                     </div>
-                    <p className="text-xs text-white/40 truncate mt-0.5">
+                    <p className="text-xs text-muted-foreground truncate mt-0.5">
                       {notification.body}
                     </p>
-                    <p className="text-[10px] text-white/40 mt-1">
+                    <p className="text-[10px] text-muted-foreground mt-1">
                       {timeAgo(notification.createdAt)}
                     </p>
                   </div>
@@ -249,7 +249,7 @@ export function NotificationBell() {
                         e.stopPropagation()
                         handleMarkRead(notification.id)
                       }}
-                      className="mt-0.5 shrink-0 text-white/40 hover:text-white/50 transition-colors"
+                      className="mt-0.5 shrink-0 text-muted-foreground hover:text-foreground transition-colors"
                       title="סמן כנקרא"
                     >
                       <Check className="h-3.5 w-3.5" />

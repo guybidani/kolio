@@ -59,9 +59,9 @@ export function StreaksDisplay({ streaks, className }: StreaksDisplayProps) {
   const streakMap = new Map(streaks.map((s) => [s.type, s]))
 
   return (
-    <div className={cn('rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden', className)}>
+    <div className={cn('rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden', className)}>
       <div className="p-5 pb-3">
-        <h3 className="text-base font-semibold text-white flex items-center gap-2">
+        <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
           <Flame className="h-4 w-4 text-orange-400" />
           רצפים
         </h3>
@@ -87,8 +87,8 @@ export function StreaksDisplay({ streaks, className }: StreaksDisplayProps) {
                 isAtRisk
                   ? 'border-orange-500/30 bg-orange-500/5'
                   : count > 0
-                  ? 'border-white/10 bg-white/[0.03]'
-                  : 'border-white/5 bg-white/[0.01]'
+                  ? 'border-border bg-muted/30'
+                  : 'border-border/50 bg-muted/10'
               )}
             >
               <div className="flex items-center gap-3">
@@ -98,7 +98,7 @@ export function StreaksDisplay({ streaks, className }: StreaksDisplayProps) {
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-white">{config.label}</p>
+                    <p className="text-sm font-medium text-foreground">{config.label}</p>
                     {isAtRisk && (
                       <span className="flex items-center gap-1 text-[10px] text-orange-400 bg-orange-500/10 rounded-full px-1.5 py-0.5">
                         <AlertTriangle className="h-2.5 w-2.5" />
@@ -106,15 +106,15 @@ export function StreaksDisplay({ streaks, className }: StreaksDisplayProps) {
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-white/50">{config.description}</p>
+                  <p className="text-xs text-muted-foreground">{config.description}</p>
                 </div>
 
                 <div className="text-left shrink-0">
-                  <p className={cn('text-xl font-bold tabular-nums', count > 0 ? config.color : 'text-white/40')}>
+                  <p className={cn('text-xl font-bold tabular-nums', count > 0 ? config.color : 'text-muted-foreground')}>
                     {count}
                   </p>
                   {best > 0 && best > count && (
-                    <p className="text-[10px] text-white/40">
+                    <p className="text-[10px] text-muted-foreground">
                       שיא: {best}
                     </p>
                   )}
@@ -125,11 +125,11 @@ export function StreaksDisplay({ streaks, className }: StreaksDisplayProps) {
               {count > 0 && (
                 <div className="mt-2">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] text-white/40">
+                    <span className="text-[10px] text-muted-foreground">
                       {count}/{nextMilestone} לתג הבא
                     </span>
                   </div>
-                  <div className="h-1 w-full rounded-full bg-white/5 overflow-hidden">
+                  <div className="h-1 w-full rounded-full bg-muted/50 overflow-hidden">
                     <div
                       className={cn('h-full rounded-full transition-all duration-500', {
                         'bg-orange-400': type === 'DAILY_CALLS',

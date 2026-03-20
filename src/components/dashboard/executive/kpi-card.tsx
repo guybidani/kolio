@@ -28,14 +28,14 @@ export function KpiCard({
   const TrendArrow = isPositive ? TrendingUp : TrendingDown
 
   return (
-    <div className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-6 hover:bg-white/[0.07] transition-colors">
+    <div className="rounded-2xl bg-muted/50 backdrop-blur-xl border border-border p-6 hover:bg-white/[0.07] transition-colors">
       <div className="flex items-center justify-between mb-4">
-        <span className="text-sm font-medium text-white/50">{title}</span>
+        <span className="text-sm font-medium text-muted-foreground">{title}</span>
         <div className={cn('flex h-10 w-10 items-center justify-center rounded-xl', iconBg)}>
           <Icon className={cn('h-5 w-5', iconColor)} />
         </div>
       </div>
-      <div className="text-3xl font-bold text-white tracking-tight">{value}</div>
+      <div className="text-3xl font-bold text-foreground tracking-tight">{value}</div>
       <div className="flex items-center gap-2 mt-2">
         {change !== undefined && (
           <span
@@ -50,7 +50,7 @@ export function KpiCard({
             {isPositive ? '+' : ''}{change}%
           </span>
         )}
-        <span className="text-xs text-white/40">
+        <span className="text-xs text-muted-foreground">
           {changeLabel || subtitle}
         </span>
       </div>

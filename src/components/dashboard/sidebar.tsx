@@ -24,6 +24,7 @@ import { Logo } from '@/components/ui/logo'
 import { Badge } from '@/components/ui/badge'
 import { useState, useEffect, useMemo } from 'react'
 import { getVisibleNavItems, type NavSection } from '@/lib/permissions'
+import { ThemeToggle } from '@/components/theme-toggle'
 import type { UserRole } from '@/types'
 
 interface NavItem {
@@ -50,7 +51,7 @@ const ROLE_COLORS: Record<string, string> = {
   CEO: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
   MANAGER: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
   REP: 'bg-green-500/10 text-green-400 border-green-500/20',
-  VIEWER: 'bg-white/5 text-white/50 border-white/10',
+  VIEWER: 'bg-muted/50 text-muted-foreground border-border',
 }
 
 const ROLE_LABELS: Record<string, string> = {
@@ -103,13 +104,13 @@ function NavContent() {
 
       {user && (
         <div className="px-4 mb-4">
-          <div className="rounded-lg bg-white/5 border border-white/10 px-3 py-2">
-            <p className="text-sm font-medium text-white truncate">{user.org.name}</p>
+          <div className="rounded-lg bg-muted/50 border border-border px-3 py-2">
+            <p className="text-sm font-medium text-foreground truncate">{user.org.name}</p>
           </div>
         </div>
       )}
 
-      <Separator className="bg-white/10" />
+      <Separator className="bg-border" />
 
       <nav className="flex-1 space-y-1 p-4">
         {visibleItems.map((item) => {
@@ -124,7 +125,7 @@ function NavContent() {
                 'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
                 isActive
                   ? 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/20'
-                  : 'text-white/50 hover:bg-white/5 hover:text-white/80'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
               )}
             >
               <item.icon className="h-4 w-4" />
@@ -134,14 +135,18 @@ function NavContent() {
         })}
       </nav>
 
-      <Separator className="bg-white/10" />
+      <div className="px-4 py-2">
+        <ThemeToggle />
+      </div>
+
+      <Separator className="bg-border" />
 
       <div className="p-4">
         {user && (
           <div className="flex items-center justify-between">
             <div className="min-w-0">
               <div className="flex items-center gap-2 mb-0.5">
-                <p className="text-sm font-medium text-white truncate">{user.name}</p>
+                <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
                 <Badge
                   className={cn(
                     'text-[10px] px-1.5 py-0 border shrink-0',
@@ -151,12 +156,12 @@ function NavContent() {
                   {ROLE_LABELS[user.role] || user.role}
                 </Badge>
               </div>
-              <p className="text-xs text-white/50 truncate">{user.email}</p>
+              <p className="text-xs text-muted-foreground truncate">{user.email}</p>
             </div>
             <Button
               variant="ghost"
               size="icon"
-              className="text-white/40 hover:text-white/80 hover:bg-white/5 shrink-0"
+              className="text-muted-foreground hover:text-foreground hover:bg-muted shrink-0"
               onClick={handleLogout}
               title="Logout"
             >
@@ -171,7 +176,7 @@ function NavContent() {
 
 export function Sidebar() {
   return (
-    <aside className="hidden lg:flex w-64 flex-col border-l border-white/10 bg-[#0D0D15] h-screen sticky top-0">
+    <aside className="hidden lg:flex w-64 flex-col border-l border-border bg-sidebar h-screen sticky top-0">
       <NavContent />
     </aside>
   )
@@ -191,7 +196,7 @@ export function MobileSidebar() {
         <Menu className="h-5 w-5" />
       </Button>
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="right" className="w-64 p-0 bg-[#0D0D15] border-white/10">
+        <SheetContent side="right" className="w-64 p-0 bg-sidebar border-border">
           <NavContent />
         </SheetContent>
       </Sheet>

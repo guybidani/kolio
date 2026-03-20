@@ -68,8 +68,8 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">סקירה כללית</h1>
-        <p className="text-white/40">ברוכים הבאים ל-Kolio</p>
+        <h1 className="text-2xl font-bold text-foreground">סקירה כללית</h1>
+        <p className="text-muted-foreground">ברוכים הבאים ל-Kolio</p>
       </div>
 
       <StatsOverview
@@ -82,9 +82,9 @@ export default async function DashboardPage() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-4">
-          <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
+          <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden">
             <div className="p-5 pb-3">
-              <h3 className="text-base font-semibold text-white">שיחות אחרונות</h3>
+              <h3 className="text-base font-semibold text-foreground">שיחות אחרונות</h3>
             </div>
             <div className="px-5 pb-5 space-y-3">
               {MOCK_CALLS.map((call) => (

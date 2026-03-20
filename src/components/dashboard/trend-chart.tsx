@@ -32,9 +32,9 @@ export function TrendChart({ data, reps }: TrendChartProps) {
   const colors = chartColors.dark
 
   return (
-    <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 p-5">
+    <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border p-5">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-semibold text-white">מגמות ציונים לפי נציג</h3>
+        <h3 className="text-base font-semibold text-foreground">מגמות ציונים לפי נציג</h3>
         <div className="flex gap-2">
           {reps.map((rep) => (
             <span
@@ -53,27 +53,27 @@ export function TrendChart({ data, reps }: TrendChartProps) {
       <div className="h-[300px]" dir="ltr">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
             <XAxis
               dataKey="period"
-              stroke="rgba(255,255,255,0.3)"
-              tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 12 }}
+              stroke="var(--border)"
+              tick={{ fill: 'var(--muted-foreground)', fontSize: 12 }}
             />
             <YAxis
               domain={[0, 10]}
-              stroke="rgba(255,255,255,0.3)"
-              tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 12 }}
+              stroke="var(--border)"
+              tick={{ fill: 'var(--muted-foreground)', fontSize: 12 }}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: 'rgba(15, 15, 25, 0.95)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                backgroundColor: 'var(--popover)',
+                border: '1px solid var(--border)',
                 borderRadius: '8px',
-                color: '#fff',
+                color: 'var(--foreground)',
               }}
             />
             <Legend
-              wrapperStyle={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px' }}
+              wrapperStyle={{ color: 'var(--muted-foreground)', fontSize: '12px' }}
             />
             {reps.map((rep, i) => (
               <Line

@@ -82,8 +82,8 @@ export default function PlaybookPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Playbook</h1>
-          <p className="text-white/40">
+          <h1 className="text-2xl font-bold text-foreground">Playbook</h1>
+          <p className="text-muted-foreground">
             {MOCK_PLAYBOOK.name} - טכניקות ותגובות שנלמדו מהשיחות
           </p>
         </div>
@@ -94,16 +94,16 @@ export default function PlaybookPage() {
       </div>
 
       <Tabs defaultValue="stages">
-        <TabsList className="bg-white/5 border border-white/10">
-          <TabsTrigger value="stages" className="data-[state=active]:bg-white/10">
+        <TabsList className="bg-muted/50 border border-border">
+          <TabsTrigger value="stages" className="data-[state=active]:bg-muted">
             <Target className="h-4 w-4 ml-1" />
             שלבי מכירה
           </TabsTrigger>
-          <TabsTrigger value="objections" className="data-[state=active]:bg-white/10">
+          <TabsTrigger value="objections" className="data-[state=active]:bg-muted">
             <MessageSquare className="h-4 w-4 ml-1" />
             בנק התנגדויות
           </TabsTrigger>
-          <TabsTrigger value="techniques" className="data-[state=active]:bg-white/10">
+          <TabsTrigger value="techniques" className="data-[state=active]:bg-muted">
             <Star className="h-4 w-4 ml-1" />
             טכניקות מנצחות
           </TabsTrigger>
@@ -112,9 +112,9 @@ export default function PlaybookPage() {
         <TabsContent value="stages" className="mt-6">
           <div className="space-y-4">
             {MOCK_PLAYBOOK.stages.map((stage, i) => (
-              <div key={i} className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
+              <div key={i} className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden">
                 <div className="p-5 pb-3">
-                  <h3 className="text-base font-semibold text-white flex items-center gap-2">
+                  <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
                     <Badge variant="outline" className="rounded-full w-6 h-6 p-0 flex items-center justify-center bg-indigo-500/15 text-indigo-400 border-indigo-500/20">
                       {i + 1}
                     </Badge>
@@ -126,7 +126,7 @@ export default function PlaybookPage() {
                     {stage.tips.map((tip, j) => (
                       <li key={j} className="flex items-start gap-2 text-sm">
                         <Lightbulb className="h-4 w-4 text-amber-400 mt-0.5 flex-shrink-0" />
-                        <span className="text-white/60">{tip}</span>
+                        <span className="text-muted-foreground">{tip}</span>
                       </li>
                     ))}
                   </ul>
@@ -138,26 +138,26 @@ export default function PlaybookPage() {
 
         <TabsContent value="objections" className="mt-6 space-y-4">
           <div className="relative">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="חיפוש התנגדות..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pr-10 bg-white/5 border-white/10 text-white placeholder:text-white/50"
+              className="pr-10 bg-muted/50 border-border text-foreground placeholder:text-muted-foreground"
             />
           </div>
 
           {MOCK_PLAYBOOK.objectionBank
             .filter((o) => !search || o.objection.includes(search) || o.bestResponse.includes(search))
             .map((obj, i) => (
-              <div key={i} className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 p-4">
+              <div key={i} className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-semibold text-sm text-white">
+                      <h3 className="font-semibold text-sm text-foreground">
                         &ldquo;{obj.objection}&rdquo;
                       </h3>
-                      <Badge variant="outline" className="text-xs bg-white/5 border-white/10 text-white/50">
+                      <Badge variant="outline" className="text-xs bg-muted/50 border-border text-muted-foreground">
                         {obj.type}
                       </Badge>
                     </div>
@@ -167,7 +167,7 @@ export default function PlaybookPage() {
                       </p>
                       <p className="text-sm text-emerald-300/80">{obj.bestResponse}</p>
                     </div>
-                    <div className="flex items-center gap-4 mt-2 text-xs text-white/50">
+                    <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                       <span>שימושים: {obj.usedCount}</span>
                       <span>הצלחה: {obj.effectiveness}%</span>
                     </div>
@@ -183,12 +183,12 @@ export default function PlaybookPage() {
               <div className="flex items-start gap-3">
                 <Star className="h-5 w-5 text-amber-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <h3 className="font-semibold text-sm text-white">{tech.technique}</h3>
-                  <p className="text-xs text-white/40 mt-1">
+                  <h3 className="font-semibold text-sm text-foreground">{tech.technique}</h3>
+                  <p className="text-xs text-muted-foreground mt-1">
                     נציג: {tech.repName} | הצלחה: {tech.successRate}%
                   </p>
                   {tech.quote && (
-                    <blockquote className="mt-2 border-r-2 border-amber-500/40 pr-3 text-sm italic text-white/50">
+                    <blockquote className="mt-2 border-r-2 border-amber-500/40 pr-3 text-sm italic text-muted-foreground">
                       &ldquo;{tech.quote}&rdquo;
                     </blockquote>
                   )}

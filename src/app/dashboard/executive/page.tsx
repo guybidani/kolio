@@ -66,8 +66,8 @@ export default function ExecutiveDashboardPage() {
     <div className="space-y-8" dir="rtl">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">דשבורד מנהל</h1>
-        <p className="text-white/40 text-sm mt-1">סקירה עסקית כללית</p>
+        <h1 className="text-2xl font-bold text-foreground">דשבורד מנהל</h1>
+        <p className="text-muted-foreground text-sm mt-1">סקירה עסקית כללית</p>
       </div>
 
       {/* Row 1 - Hero KPIs */}
@@ -144,7 +144,7 @@ function ExecutiveSkeleton() {
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="rounded-2xl bg-white/5 border border-white/10 p-6 space-y-4">
+          <div key={i} className="rounded-2xl bg-muted/50 border border-border p-6 space-y-4">
             <div className="flex justify-between">
               <div className="skeleton h-4 w-24 rounded" />
               <div className="skeleton h-10 w-10 rounded-xl" />
@@ -156,13 +156,13 @@ function ExecutiveSkeleton() {
       </div>
       <div className="grid gap-6 lg:grid-cols-2">
         {Array.from({ length: 2 }).map((_, i) => (
-          <div key={i} className="rounded-2xl bg-white/5 border border-white/10 p-6">
+          <div key={i} className="rounded-2xl bg-muted/50 border border-border p-6">
             <div className="skeleton h-5 w-32 rounded mb-6" />
             <div className="skeleton h-[280px] w-full rounded-lg" />
           </div>
         ))}
       </div>
-      <div className="rounded-2xl bg-white/5 border border-white/10 p-6">
+      <div className="rounded-2xl bg-muted/50 border border-border p-6">
         <div className="skeleton h-5 w-28 rounded mb-4" />
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="flex gap-4 py-3">

@@ -9,7 +9,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const count = await getUnreadCount(session.id)
+    const count = await getUnreadCount(session.id, session.orgId)
     return NextResponse.json({ count })
   } catch (error) {
     console.error('Error fetching notification count:', error)

@@ -13,7 +13,7 @@ export default function DashboardLoading() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-4">
-          <div className="rounded-xl bg-white/5 border border-white/10 overflow-hidden">
+          <div className="rounded-xl bg-muted/50 border border-border overflow-hidden">
             <div className="p-5 pb-3">
               <div className="skeleton h-5 w-24 rounded" />
             </div>
@@ -25,7 +25,7 @@ export default function DashboardLoading() {
           </div>
         </div>
 
-        <div className="rounded-xl bg-white/5 border border-white/10 p-5 space-y-4">
+        <div className="rounded-xl bg-muted/50 border border-border p-5 space-y-4">
           <div className="skeleton h-5 w-32 rounded" />
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="flex items-center gap-3">

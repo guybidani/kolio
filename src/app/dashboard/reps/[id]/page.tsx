@@ -91,7 +91,7 @@ export default function RepDetailPage() {
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Link href="/dashboard/reps">
-          <Button variant="ghost" size="icon" className="text-white/60 hover:text-white hover:bg-white/10">
+          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground hover:bg-muted">
             <ArrowRight className="h-4 w-4" />
           </Button>
         </Link>
@@ -101,12 +101,12 @@ export default function RepDetailPage() {
           </AvatarFallback>
         </Avatar>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-white">{MOCK_REP.name}</h1>
-          <div className="flex items-center gap-3 text-sm text-white/40">
+          <h1 className="text-2xl font-bold text-foreground">{MOCK_REP.name}</h1>
+          <div className="flex items-center gap-3 text-sm text-muted-foreground">
             <span>שלוחה {MOCK_REP.extension}</span>
-            <Separator orientation="vertical" className="h-4 bg-white/10" />
+            <Separator orientation="vertical" className="h-4 bg-muted" />
             <span>{MOCK_REP.phone}</span>
-            <Separator orientation="vertical" className="h-4 bg-white/10" />
+            <Separator orientation="vertical" className="h-4 bg-muted" />
             <span>{MOCK_REP.totalCalls} שיחות</span>
           </div>
         </div>
@@ -115,26 +115,26 @@ export default function RepDetailPage() {
 
       {/* Score breakdown */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 p-5 sm:col-span-2 lg:col-span-1 text-center">
-          <h3 className="text-base font-semibold text-white flex items-center justify-center gap-2 mb-4">
+        <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border p-5 sm:col-span-2 lg:col-span-1 text-center">
+          <h3 className="text-base font-semibold text-foreground flex items-center justify-center gap-2 mb-4">
             <Target className="h-4 w-4 text-indigo-400" />
             ציון כולל
           </h3>
-          <div className="text-5xl font-bold text-white mb-2">{MOCK_REP.avgScore.toFixed(1)}</div>
+          <div className="text-5xl font-bold text-foreground mb-2">{MOCK_REP.avgScore.toFixed(1)}</div>
           <div className="flex items-center justify-center gap-1 text-sm">
             <TrendingUp className="h-4 w-4 text-emerald-400" />
             <span className="text-emerald-400">+{MOCK_REP.trend.toFixed(1)} מהשבוע שעבר</span>
           </div>
         </div>
 
-        <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 p-5 sm:col-span-2">
-          <h3 className="text-base font-semibold text-white mb-4">פירוט ציונים</h3>
+        <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border p-5 sm:col-span-2">
+          <h3 className="text-base font-semibold text-foreground mb-4">פירוט ציונים</h3>
           <div className="space-y-4">
             {scoreCategories.map((cat) => (
               <div key={cat.key} className="space-y-1">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-white/60">{cat.label}</span>
-                  <span className="font-medium text-white">{cat.score.toFixed(1)}</span>
+                  <span className="text-muted-foreground">{cat.label}</span>
+                  <span className="font-medium text-foreground">{cat.score.toFixed(1)}</span>
                 </div>
                 <Progress value={cat.score * 10} className="h-2" />
               </div>
@@ -159,7 +159,7 @@ export default function RepDetailPage() {
                   <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 mt-0.5">
                     +
                   </Badge>
-                  <span className="text-white/70">{s}</span>
+                  <span className="text-foreground/70">{s}</span>
                 </li>
               ))}
             </ul>
@@ -180,7 +180,7 @@ export default function RepDetailPage() {
                   <Badge variant="outline" className="bg-orange-500/10 text-orange-400 border-orange-500/20 mt-0.5">
                     !
                   </Badge>
-                  <span className="text-white/70">{w}</span>
+                  <span className="text-foreground/70">{w}</span>
                 </li>
               ))}
             </ul>
@@ -189,9 +189,9 @@ export default function RepDetailPage() {
       </div>
 
       {/* Recent Calls */}
-      <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
+      <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden">
         <div className="p-5 pb-3">
-          <h3 className="text-base font-semibold text-white flex items-center gap-2">
+          <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
             <Phone className="h-4 w-4 text-indigo-400" />
             שיחות אחרונות
           </h3>

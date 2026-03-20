@@ -112,10 +112,10 @@ export default function CallsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">שיחות</h1>
-          <p className="text-white/40">כל שיחות הצוות במקום אחד</p>
+          <h1 className="text-2xl font-bold text-foreground">שיחות</h1>
+          <p className="text-muted-foreground">כל שיחות הצוות במקום אחד</p>
         </div>
-        <Button className="border-white/10 text-white/70 hover:bg-white/5" variant="outline">
+        <Button className="border-border text-foreground/70 hover:bg-muted/50" variant="outline">
           <Filter className="h-4 w-4 ml-2" />
           סינון מתקדם
         </Button>
@@ -123,12 +123,12 @@ export default function CallsPage() {
 
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="חיפוש לפי שם ליד, עסק או נציג..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pr-10 bg-white/5 border-white/10 text-white placeholder:text-white/50"
+            className="pr-10 bg-muted/50 border-border text-foreground placeholder:text-muted-foreground"
           />
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -139,7 +139,7 @@ export default function CallsPage() {
               className={`cursor-pointer transition-colors ${
                 statusFilter === f.value
                   ? 'bg-indigo-500/15 text-indigo-400 border-indigo-500/20'
-                  : 'bg-white/5 text-white/50 border-white/10 hover:bg-white/10'
+                  : 'bg-muted/50 text-muted-foreground border-border hover:bg-muted'
               }`}
               onClick={() => setStatusFilter(f.value)}
             >
@@ -155,10 +155,10 @@ export default function CallsPage() {
         ))}
 
         {filtered.length === 0 && (
-          <div className="rounded-xl bg-white/5 border border-white/10 py-12 text-center">
-            <Search className="h-8 w-8 text-white/40 mx-auto mb-3" />
-            <p className="text-white/40">לא נמצאו שיחות</p>
-            <p className="text-sm text-white/40 mt-1">נסו לשנות את מילות החיפוש או הסינון</p>
+          <div className="rounded-xl bg-muted/50 border border-border py-12 text-center">
+            <Search className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
+            <p className="text-muted-foreground">לא נמצאו שיחות</p>
+            <p className="text-sm text-muted-foreground mt-1">נסו לשנות את מילות החיפוש או הסינון</p>
           </div>
         )}
       </div>

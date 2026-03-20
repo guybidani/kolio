@@ -18,7 +18,7 @@ function TrendIcon({ trend }: { trend: number }) {
   // For filler words, going down is good
   if (trend < -0.5) return <TrendingDown className="h-3 w-3 text-emerald-400" />
   if (trend > 0.5) return <TrendingUp className="h-3 w-3 text-red-400" />
-  return <Minus className="h-3 w-3 text-white/50" />
+  return <Minus className="h-3 w-3 text-muted-foreground" />
 }
 
 export function FillerWords({ data }: FillerWordsProps) {
@@ -26,13 +26,13 @@ export function FillerWords({ data }: FillerWordsProps) {
   const worst = sorted[0]
 
   return (
-    <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
+    <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden">
       <div className="p-5 pb-3">
-        <h3 className="text-base font-semibold text-white flex items-center gap-2">
+        <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
           <AlertCircle className="h-4 w-4 text-amber-400" />
           מילות מילוי - לידרבורד
         </h3>
-        <p className="text-xs text-white/50 mt-1">
+        <p className="text-xs text-muted-foreground mt-1">
           ממוצע מילות מילוי לשיחה (פחות = טוב יותר)
         </p>
       </div>
@@ -50,7 +50,7 @@ export function FillerWords({ data }: FillerWordsProps) {
       <div className="px-5 pb-5">
         <table className="w-full">
           <thead>
-            <tr className="text-xs text-white/50">
+            <tr className="text-xs text-muted-foreground">
               <th className="text-right pb-2 font-medium">#</th>
               <th className="text-right pb-2 font-medium">נציג</th>
               <th className="text-center pb-2 font-medium">ממוצע</th>
@@ -62,11 +62,11 @@ export function FillerWords({ data }: FillerWordsProps) {
             {sorted.map((rep, i) => (
               <tr
                 key={rep.id}
-                className="border-t border-white/5 hover:bg-white/5 transition-colors"
+                className="border-t border-border/50 hover:bg-muted/50 transition-colors"
               >
-                <td className="py-2.5 text-sm text-white/50 w-8">{i + 1}</td>
+                <td className="py-2.5 text-sm text-muted-foreground w-8">{i + 1}</td>
                 <td className="py-2.5">
-                  <span className="text-sm text-white">{rep.name}</span>
+                  <span className="text-sm text-foreground">{rep.name}</span>
                 </td>
                 <td className="py-2.5 text-center">
                   <span
@@ -81,7 +81,7 @@ export function FillerWords({ data }: FillerWordsProps) {
                     {rep.avgFillerWords.toFixed(1)}
                   </span>
                 </td>
-                <td className="py-2.5 text-center text-xs text-white/40">
+                <td className="py-2.5 text-center text-xs text-muted-foreground">
                   {rep.totalCalls}
                 </td>
                 <td className="py-2.5 text-center">
@@ -95,7 +95,7 @@ export function FillerWords({ data }: FillerWordsProps) {
         </table>
 
         {sorted.length === 0 && (
-          <p className="text-sm text-white/50 text-center py-4">
+          <p className="text-sm text-muted-foreground text-center py-4">
             אין נתונים עדיין
           </p>
         )}

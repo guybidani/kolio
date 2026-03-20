@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Heebo, Geist_Mono } from 'next/font/google'
 import { Toaster } from '@/components/ui/sonner'
+import { ThemeProvider } from '@/components/theme-provider'
 import './globals.css'
 
 /**
@@ -43,11 +44,14 @@ export default function RootLayout({
     <html
       lang="he"
       dir="rtl"
-      className={`dark ${inter.variable} ${heebo.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${heebo.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        {children}
-        <Toaster position="top-center" richColors />
+        <ThemeProvider>
+          {children}
+          <Toaster position="top-center" richColors />
+        </ThemeProvider>
       </body>
     </html>
   )

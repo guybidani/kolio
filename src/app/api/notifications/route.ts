@@ -21,7 +21,7 @@ export async function GET(req: Request) {
     )
     const offset = Math.max(0, parseInt(url.searchParams.get('offset') || '0') || 0)
 
-    const result = await getNotifications(session.id, { unreadOnly, limit, offset })
+    const result = await getNotifications(session.id, session.orgId, { unreadOnly, limit, offset })
     return NextResponse.json(result)
   } catch (error) {
     console.error('Error fetching notifications:', error)
@@ -43,12 +43,12 @@ export async function PATCH(req: Request) {
     }
 
     if (markAll) {
-      await markAllRead(session.id)
+      await markAllRead(session.id, session.orgId)
       return NextResponse.json({ success: true })
     }
 
     if (notificationId) {
-      await markAsRead(notificationId, session.id)
+      await markAsRead(notificationId, session.id, session.orgId)
       return NextResponse.json({ success: true })
     }
 

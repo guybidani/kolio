@@ -27,7 +27,7 @@ function TrendBadge({ trend, value }: { trend: string; value: number }) {
         'inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md',
         trend === 'up' && 'text-emerald-400 bg-emerald-500/10',
         trend === 'down' && 'text-red-400 bg-red-500/10',
-        trend === 'stable' && 'text-white/40 bg-white/5'
+        trend === 'stable' && 'text-muted-foreground bg-muted/50'
       )}
     >
       <Icon className="h-3 w-3" />
@@ -46,22 +46,22 @@ export function RepRankingsTable({ reps }: RepRankingsTableProps) {
   const sorted = [...reps].sort((a, b) => b.avgScore - a.avgScore)
 
   return (
-    <div className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
+    <div className="rounded-2xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden">
       <div className="p-6 pb-4">
-        <h3 className="text-base font-semibold text-white">דירוג נציגים</h3>
+        <h3 className="text-base font-semibold text-foreground">דירוג נציגים</h3>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-white/10">
-              <th className="text-right text-xs font-medium text-white/40 px-6 py-3">#</th>
-              <th className="text-right text-xs font-medium text-white/40 px-4 py-3">נציג</th>
-              <th className="text-right text-xs font-medium text-white/40 px-4 py-3">שיחות</th>
-              <th className="text-right text-xs font-medium text-white/40 px-4 py-3">ציון ממוצע</th>
-              <th className="text-right text-xs font-medium text-white/40 px-4 py-3">מגמה</th>
-              <th className="text-right text-xs font-medium text-white/40 px-4 py-3">חוזקה עיקרית</th>
-              <th className="text-right text-xs font-medium text-white/40 px-4 py-3">פער לשיפור</th>
-              <th className="text-right text-xs font-medium text-white/40 px-4 py-3"></th>
+            <tr className="border-b border-border">
+              <th className="text-right text-xs font-medium text-muted-foreground px-6 py-3">#</th>
+              <th className="text-right text-xs font-medium text-muted-foreground px-4 py-3">נציג</th>
+              <th className="text-right text-xs font-medium text-muted-foreground px-4 py-3">שיחות</th>
+              <th className="text-right text-xs font-medium text-muted-foreground px-4 py-3">ציון ממוצע</th>
+              <th className="text-right text-xs font-medium text-muted-foreground px-4 py-3">מגמה</th>
+              <th className="text-right text-xs font-medium text-muted-foreground px-4 py-3">חוזקה עיקרית</th>
+              <th className="text-right text-xs font-medium text-muted-foreground px-4 py-3">פער לשיפור</th>
+              <th className="text-right text-xs font-medium text-muted-foreground px-4 py-3"></th>
             </tr>
           </thead>
           <tbody>
@@ -69,23 +69,23 @@ export function RepRankingsTable({ reps }: RepRankingsTableProps) {
               <tr
                 key={rep.id}
                 className={cn(
-                  'border-b border-white/5 border-r-2 hover:bg-white/5 transition-colors',
+                  'border-b border-border/50 border-r-2 hover:bg-muted/50 transition-colors',
                   getRowColor(rep.avgScore)
                 )}
               >
                 <td className="px-6 py-3">
                   <span className={cn(
                     'text-sm font-bold',
-                    i === 0 ? 'text-amber-400' : 'text-white/50'
+                    i === 0 ? 'text-amber-400' : 'text-muted-foreground'
                   )}>
                     {i + 1}
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  <span className="text-sm font-medium text-white">{rep.name}</span>
+                  <span className="text-sm font-medium text-foreground">{rep.name}</span>
                 </td>
                 <td className="px-4 py-3">
-                  <span className="text-sm text-white/60 tabular-nums">{rep.callsThisMonth}</span>
+                  <span className="text-sm text-muted-foreground tabular-nums">{rep.callsThisMonth}</span>
                 </td>
                 <td className="px-4 py-3">
                   <span

@@ -92,12 +92,12 @@ export function CallPlayer({ audioUrl, utterances, keyMoments = [] }: CallPlayer
   return (
     <div className="space-y-4">
       {/* Audio Player Controls */}
-      <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 p-4">
+      <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border p-4">
         <audio ref={audioRef} src={audioUrl} preload="metadata" />
 
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={() => skip(-10)} className="text-white/60 hover:text-white hover:bg-white/10" aria-label="אחורה 10 שניות">
+            <Button variant="ghost" size="icon" onClick={() => skip(-10)} className="text-muted-foreground hover:text-foreground hover:bg-muted" aria-label="אחורה 10 שניות">
               <SkipBack className="h-4 w-4" />
             </Button>
             <Button size="icon" onClick={togglePlay} className="h-10 w-10 bg-indigo-600 hover:bg-indigo-500 text-white" aria-label={isPlaying ? 'עצור' : 'נגן'}>
@@ -107,20 +107,20 @@ export function CallPlayer({ audioUrl, utterances, keyMoments = [] }: CallPlayer
                 <Play className="h-5 w-5" />
               )}
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => skip(10)} className="text-white/60 hover:text-white hover:bg-white/10" aria-label="קדימה 10 שניות">
+            <Button variant="ghost" size="icon" onClick={() => skip(10)} className="text-muted-foreground hover:text-foreground hover:bg-muted" aria-label="קדימה 10 שניות">
               <SkipForward className="h-4 w-4" />
             </Button>
           </div>
 
           <div className="flex-1 space-y-1">
             <Progress value={progress} className="h-2 cursor-pointer" />
-            <div className="flex justify-between text-xs text-white/50">
+            <div className="flex justify-between text-xs text-muted-foreground">
               <span>{formatTime(currentTime)}</span>
               <span>{formatTime(duration)}</span>
             </div>
           </div>
 
-          <Volume2 className="h-4 w-4 text-white/50" />
+          <Volume2 className="h-4 w-4 text-muted-foreground" />
         </div>
 
         {/* Key Moments Markers */}
@@ -131,7 +131,7 @@ export function CallPlayer({ audioUrl, utterances, keyMoments = [] }: CallPlayer
                 key={i}
                 variant="outline"
                 size="sm"
-                className="text-xs border-white/10 text-white/60 hover:bg-white/5 hover:text-white"
+                className="text-xs border-border text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                 onClick={() => seek(moment.time)}
               >
                 {formatTime(moment.time)} - {moment.label}
@@ -142,9 +142,9 @@ export function CallPlayer({ audioUrl, utterances, keyMoments = [] }: CallPlayer
       </div>
 
       {/* Synced Transcript */}
-      <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
+      <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden">
         <div className="p-5 pb-3">
-          <h3 className="text-base font-semibold text-white">תמלול</h3>
+          <h3 className="text-base font-semibold text-foreground">תמלול</h3>
         </div>
         <div className="px-5 pb-5">
           <div
@@ -158,7 +158,7 @@ export function CallPlayer({ audioUrl, utterances, keyMoments = [] }: CallPlayer
                 className={`p-2 rounded-lg cursor-pointer transition-colors ${
                   i === activeUtterance
                     ? 'bg-indigo-500/10 border border-indigo-500/20'
-                    : 'hover:bg-white/5'
+                    : 'hover:bg-muted/50'
                 }`}
                 onClick={() => seek(utt.start)}
               >
@@ -172,16 +172,16 @@ export function CallPlayer({ audioUrl, utterances, keyMoments = [] }: CallPlayer
                   >
                     {utt.speaker === 0 ? 'נציג' : 'לקוח'}
                   </span>
-                  <span className="text-xs text-white/50">
+                  <span className="text-xs text-muted-foreground">
                     {formatTime(utt.start)}
                   </span>
                 </div>
-                <p className="leading-relaxed text-white/70">{utt.text}</p>
+                <p className="leading-relaxed text-foreground/70">{utt.text}</p>
               </div>
             ))}
 
             {utterances.length === 0 && (
-              <p className="text-center text-white/50 py-8">
+              <p className="text-center text-muted-foreground py-8">
                 אין תמלול זמין לשיחה זו
               </p>
             )}

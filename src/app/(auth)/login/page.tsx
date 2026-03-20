@@ -47,7 +47,7 @@ function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="email" className="text-sm font-medium text-white/70 mb-1.5 block">
+        <label htmlFor="email" className="text-sm font-medium text-foreground/70 mb-1.5 block">
           אימייל
         </label>
         <Input
@@ -58,12 +58,12 @@ function LoginForm() {
           placeholder="you@company.com"
           required
           autoComplete="email"
-          className="bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-indigo-500/50 focus:ring-indigo-500/20"
+          className="bg-muted/50 border-border text-foreground placeholder:text-muted-foreground focus:border-indigo-500/50 focus:ring-indigo-500/20"
         />
       </div>
 
       <div>
-        <label htmlFor="password" className="text-sm font-medium text-white/70 mb-1.5 block">
+        <label htmlFor="password" className="text-sm font-medium text-foreground/70 mb-1.5 block">
           סיסמה
         </label>
         <Input
@@ -74,7 +74,7 @@ function LoginForm() {
           placeholder="••••••••"
           required
           autoComplete="current-password"
-          className="bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-indigo-500/50 focus:ring-indigo-500/20"
+          className="bg-muted/50 border-border text-foreground placeholder:text-muted-foreground focus:border-indigo-500/50 focus:ring-indigo-500/20"
         />
       </div>
 
@@ -98,7 +98,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#0A0A0F]">
+    <div className="flex min-h-screen items-center justify-center bg-background">
       {/* Glow background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-indigo-500/8 blur-[120px]" />
@@ -112,10 +112,10 @@ export default function LoginPage() {
         </div>
 
         {/* Glass card */}
-        <div className="rounded-2xl bg-white/[0.05] backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/20 p-8">
+        <div className="rounded-2xl bg-muted/50 backdrop-blur-xl border border-border shadow-2xl shadow-black/20 p-8">
           <div className="text-center mb-6">
-            <h1 className="text-xl font-bold text-white">ברוך הבא</h1>
-            <p className="text-sm text-white/40 mt-1">התחבר לחשבון שלך</p>
+            <h1 className="text-xl font-bold text-foreground">ברוך הבא</h1>
+            <p className="text-sm text-muted-foreground mt-1">התחבר לחשבון שלך</p>
           </div>
 
           <Suspense fallback={<div className="h-48" />}>
@@ -123,7 +123,7 @@ export default function LoginPage() {
           </Suspense>
         </div>
 
-        <p className="text-center text-xs text-white/40 mt-6">
+        <p className="text-center text-xs text-muted-foreground mt-6">
           פנה למנהל המערכת לקבלת חשבון
         </p>
       </div>

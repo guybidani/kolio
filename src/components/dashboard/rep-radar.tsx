@@ -42,28 +42,28 @@ export function RepRadar({ repName, repData, teamData }: RepRadarProps) {
   }))
 
   return (
-    <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 p-5">
-      <h3 className="text-base font-semibold text-white mb-4">
+    <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border p-5">
+      <h3 className="text-base font-semibold text-foreground mb-4">
         פרופיל יכולות - {repName}
       </h3>
       <div className="h-[350px]" dir="ltr">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data}>
-            <PolarGrid stroke="rgba(255,255,255,0.1)" />
+            <PolarGrid stroke="var(--border)" />
             <PolarAngleAxis
               dataKey="label"
-              tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 11 }}
+              tick={{ fill: 'var(--muted-foreground)', fontSize: 11 }}
             />
             <PolarRadiusAxis
               angle={90}
               domain={[0, 10]}
-              tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10 }}
+              tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }}
             />
             <Radar
               name={repName}
               dataKey="rep"
-              stroke="#818CF8"
-              fill="#818CF8"
+              stroke="var(--primary)"
+              fill="var(--primary)"
               fillOpacity={0.25}
               strokeWidth={2}
             />
@@ -77,7 +77,7 @@ export function RepRadar({ repName, repData, teamData }: RepRadarProps) {
               strokeDasharray="5 5"
             />
             <Legend
-              wrapperStyle={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px' }}
+              wrapperStyle={{ color: 'var(--muted-foreground)', fontSize: '12px' }}
             />
           </RadarChart>
         </ResponsiveContainer>

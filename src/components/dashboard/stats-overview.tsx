@@ -59,24 +59,24 @@ export function StatsOverview({
       {stats.map((stat) => (
         <div
           key={stat.title}
-          className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 p-5"
+          className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border p-5"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-medium text-white/50">
+            <span className="text-sm font-medium text-muted-foreground">
               {stat.title}
             </span>
             <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${stat.iconBg}`}>
               <stat.icon className={`h-4 w-4 ${stat.iconColor}`} />
             </div>
           </div>
-          <div className="text-2xl font-bold text-white">{stat.value}</div>
+          <div className="text-2xl font-bold text-foreground">{stat.value}</div>
           <p
             className={`text-xs mt-1 ${
               stat.trend === 'up'
                 ? 'text-emerald-400'
                 : stat.trend === 'down'
                 ? 'text-red-400'
-                : 'text-white/40'
+                : 'text-muted-foreground'
             }`}
           >
             {stat.description}
@@ -92,7 +92,7 @@ export function StatsOverviewSkeleton() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="rounded-xl bg-white/5 border border-white/10 p-5 space-y-3">
+        <div key={i} className="rounded-xl bg-muted/50 border border-border p-5 space-y-3">
           <div className="flex justify-between">
             <div className="skeleton h-4 w-20 rounded" />
             <div className="skeleton h-8 w-8 rounded-lg" />

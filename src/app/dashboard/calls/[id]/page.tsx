@@ -198,15 +198,15 @@ export default function CallDetailPage() {
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Link href="/dashboard/calls">
-          <Button variant="ghost" size="icon" className="text-white/60 hover:text-white hover:bg-white/10">
+          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground hover:bg-muted">
             <ArrowRight className="h-4 w-4" />
           </Button>
         </Link>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-white">
+          <h1 className="text-2xl font-bold text-foreground">
             {MOCK_ANALYSIS.call_metadata.prospect_name}
           </h1>
-          <div className="flex items-center gap-3 text-sm text-white/40 mt-1">
+          <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
             <span className="flex items-center gap-1">
               <Building2 className="h-3.5 w-3.5" />
               {MOCK_ANALYSIS.call_metadata.prospect_business}
@@ -232,33 +232,33 @@ export default function CallDetailPage() {
       </div>
 
       {/* Summary Card */}
-      <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
+      <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden">
         <div className="p-5 pb-3">
-          <h3 className="text-base font-semibold text-white">סיכום שיחה</h3>
+          <h3 className="text-base font-semibold text-foreground">סיכום שיחה</h3>
         </div>
         <div className="px-5 pb-5">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <h4 className="text-sm font-medium text-white mb-1">צורך הליד</h4>
-              <p className="text-sm text-white/50">
+              <h4 className="text-sm font-medium text-foreground mb-1">צורך הליד</h4>
+              <p className="text-sm text-muted-foreground">
                 {MOCK_ANALYSIS.summary.prospect_needs}
               </p>
             </div>
             <div>
-              <h4 className="text-sm font-medium text-white mb-1">מה הוצע</h4>
-              <p className="text-sm text-white/50">
+              <h4 className="text-sm font-medium text-foreground mb-1">מה הוצע</h4>
+              <p className="text-sm text-muted-foreground">
                 {MOCK_ANALYSIS.summary.what_was_offered}
               </p>
             </div>
             <div>
-              <h4 className="text-sm font-medium text-white mb-1">מה סוכם</h4>
-              <p className="text-sm text-white/50">
+              <h4 className="text-sm font-medium text-foreground mb-1">מה סוכם</h4>
+              <p className="text-sm text-muted-foreground">
                 {MOCK_ANALYSIS.summary.what_was_agreed}
               </p>
             </div>
             <div>
-              <h4 className="text-sm font-medium text-white mb-1">שיווק נוכחי</h4>
-              <p className="text-sm text-white/50">
+              <h4 className="text-sm font-medium text-foreground mb-1">שיווק נוכחי</h4>
+              <p className="text-sm text-muted-foreground">
                 {MOCK_ANALYSIS.summary.current_marketing}
               </p>
             </div>
