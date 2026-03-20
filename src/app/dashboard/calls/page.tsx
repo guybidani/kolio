@@ -5,8 +5,7 @@ import { CallCard } from '@/components/dashboard/call-card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Search, Filter, SortAsc } from 'lucide-react'
+import { Search, Filter } from 'lucide-react'
 
 const MOCK_CALLS = [
   {

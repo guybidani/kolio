@@ -1,6 +1,5 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -12,7 +11,6 @@ import {
   Link2,
   Shield,
   Copy,
-  ExternalLink,
 } from 'lucide-react'
 
 export default function SettingsPage() {
@@ -21,142 +19,143 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">הגדרות</h1>
-        <p className="text-muted-foreground">ניהול ארגון, חיוב ואינטגרציות</p>
+        <h1 className="text-2xl font-bold text-white">הגדרות</h1>
+        <p className="text-white/40">ניהול ארגון, חיוב ואינטגרציות</p>
       </div>
 
       <Tabs defaultValue="general">
-        <TabsList>
-          <TabsTrigger value="general">
+        <TabsList className="bg-white/5 border border-white/10">
+          <TabsTrigger value="general" className="data-[state=active]:bg-white/10">
             <Settings className="h-4 w-4 ml-1" />
             כללי
           </TabsTrigger>
-          <TabsTrigger value="billing">
+          <TabsTrigger value="billing" className="data-[state=active]:bg-white/10">
             <CreditCard className="h-4 w-4 ml-1" />
             חיוב
           </TabsTrigger>
-          <TabsTrigger value="integrations">
+          <TabsTrigger value="integrations" className="data-[state=active]:bg-white/10">
             <Link2 className="h-4 w-4 ml-1" />
             אינטגרציות
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="general" className="mt-6 space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">פרטי ארגון</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
+            <div className="p-5 pb-3">
+              <h3 className="text-base font-semibold text-white">פרטי ארגון</h3>
+            </div>
+            <div className="px-5 pb-5 space-y-4">
               <div>
-                <label className="text-sm font-medium mb-1 block">שם הארגון</label>
-                <Input defaultValue="סוכנות Project Adam" />
+                <label className="text-sm font-medium text-white mb-1 block">שם הארגון</label>
+                <Input defaultValue="סוכנות Project Adam" className="bg-white/5 border-white/10 text-white" />
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Slug</label>
-                <Input defaultValue="project-adam" disabled />
-                <p className="text-xs text-muted-foreground mt-1">
+                <label className="text-sm font-medium text-white mb-1 block">Slug</label>
+                <Input defaultValue="project-adam" disabled className="bg-white/[0.03] border-white/10 text-white/40" />
+                <p className="text-xs text-white/30 mt-1">
                   לא ניתן לשנות את ה-slug
                 </p>
               </div>
-              <Button>שמור שינויים</Button>
-            </CardContent>
-          </Card>
+              <Button className="bg-indigo-600 hover:bg-indigo-500 text-white">שמור שינויים</Button>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Shield className="h-4 w-4" />
+          <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
+            <div className="p-5 pb-3">
+              <h3 className="text-base font-semibold text-white flex items-center gap-2">
+                <Shield className="h-4 w-4 text-indigo-400" />
                 אבטחה
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+              </h3>
+            </div>
+            <div className="px-5 pb-5 space-y-4">
               <div>
-                <label className="text-sm font-medium mb-1 block">Webhook Secret</label>
+                <label className="text-sm font-medium text-white mb-1 block">Webhook Secret</label>
                 <div className="flex gap-2">
-                  <Input defaultValue="whsec_abc123..." type="password" readOnly />
-                  <Button variant="outline" size="icon">
+                  <Input defaultValue="whsec_abc123..." type="password" readOnly className="bg-white/[0.03] border-white/10 text-white/40" />
+                  <Button variant="outline" size="icon" className="border-white/10 text-white/60 hover:bg-white/5">
                     <Copy className="h-4 w-4" />
                   </Button>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs text-white/30 mt-1">
                   משמש לאימות webhook-ים נכנסים מהמרכזיה
                 </p>
               </div>
-              <Button variant="outline">חידוש Secret</Button>
-            </CardContent>
-          </Card>
+              <Button variant="outline" className="border-white/10 text-white/60 hover:bg-white/5">חידוש Secret</Button>
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="billing" className="mt-6 space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">התוכנית הנוכחית</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
+            <div className="p-5 pb-3">
+              <h3 className="text-base font-semibold text-white">התוכנית הנוכחית</h3>
+            </div>
+            <div className="px-5 pb-5">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-bold">Trial</h3>
-                    <Badge>14 ימים נותרו</Badge>
+                    <h3 className="text-lg font-bold text-white">Trial</h3>
+                    <Badge className="bg-amber-500/10 text-amber-400 border border-amber-500/20">14 ימים נותרו</Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-white/40">
                     3 נציגים, 50 שיחות בחודש
                   </p>
                 </div>
-                <Button>שדרוג תוכנית</Button>
+                <Button className="bg-indigo-600 hover:bg-indigo-500 text-white">שדרוג תוכנית</Button>
               </div>
 
-              <Separator className="my-4" />
+              <Separator className="my-4 bg-white/10" />
 
               <div className="grid gap-4 sm:grid-cols-3">
-                <div className="text-center p-4 rounded-lg border">
-                  <p className="text-2xl font-bold">23</p>
-                  <p className="text-sm text-muted-foreground">שיחות החודש</p>
-                  <p className="text-xs text-muted-foreground">מתוך 50</p>
+                <div className="text-center p-4 rounded-lg border border-white/10 bg-white/[0.03]">
+                  <p className="text-2xl font-bold text-white">23</p>
+                  <p className="text-sm text-white/40">שיחות החודש</p>
+                  <p className="text-xs text-white/30">מתוך 50</p>
                 </div>
-                <div className="text-center p-4 rounded-lg border">
-                  <p className="text-2xl font-bold">4</p>
-                  <p className="text-sm text-muted-foreground">נציגים פעילים</p>
-                  <p className="text-xs text-muted-foreground">מתוך 3 (חריגה!)</p>
+                <div className="text-center p-4 rounded-lg border border-red-500/20 bg-red-500/5">
+                  <p className="text-2xl font-bold text-white">4</p>
+                  <p className="text-sm text-white/40">נציגים פעילים</p>
+                  <p className="text-xs text-red-400">מתוך 3 (חריגה!)</p>
                 </div>
-                <div className="text-center p-4 rounded-lg border">
-                  <p className="text-2xl font-bold">14</p>
-                  <p className="text-sm text-muted-foreground">ימים נותרו</p>
-                  <p className="text-xs text-muted-foreground">בניסיון חינם</p>
+                <div className="text-center p-4 rounded-lg border border-white/10 bg-white/[0.03]">
+                  <p className="text-2xl font-bold text-white">14</p>
+                  <p className="text-sm text-white/40">ימים נותרו</p>
+                  <p className="text-xs text-white/30">בניסיון חינם</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">היסטוריית חיובים</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground text-center py-4">
+          <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
+            <div className="p-5 pb-3">
+              <h3 className="text-base font-semibold text-white">היסטוריית חיובים</h3>
+            </div>
+            <div className="px-5 pb-5">
+              <p className="text-sm text-white/30 text-center py-4">
                 אין חיובים עדיין - אתם בתקופת ניסיון
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="integrations" className="mt-6 space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">חיבור מרכזיה (PBX)</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
+          <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
+            <div className="p-5 pb-3">
+              <h3 className="text-base font-semibold text-white">חיבור מרכזיה (PBX)</h3>
+            </div>
+            <div className="px-5 pb-5 space-y-4">
+              <p className="text-sm text-white/50">
                 העתיקו את כתובת ה-Webhook למרכזיה שלכם. תומכים ב-Voicenter, 3CX, Yeastar,
                 Grandstream, Twilio, Vonage, CloudTalk ועוד.
               </p>
               <div>
-                <label className="text-sm font-medium mb-1 block">Webhook URL</label>
+                <label className="text-sm font-medium text-white mb-1 block">Webhook URL</label>
                 <div className="flex gap-2">
-                  <Input value={webhookUrl} readOnly className="font-mono text-xs" />
+                  <Input value={webhookUrl} readOnly className="font-mono text-xs bg-white/[0.03] border-white/10 text-white/60" />
                   <Button
                     variant="outline"
                     size="icon"
+                    className="border-white/10 text-white/60 hover:bg-white/5"
                     onClick={() => navigator.clipboard.writeText(webhookUrl)}
                   >
                     <Copy className="h-4 w-4" />
@@ -165,8 +164,8 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <label className="text-sm font-medium mb-1 block">מיפוי שלוחות</label>
-                <p className="text-xs text-muted-foreground mb-2">
+                <label className="text-sm font-medium text-white mb-1 block">מיפוי שלוחות</label>
+                <p className="text-xs text-white/30 mb-2">
                   מפו שלוחות לנציגים כדי לזהות אוטומטית מי דיבר
                 </p>
                 <div className="space-y-2">
@@ -178,69 +177,69 @@ export default function SettingsPage() {
                     <div key={mapping.ext} className="flex gap-2">
                       <Input
                         defaultValue={mapping.ext}
-                        className="w-24"
+                        className="w-24 bg-white/5 border-white/10 text-white"
                         placeholder="שלוחה"
                       />
                       <Input
                         defaultValue={mapping.name}
-                        className="flex-1"
+                        className="flex-1 bg-white/5 border-white/10 text-white"
                         placeholder="שם נציג"
                       />
                     </div>
                   ))}
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" className="border-white/10 text-white/60 hover:bg-white/5">
                     + הוסף שלוחה
                   </Button>
                 </div>
               </div>
 
-              <Separator />
+              <Separator className="bg-white/10" />
 
               <div>
-                <h4 className="text-sm font-medium mb-2">מרכזיות מחוברות</h4>
-                <div className="flex items-center gap-3 p-3 rounded-lg border">
-                  <Badge className="bg-green-100 text-green-800">פעיל</Badge>
+                <h4 className="text-sm font-medium text-white mb-2">מרכזיות מחוברות</h4>
+                <div className="flex items-center gap-3 p-3 rounded-lg border border-white/10 bg-white/[0.03]">
+                  <Badge className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">פעיל</Badge>
                   <div>
-                    <p className="text-sm font-medium">Voicenter</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-sm font-medium text-white">Voicenter</p>
+                    <p className="text-xs text-white/30">
                       חובר ב-15/03/2026 | 23 שיחות הועברו
                     </p>
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">אינטגרציות נוספות</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
+            <div className="p-5 pb-3">
+              <h3 className="text-base font-semibold text-white">אינטגרציות נוספות</h3>
+            </div>
+            <div className="px-5 pb-5">
               <div className="grid gap-3 sm:grid-cols-2">
                 {[
-                  { name: 'Google Drive', description: 'סנכרון הקלטות מ-Google Drive', active: false },
-                  { name: 'Slack', description: 'התראות על שיחות חדשות', active: false },
-                  { name: 'HubSpot', description: 'סנכרון עם CRM', active: false },
-                  { name: 'Monday.com', description: 'יצירת פריטים אוטומטית', active: false },
+                  { name: 'Google Drive', description: 'סנכרון הקלטות מ-Google Drive' },
+                  { name: 'Slack', description: 'התראות על שיחות חדשות' },
+                  { name: 'HubSpot', description: 'סנכרון עם CRM' },
+                  { name: 'Monday.com', description: 'יצירת פריטים אוטומטית' },
                 ].map((integration) => (
                   <div
                     key={integration.name}
-                    className="flex items-center justify-between p-3 rounded-lg border"
+                    className="flex items-center justify-between p-3 rounded-lg border border-white/10 bg-white/[0.03]"
                   >
                     <div>
-                      <p className="text-sm font-medium">{integration.name}</p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-sm font-medium text-white">{integration.name}</p>
+                      <p className="text-xs text-white/30">
                         {integration.description}
                       </p>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="border-white/10 text-white/60 hover:bg-white/5">
                       חבר
                     </Button>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

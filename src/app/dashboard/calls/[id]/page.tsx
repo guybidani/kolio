@@ -1,17 +1,12 @@
 'use client'
 
-import { useParams } from 'next/navigation'
 import { CallPlayer } from '@/components/dashboard/call-player'
 import { CoachingPanel } from '@/components/dashboard/coaching-panel'
 import { ScoreBadge } from '@/components/dashboard/score-badge'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import {
   ArrowRight,
-  Phone,
-  PhoneIncoming,
   PhoneOutgoing,
   Clock,
   User,
@@ -199,9 +194,6 @@ const MOCK_UTTERANCES = [
 ]
 
 export default function CallDetailPage() {
-  const params = useParams()
-  const callId = params.id as string
-
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">

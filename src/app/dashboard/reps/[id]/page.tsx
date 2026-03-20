@@ -3,7 +3,6 @@
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
@@ -92,22 +91,22 @@ export default function RepDetailPage() {
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Link href="/dashboard/reps">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" className="text-white/60 hover:text-white hover:bg-white/10">
             <ArrowRight className="h-4 w-4" />
           </Button>
         </Link>
         <Avatar className="h-12 w-12">
-          <AvatarFallback className="text-lg">
+          <AvatarFallback className="text-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/20">
             {MOCK_REP.name.split(' ').map(n => n[0]).join('')}
           </AvatarFallback>
         </Avatar>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold">{MOCK_REP.name}</h1>
-          <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          <h1 className="text-2xl font-bold text-white">{MOCK_REP.name}</h1>
+          <div className="flex items-center gap-3 text-sm text-white/40">
             <span>שלוחה {MOCK_REP.extension}</span>
-            <Separator orientation="vertical" className="h-4" />
+            <Separator orientation="vertical" className="h-4 bg-white/10" />
             <span>{MOCK_REP.phone}</span>
-            <Separator orientation="vertical" className="h-4" />
+            <Separator orientation="vertical" className="h-4 bg-white/10" />
             <span>{MOCK_REP.totalCalls} שיחות</span>
           </div>
         </div>
@@ -116,99 +115,93 @@ export default function RepDetailPage() {
 
       {/* Score breakdown */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Card className="sm:col-span-2 lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Target className="h-4 w-4" />
-              ציון כולל
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-center">
-            <div className="text-5xl font-bold mb-2">{MOCK_REP.avgScore.toFixed(1)}</div>
-            <div className="flex items-center justify-center gap-1 text-sm">
-              <TrendingUp className="h-4 w-4 text-green-500" />
-              <span className="text-green-600">+{MOCK_REP.trend.toFixed(1)} מהשבוע שעבר</span>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 p-5 sm:col-span-2 lg:col-span-1 text-center">
+          <h3 className="text-base font-semibold text-white flex items-center justify-center gap-2 mb-4">
+            <Target className="h-4 w-4 text-indigo-400" />
+            ציון כולל
+          </h3>
+          <div className="text-5xl font-bold text-white mb-2">{MOCK_REP.avgScore.toFixed(1)}</div>
+          <div className="flex items-center justify-center gap-1 text-sm">
+            <TrendingUp className="h-4 w-4 text-emerald-400" />
+            <span className="text-emerald-400">+{MOCK_REP.trend.toFixed(1)} מהשבוע שעבר</span>
+          </div>
+        </div>
 
-        <Card className="sm:col-span-2">
-          <CardHeader>
-            <CardTitle className="text-base">פירוט ציונים</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 p-5 sm:col-span-2">
+          <h3 className="text-base font-semibold text-white mb-4">פירוט ציונים</h3>
+          <div className="space-y-4">
             {scoreCategories.map((cat) => (
               <div key={cat.key} className="space-y-1">
                 <div className="flex items-center justify-between text-sm">
-                  <span>{cat.label}</span>
-                  <span className="font-medium">{cat.score.toFixed(1)}</span>
+                  <span className="text-white/60">{cat.label}</span>
+                  <span className="font-medium text-white">{cat.score.toFixed(1)}</span>
                 </div>
                 <Progress value={cat.score * 10} className="h-2" />
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Strengths & Weaknesses */}
       <div className="grid gap-4 sm:grid-cols-2">
-        <Card className="border-green-200">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2 text-green-700">
+        <div className="rounded-xl bg-emerald-500/5 border border-emerald-500/20 overflow-hidden">
+          <div className="p-5 pb-3">
+            <h3 className="text-base font-semibold text-emerald-400 flex items-center gap-2">
               <Award className="h-4 w-4" />
               חוזקות
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+            </h3>
+          </div>
+          <div className="px-5 pb-5">
             <ul className="space-y-2">
               {MOCK_REP.strengths.map((s, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm">
-                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 mt-0.5">
+                  <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 mt-0.5">
                     +
                   </Badge>
-                  {s}
+                  <span className="text-white/70">{s}</span>
                 </li>
               ))}
             </ul>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="border-orange-200">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2 text-orange-700">
+        <div className="rounded-xl bg-orange-500/5 border border-orange-500/20 overflow-hidden">
+          <div className="p-5 pb-3">
+            <h3 className="text-base font-semibold text-orange-400 flex items-center gap-2">
               <AlertCircle className="h-4 w-4" />
               נקודות לשיפור
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+            </h3>
+          </div>
+          <div className="px-5 pb-5">
             <ul className="space-y-2">
               {MOCK_REP.weaknesses.map((w, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm">
-                  <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 mt-0.5">
+                  <Badge variant="outline" className="bg-orange-500/10 text-orange-400 border-orange-500/20 mt-0.5">
                     !
                   </Badge>
-                  {w}
+                  <span className="text-white/70">{w}</span>
                 </li>
               ))}
             </ul>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Recent Calls */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Phone className="h-4 w-4" />
+      <div className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
+        <div className="p-5 pb-3">
+          <h3 className="text-base font-semibold text-white flex items-center gap-2">
+            <Phone className="h-4 w-4 text-indigo-400" />
             שיחות אחרונות
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
+          </h3>
+        </div>
+        <div className="px-5 pb-5 space-y-3">
           {MOCK_REP.recentCalls.map((call) => (
             <CallCard key={call.id} {...call} />
           ))}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }
