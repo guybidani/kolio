@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <!-- Kolio logo: abstract voice waveform in a rounded square container -->
+  <!-- Three sound wave bars of varying heights, rounded ends, forming a voice/equalizer motif -->
+  <!-- The bars are asymmetric (taller center) suggesting a sound wave peak -->
+  <rect width="40" height="40" rx="10" fill="#6366F1"/>
+  <!-- Left bar -->
+  <rect x="10" y="14" width="4" height="12" rx="2" fill="white"/>
+  <!-- Center bar (tallest - the voice) -->
+  <rect x="18" y="8" width="4" height="24" rx="2" fill="white"/>
+  <!-- Right bar -->
+  <rect x="26" y="11" width="4" height="18" rx="2" fill="white"/>
+</svg>

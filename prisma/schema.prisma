@@ -1,13 +1,199 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum Plan {
+  TRIAL
+  STARTER
+  PRO
+  ENTERPRISE
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  REP
+  VIEWER
+}
+
+enum CallDirection {
+  INBOUND
+  OUTBOUND
+  UNKNOWN
+}
+
+enum CallStatus {
+  UPLOADED
+  TRANSCRIBING
+  TRANSCRIBED
+  ANALYZING
+  COMPLETE
+  FAILED
+}
+
+enum CallSource {
+  PBX_WEBHOOK
+  MANUAL_UPLOAD
+  MOBILE_APP
+  GOOGLE_DRIVE
+}
+
+model Organization {
+  id               String   @id @default(cuid())
+  name             String
+  slug             String   @unique
+  plan             Plan     @default(TRIAL)
+  planSeats        Int      @default(3)
+  trialEndsAt      DateTime?
+  stripeCustomerId String?  @unique
+  stripeSubId      String?
+  settings         Json     @default("{}")
+  webhookSecret    String   @default(uuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  users            User[]
+  reps             Rep[]
+  calls            Call[]
+  playbooks        Playbook[]
+  weeklyReports    WeeklyReport[]
+  pbxIntegrations  PbxIntegration[]
+}
+
+model User {
+  id          String   @id @default(cuid())
+  orgId       String
+  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  email       String
+  name        String
+  role        UserRole @default(VIEWER)
+  clerkUserId String   @unique
+  avatarUrl   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([orgId, email])
+  @@index([orgId])
+}
+
+model Rep {
+  id         String   @id @default(cuid())
+  orgId      String
+  org        Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  name       String
+  phone      String?
+  extension  String?
+  avatarUrl  String?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  calls      Call[]
+
+  @@index([orgId])
+  @@index([orgId, extension])
+}
+
+model Call {
+  id             String        @id @default(cuid())
+  orgId          String
+  org            Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  repId          String?
+  rep            Rep?          @relation(fields: [repId], references: [id])
+
+  audioUrl       String
+  audioSize      Int?
+  duration       Int           @default(0)
+  direction      CallDirection @default(UNKNOWN)
+  callerNumber   String?
+  calledNumber   String?
+
+  status         CallStatus    @default(UPLOADED)
+  errorMessage   String?
+
+  transcript     Json?
+  transcriptText String?
+  language       String?
+
+  overallScore   Float?
+  scores         Json?
+  summary        String?
+  prospectName   String?
+  prospectBusiness String?
+  keyMoments     Json?
+  objections     Json?
+  coachingTips   Json?
+  retentionPoints Json?
+  improvementPoints Json?
+  nextCallPrep   Json?
+  spinAnalysis   Json?
+  internalInsights Json?
+  talkRatio      Json?
+
+  source         CallSource    @default(MANUAL_UPLOAD)
+  externalId     String?
+  pbxType        String?
+  recordedAt     DateTime      @default(now())
+  processedAt    DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([orgId, repId])
+  @@index([orgId, recordedAt])
+  @@index([orgId, status])
+  @@index([status])
+}
+
+model Playbook {
+  id          String   @id @default(cuid())
+  orgId       String
+  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  stages      Json     @default("[]")
+  objectionBank Json   @default("[]")
+  keywords    Json     @default("{}")
+  scoringWeights Json  @default("{}")
+  isDefault   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([orgId])
+}
+
+model WeeklyReport {
+  id          String   @id @default(cuid())
+  orgId       String
+  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  weekStart   DateTime
+  weekEnd     DateTime
+  totalCalls  Int      @default(0)
+  avgScore    Float?
+  topRep      String?
+  highlights  Json     @default("[]")
+  data        Json     @default("{}")
+  createdAt   DateTime @default(now())
+
+  @@unique([orgId, weekStart])
+  @@index([orgId, weekStart])
+}
+
+model PbxIntegration {
+  id          String   @id @default(cuid())
+  orgId       String
+  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  pbxType     String
+  config      Json     @default("{}")
+  extensionMap Json    @default("{}")
+  isActive    Boolean  @default(true)
+  webhookUrl  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([orgId])
 }
