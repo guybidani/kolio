@@ -21,9 +21,6 @@ COPY . .
 # Generate Prisma client
 RUN npx prisma generate --schema=./prisma/schema.prisma
 
-# Compile seed script to JS
-RUN npx tsc prisma/seed.ts --outDir prisma/compiled --esModuleInterop --resolveJsonModule --skipLibCheck 2>/dev/null || npx esbuild prisma/seed.ts --outfile=prisma/seed.js --platform=node --bundle --external:@prisma/client --external:bcryptjs 2>/dev/null || echo "Seed compile skipped"
-
 # Build Next.js
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
@@ -48,17 +45,13 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy prisma files for migration + seed
+# Copy prisma files + ALL node_modules for db push at runtime
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/bcryptjs ./node_modules/bcryptjs
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/dotenv ./node_modules/dotenv
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 
-# Copy startup script
+# Copy startup script and seed
 COPY --from=builder --chown=nextjs:nodejs /app/start.sh ./start.sh
 RUN chmod +x ./start.sh
 
