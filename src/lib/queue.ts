@@ -1,9 +1,16 @@
 import { Queue } from 'bullmq'
 
-const connection = {
-  host: new URL(process.env.REDIS_URL || 'redis://localhost:6379').hostname || 'localhost',
-  port: parseInt(new URL(process.env.REDIS_URL || 'redis://localhost:6379').port || '6379'),
+function getRedisConnection() {
+  const url = new URL(process.env.REDIS_URL || 'redis://localhost:6379')
+  return {
+    host: url.hostname || 'localhost',
+    port: parseInt(url.port || '6379'),
+    password: url.password || undefined,
+    username: url.username && url.username !== 'default' ? url.username : undefined,
+  }
 }
+
+const connection = getRedisConnection()
 
 export const callQueue = new Queue('call-pipeline', { connection })
 
