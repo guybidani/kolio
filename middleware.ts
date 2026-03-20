@@ -5,7 +5,7 @@ import { jwtVerify } from 'jose'
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'dev-secret-change-me')
 const COOKIE_NAME = 'kolio_session'
 
-const publicPaths = ['/', '/login', '/api/auth/login', '/api/auth/logout', '/api/webhooks']
+const publicPaths = ['/', '/login', '/api/auth/login', '/api/auth/logout', '/api/webhooks', '/api/health']
 
 function isPublicPath(pathname: string): boolean {
   return publicPaths.some(
