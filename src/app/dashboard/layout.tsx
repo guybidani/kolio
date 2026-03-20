@@ -19,7 +19,7 @@ export default function DashboardLayout({
         <header className="sticky top-0 z-40 flex h-14 items-center gap-4 border-b border-white/10 glass px-4 lg:hidden">
           <MobileSidebar />
           <Logo size="sm" />
-          <div className="mr-auto">
+          <div className="ms-auto">
             <NotificationBell />
           </div>
         </header>

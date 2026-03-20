@@ -18,7 +18,7 @@ function TrendIcon({ trend }: { trend: number }) {
   // For filler words, going down is good
   if (trend < -0.5) return <TrendingDown className="h-3 w-3 text-emerald-400" />
   if (trend > 0.5) return <TrendingUp className="h-3 w-3 text-red-400" />
-  return <Minus className="h-3 w-3 text-white/30" />
+  return <Minus className="h-3 w-3 text-white/50" />
 }
 
 export function FillerWords({ data }: FillerWordsProps) {
@@ -32,7 +32,7 @@ export function FillerWords({ data }: FillerWordsProps) {
           <AlertCircle className="h-4 w-4 text-amber-400" />
           מילות מילוי - לידרבורד
         </h3>
-        <p className="text-xs text-white/30 mt-1">
+        <p className="text-xs text-white/50 mt-1">
           ממוצע מילות מילוי לשיחה (פחות = טוב יותר)
         </p>
       </div>
@@ -50,7 +50,7 @@ export function FillerWords({ data }: FillerWordsProps) {
       <div className="px-5 pb-5">
         <table className="w-full">
           <thead>
-            <tr className="text-xs text-white/30">
+            <tr className="text-xs text-white/50">
               <th className="text-right pb-2 font-medium">#</th>
               <th className="text-right pb-2 font-medium">נציג</th>
               <th className="text-center pb-2 font-medium">ממוצע</th>
@@ -64,7 +64,7 @@ export function FillerWords({ data }: FillerWordsProps) {
                 key={rep.id}
                 className="border-t border-white/5 hover:bg-white/5 transition-colors"
               >
-                <td className="py-2.5 text-sm text-white/30 w-8">{i + 1}</td>
+                <td className="py-2.5 text-sm text-white/50 w-8">{i + 1}</td>
                 <td className="py-2.5">
                   <span className="text-sm text-white">{rep.name}</span>
                 </td>
@@ -95,7 +95,7 @@ export function FillerWords({ data }: FillerWordsProps) {
         </table>
 
         {sorted.length === 0 && (
-          <p className="text-sm text-white/30 text-center py-4">
+          <p className="text-sm text-white/50 text-center py-4">
             אין נתונים עדיין
           </p>
         )}

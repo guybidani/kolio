@@ -1,8 +1,5 @@
 import { Worker, Job } from 'bullmq'
-const connection = {
-  host: new URL(process.env.REDIS_URL || 'redis://localhost:6379').hostname || 'localhost',
-  port: parseInt(new URL(process.env.REDIS_URL || 'redis://localhost:6379').port || '6379'),
-}
+import { connection } from '@/lib/queue'
 import { db } from '@/lib/db'
 import { Prisma } from '@prisma/client'
 import { analyzeCallTranscript } from '@/lib/openai'

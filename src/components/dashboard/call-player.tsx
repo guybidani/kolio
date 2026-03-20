@@ -97,30 +97,30 @@ export function CallPlayer({ audioUrl, utterances, keyMoments = [] }: CallPlayer
 
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={() => skip(-10)} className="text-white/60 hover:text-white hover:bg-white/10">
+            <Button variant="ghost" size="icon" onClick={() => skip(-10)} className="text-white/60 hover:text-white hover:bg-white/10" aria-label="אחורה 10 שניות">
               <SkipBack className="h-4 w-4" />
             </Button>
-            <Button size="icon" onClick={togglePlay} className="h-10 w-10 bg-indigo-600 hover:bg-indigo-500 text-white">
+            <Button size="icon" onClick={togglePlay} className="h-10 w-10 bg-indigo-600 hover:bg-indigo-500 text-white" aria-label={isPlaying ? 'עצור' : 'נגן'}>
               {isPlaying ? (
                 <Pause className="h-5 w-5" />
               ) : (
                 <Play className="h-5 w-5" />
               )}
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => skip(10)} className="text-white/60 hover:text-white hover:bg-white/10">
+            <Button variant="ghost" size="icon" onClick={() => skip(10)} className="text-white/60 hover:text-white hover:bg-white/10" aria-label="קדימה 10 שניות">
               <SkipForward className="h-4 w-4" />
             </Button>
           </div>
 
           <div className="flex-1 space-y-1">
             <Progress value={progress} className="h-2 cursor-pointer" />
-            <div className="flex justify-between text-xs text-white/30">
+            <div className="flex justify-between text-xs text-white/50">
               <span>{formatTime(currentTime)}</span>
               <span>{formatTime(duration)}</span>
             </div>
           </div>
 
-          <Volume2 className="h-4 w-4 text-white/30" />
+          <Volume2 className="h-4 w-4 text-white/50" />
         </div>
 
         {/* Key Moments Markers */}
@@ -172,7 +172,7 @@ export function CallPlayer({ audioUrl, utterances, keyMoments = [] }: CallPlayer
                   >
                     {utt.speaker === 0 ? 'נציג' : 'לקוח'}
                   </span>
-                  <span className="text-xs text-white/30">
+                  <span className="text-xs text-white/50">
                     {formatTime(utt.start)}
                   </span>
                 </div>
@@ -181,7 +181,7 @@ export function CallPlayer({ audioUrl, utterances, keyMoments = [] }: CallPlayer
             ))}
 
             {utterances.length === 0 && (
-              <p className="text-center text-white/30 py-8">
+              <p className="text-center text-white/50 py-8">
                 אין תמלול זמין לשיחה זו
               </p>
             )}

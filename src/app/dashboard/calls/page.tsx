@@ -123,12 +123,12 @@ export default function CallsPage() {
 
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
           <Input
             placeholder="חיפוש לפי שם ליד, עסק או נציג..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pr-10 bg-white/5 border-white/10 text-white placeholder:text-white/30"
+            className="pr-10 bg-white/5 border-white/10 text-white placeholder:text-white/50"
           />
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -156,9 +156,9 @@ export default function CallsPage() {
 
         {filtered.length === 0 && (
           <div className="rounded-xl bg-white/5 border border-white/10 py-12 text-center">
-            <Search className="h-8 w-8 text-white/20 mx-auto mb-3" />
+            <Search className="h-8 w-8 text-white/40 mx-auto mb-3" />
             <p className="text-white/40">לא נמצאו שיחות</p>
-            <p className="text-sm text-white/20 mt-1">נסו לשנות את מילות החיפוש או הסינון</p>
+            <p className="text-sm text-white/40 mt-1">נסו לשנות את מילות החיפוש או הסינון</p>
           </div>
         )}
       </div>

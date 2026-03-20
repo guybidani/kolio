@@ -106,7 +106,7 @@ export function BadgesDisplay({ earned, className }: BadgesDisplayProps) {
         <h3 className="text-base font-semibold text-white flex items-center gap-2">
           <Award className="h-4 w-4 text-amber-400" />
           תגים
-          <span className="text-xs text-white/30 font-normal">
+          <span className="text-xs text-white/50 font-normal">
             {earned.length}/{ALL_BADGES.length}
           </span>
         </h3>
@@ -138,7 +138,7 @@ export function BadgesDisplay({ earned, className }: BadgesDisplayProps) {
                   <Icon
                     className={cn(
                       'h-5 w-5',
-                      isEarned ? config.color : 'text-white/20'
+                      isEarned ? config.color : 'text-white/40'
                     )}
                   />
                 </div>
@@ -146,13 +146,13 @@ export function BadgesDisplay({ earned, className }: BadgesDisplayProps) {
                   <p
                     className={cn(
                       'text-xs font-medium leading-tight',
-                      isEarned ? 'text-white' : 'text-white/30'
+                      isEarned ? 'text-white' : 'text-white/50'
                     )}
                   >
                     {badge.name}
                   </p>
                   {isEarned && earnedBadge && (
-                    <p className="text-[10px] text-white/30 mt-0.5">
+                    <p className="text-[10px] text-white/50 mt-0.5">
                       {new Date(earnedBadge.earnedAt).toLocaleDateString('he-IL')}
                     </p>
                   )}

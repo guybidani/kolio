@@ -2,7 +2,17 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { jwtVerify } from 'jose'
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'dev-secret-change-me')
+function getJwtSecret(): Uint8Array {
+  const secret = process.env.JWT_SECRET
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production' && !process.env.NEXT_PHASE) {
+      throw new Error('JWT_SECRET environment variable is required in production')
+    }
+    return new TextEncoder().encode('UNSAFE-DEV-SECRET-DO-NOT-USE-IN-PRODUCTION')
+  }
+  return new TextEncoder().encode(secret)
+}
+const JWT_SECRET = getJwtSecret()
 const COOKIE_NAME = 'kolio_session'
 
 const publicPaths = ['/', '/login', '/api/auth/login', '/api/auth/logout', '/api/webhooks', '/api/health']

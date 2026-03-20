@@ -169,7 +169,7 @@ export default function AnalyticsPage() {
       </div>
 
       {loading && (
-        <div className="text-center py-8 text-white/30">טוען נתונים...</div>
+        <div className="text-center py-8 text-white/50">טוען נתונים...</div>
       )}
 
       <AdvancedStats

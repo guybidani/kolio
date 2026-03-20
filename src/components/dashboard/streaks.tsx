@@ -106,15 +106,15 @@ export function StreaksDisplay({ streaks, className }: StreaksDisplayProps) {
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-white/30">{config.description}</p>
+                  <p className="text-xs text-white/50">{config.description}</p>
                 </div>
 
                 <div className="text-left shrink-0">
-                  <p className={cn('text-xl font-bold tabular-nums', count > 0 ? config.color : 'text-white/20')}>
+                  <p className={cn('text-xl font-bold tabular-nums', count > 0 ? config.color : 'text-white/40')}>
                     {count}
                   </p>
                   {best > 0 && best > count && (
-                    <p className="text-[10px] text-white/20">
+                    <p className="text-[10px] text-white/40">
                       שיא: {best}
                     </p>
                   )}
@@ -125,7 +125,7 @@ export function StreaksDisplay({ streaks, className }: StreaksDisplayProps) {
               {count > 0 && (
                 <div className="mt-2">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] text-white/20">
+                    <span className="text-[10px] text-white/40">
                       {count}/{nextMilestone} לתג הבא
                     </span>
                   </div>

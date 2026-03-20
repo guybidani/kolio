@@ -104,7 +104,7 @@ export default function UploadPage() {
             placeholder="שם הנציג (אופציונלי)"
             value={defaultRep}
             onChange={(e) => setDefaultRep(e.target.value)}
-            className="max-w-xs bg-white/5 border-white/10 text-white placeholder:text-white/30"
+            className="max-w-xs bg-white/5 border-white/10 text-white placeholder:text-white/50"
           />
         </div>
       </div>
@@ -123,7 +123,7 @@ export default function UploadPage() {
         onDragLeave={() => setDragActive(false)}
         onDrop={handleDrop}
       >
-        <Upload className="h-12 w-12 text-white/20 mx-auto mb-4" />
+        <Upload className="h-12 w-12 text-white/40 mx-auto mb-4" />
         <h3 className="text-lg font-medium text-white mb-2">גררו קבצי אודיו לכאן</h3>
         <p className="text-sm text-white/40 mb-4">
           או לחצו לבחירת קבצים
@@ -167,11 +167,11 @@ export default function UploadPage() {
                 key={file.id}
                 className="flex items-center gap-3 p-3 rounded-lg border border-white/10 bg-white/[0.03]"
               >
-                <FileAudio className="h-8 w-8 text-white/20 flex-shrink-0" />
+                <FileAudio className="h-8 w-8 text-white/40 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-medium text-white truncate">{file.name}</p>
-                    <span className="text-xs text-white/30">
+                    <span className="text-xs text-white/50">
                       {formatSize(file.size)}
                     </span>
                   </div>
@@ -179,7 +179,7 @@ export default function UploadPage() {
                     <Progress value={file.progress} className="h-1 mt-1" />
                   )}
                   {file.repName && (
-                    <p className="text-xs text-white/30">נציג: {file.repName}</p>
+                    <p className="text-xs text-white/50">נציג: {file.repName}</p>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
@@ -211,7 +211,7 @@ export default function UploadPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-white/30 hover:text-white hover:bg-white/10"
+                      className="h-8 w-8 text-white/50 hover:text-white hover:bg-white/10"
                       onClick={() => removeFile(file.id)}
                     >
                       <X className="h-4 w-4" />

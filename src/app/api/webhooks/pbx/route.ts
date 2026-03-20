@@ -174,6 +174,20 @@ export async function POST(req: Request) {
       }
     }
 
+    // Deduplicate: check if a call with this externalId already exists for this org
+    if (callData.callId) {
+      const existing = await db.call.findFirst({
+        where: { orgId: org.id, externalId: callData.callId },
+      })
+      if (existing) {
+        return NextResponse.json({
+          success: true,
+          callId: existing.id,
+          duplicate: true,
+        })
+      }
+    }
+
     // Create call record
     const directionMap: Record<string, 'INBOUND' | 'OUTBOUND' | 'UNKNOWN'> = {
       inbound: 'INBOUND',

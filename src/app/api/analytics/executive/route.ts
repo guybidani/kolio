@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { getSession } from '@/lib/auth'
 
 // Mock data for executive dashboard - realistic looking data
 // In production, this would query Call + Rep tables with aggregations
@@ -147,6 +148,11 @@ function generateMockData() {
 
 export async function GET() {
   try {
+    const session = await getSession()
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     // In production: validate session, query DB with org filter
     // For now, return mock data
     const data = generateMockData()

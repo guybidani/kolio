@@ -27,7 +27,7 @@ export function RadarComparison({ categories, thisMonth, lastMonth }: RadarCompa
     <div className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-6">
       <h3 className="text-base font-semibold text-white mb-4">השוואת תקופות</h3>
       <p className="text-xs text-white/40 mb-6">החודש לעומת חודש שעבר</p>
-      <div className="h-[320px]">
+      <div className="h-[320px]" dir="ltr">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart data={data} cx="50%" cy="50%" outerRadius="70%">
             <PolarGrid stroke="rgba(255,255,255,0.1)" />

@@ -46,7 +46,7 @@ export default function SettingsPage() {
               <div>
                 <label className="text-sm font-medium text-white mb-1 block">Slug</label>
                 <Input defaultValue="project-adam" disabled className="bg-white/[0.03] border-white/10 text-white/40" />
-                <p className="text-xs text-white/30 mt-1">
+                <p className="text-xs text-white/50 mt-1">
                   לא ניתן לשנות את ה-slug
                 </p>
               </div>
@@ -70,7 +70,7 @@ export default function SettingsPage() {
                     <Copy className="h-4 w-4" />
                   </Button>
                 </div>
-                <p className="text-xs text-white/30 mt-1">
+                <p className="text-xs text-white/50 mt-1">
                   משמש לאימות webhook-ים נכנסים מהמרכזיה
                 </p>
               </div>
@@ -106,7 +106,7 @@ export default function SettingsPage() {
 
               <div>
                 <label className="text-sm font-medium text-white mb-1 block">מיפוי שלוחות</label>
-                <p className="text-xs text-white/30 mb-2">
+                <p className="text-xs text-white/50 mb-2">
                   מפו שלוחות לנציגים כדי לזהות אוטומטית מי דיבר
                 </p>
                 <div className="space-y-2">
@@ -140,7 +140,7 @@ export default function SettingsPage() {
                   <Badge className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">פעיל</Badge>
                   <div>
                     <p className="text-sm font-medium text-white">Voicenter</p>
-                    <p className="text-xs text-white/30">
+                    <p className="text-xs text-white/50">
                       חובר ב-15/03/2026 | 23 שיחות הועברו
                     </p>
                   </div>
@@ -167,7 +167,7 @@ export default function SettingsPage() {
                   >
                     <div>
                       <p className="text-sm font-medium text-white">{integration.name}</p>
-                      <p className="text-xs text-white/30">
+                      <p className="text-xs text-white/50">
                         {integration.description}
                       </p>
                     </div>

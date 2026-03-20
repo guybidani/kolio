@@ -4,12 +4,33 @@ import { verifyPassword, createToken, getSessionCookieOptions } from '@/lib/auth
 
 export const runtime = 'nodejs'
 
+// In-memory rate limiter: max 5 attempts per email per 15 minutes
+const loginAttempts = new Map<string, { count: number; resetAt: number }>()
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000 // 15 minutes
+const RATE_LIMIT_MAX = 5
+
+function checkLoginRateLimit(email: string): boolean {
+  const now = Date.now()
+  const key = email.toLowerCase().trim()
+  const entry = loginAttempts.get(key)
+  if (!entry || now > entry.resetAt) {
+    loginAttempts.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS })
+    return true
+  }
+  entry.count++
+  return entry.count <= RATE_LIMIT_MAX
+}
+
 export async function POST(req: Request) {
   try {
     const { email, password } = await req.json()
 
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
+    }
+
+    if (!checkLoginRateLimit(email)) {
+      return NextResponse.json({ error: 'Too many login attempts. Please try again later.' }, { status: 429 })
     }
 
     const user = await db.user.findUnique({
@@ -56,8 +77,12 @@ export async function POST(req: Request) {
     })
 
     return response
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Login error:', error)
-    return NextResponse.json({ error: 'Internal server error', detail: error?.message?.slice(0, 200) }, { status: 500 })
+    const body: Record<string, string> = { error: 'Internal server error' }
+    if (process.env.NODE_ENV !== 'production' && error instanceof Error) {
+      body.detail = error.message.slice(0, 200)
+    }
+    return NextResponse.json(body, { status: 500 })
   }
 }

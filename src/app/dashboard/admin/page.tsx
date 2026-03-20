@@ -190,8 +190,8 @@ export default function AdminPage() {
       <div className="flex items-center gap-3">
         <Shield className="h-6 w-6 text-indigo-400" />
         <div>
-          <h1 className="text-2xl font-bold text-white">Admin Panel</h1>
-          <p className="text-white/40">Manage organizations and users</p>
+          <h1 className="text-2xl font-bold text-white">ניהול מערכת</h1>
+          <p className="text-white/40">ניהול ארגונים ומשתמשים</p>
         </div>
       </div>
 
@@ -200,7 +200,7 @@ export default function AdminPage() {
         <div className="p-5 pb-3 flex items-center justify-between">
           <h3 className="text-base font-semibold text-white flex items-center gap-2">
             <Building2 className="h-4 w-4 text-indigo-400" />
-            Organizations ({orgs.length})
+            ארגונים ({orgs.length})
           </h3>
           <Button
             size="sm"
@@ -208,12 +208,12 @@ export default function AdminPage() {
             onClick={() => setShowNewOrg(true)}
           >
             <Plus className="h-4 w-4 ml-1" />
-            New Organization
+            ארגון חדש
           </Button>
         </div>
         <div className="px-5 pb-5">
           {orgs.length === 0 ? (
-            <p className="text-sm text-white/30 text-center py-4">No organizations yet</p>
+            <p className="text-sm text-white/50 text-center py-4">אין ארגונים עדיין</p>
           ) : (
             <div className="space-y-2">
               {orgs.map((org) => (
@@ -223,7 +223,7 @@ export default function AdminPage() {
                 >
                   <div>
                     <p className="text-sm font-medium text-white">{org.name}</p>
-                    <p className="text-xs text-white/30">
+                    <p className="text-xs text-white/50">
                       {org.slug} | {org._count.users} users | {org._count.calls} calls | {org._count.reps} reps
                     </p>
                   </div>
@@ -244,7 +244,7 @@ export default function AdminPage() {
         <div className="p-5 pb-3 flex items-center justify-between">
           <h3 className="text-base font-semibold text-white flex items-center gap-2">
             <Users className="h-4 w-4 text-indigo-400" />
-            Users ({users.length})
+            משתמשים ({users.length})
           </h3>
           <Button
             size="sm"
@@ -255,12 +255,12 @@ export default function AdminPage() {
             }}
           >
             <UserPlus className="h-4 w-4 ml-1" />
-            New User
+            משתמש חדש
           </Button>
         </div>
         <div className="px-5 pb-5">
           {users.length === 0 ? (
-            <p className="text-sm text-white/30 text-center py-4">No users yet</p>
+            <p className="text-sm text-white/50 text-center py-4">אין משתמשים עדיין</p>
           ) : (
             <div className="space-y-2">
               {users.map((user) => (
@@ -281,19 +281,19 @@ export default function AdminPage() {
                       </Badge>
                       {user.isAdmin && (
                         <Badge className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs">
-                          System Admin
+                          מנהל מערכת
                         </Badge>
                       )}
                       {!user.isActive && (
                         <Badge className="bg-red-500/10 text-red-400 border border-red-500/20 text-xs">
-                          Inactive
+                          לא פעיל
                         </Badge>
                       )}
                     </div>
-                    <p className="text-xs text-white/30">
+                    <p className="text-xs text-white/50">
                       {user.email} | {user.org.name}
                       {user.managedReps.length > 0 && (
-                        <> | Manages: {user.managedReps.map((r) => r.name).join(', ')}</>
+                        <> | מנהל: {user.managedReps.map((r) => r.name).join(', ')}</>
                       )}
                     </p>
                   </div>
@@ -308,11 +308,11 @@ export default function AdminPage() {
       <Dialog open={showNewOrg} onOpenChange={setShowNewOrg}>
         <DialogContent className="bg-[#12121A] border-white/10 text-white">
           <DialogHeader>
-            <DialogTitle>Create Organization</DialogTitle>
+            <DialogTitle>יצירת ארגון</DialogTitle>
           </DialogHeader>
           <form onSubmit={createOrg} className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">Name</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">שם</label>
               <Input
                 value={orgName}
                 onChange={(e) => setOrgName(e.target.value)}
@@ -322,7 +322,7 @@ export default function AdminPage() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">Slug</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">מזהה</label>
               <Input
                 value={orgSlug}
                 onChange={(e) => setOrgSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
@@ -335,7 +335,7 @@ export default function AdminPage() {
               <p className="text-sm text-red-400">{orgError}</p>
             )}
             <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white">
-              Create
+              צור
             </Button>
           </form>
         </DialogContent>
@@ -345,11 +345,11 @@ export default function AdminPage() {
       <Dialog open={showNewUser} onOpenChange={setShowNewUser}>
         <DialogContent className="bg-[#12121A] border-white/10 text-white">
           <DialogHeader>
-            <DialogTitle>Create User</DialogTitle>
+            <DialogTitle>יצירת משתמש</DialogTitle>
           </DialogHeader>
           <form onSubmit={createUser} className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">Name</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">שם</label>
               <Input
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
@@ -359,7 +359,7 @@ export default function AdminPage() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">Email</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">אימייל</label>
               <Input
                 type="email"
                 value={userEmail}
@@ -370,26 +370,26 @@ export default function AdminPage() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">Password</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">סיסמה</label>
               <Input
                 type="password"
                 value={userPassword}
                 onChange={(e) => setUserPassword(e.target.value)}
-                placeholder="Min 8 characters"
+                placeholder="מינימום 8 תווים"
                 required
                 minLength={8}
                 className="bg-white/5 border-white/10 text-white"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">Organization</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">ארגון</label>
               <select
                 value={userOrgId}
                 onChange={(e) => setUserOrgId(e.target.value)}
                 required
                 className="w-full rounded-md bg-white/5 border border-white/10 text-white px-3 py-2 text-sm"
               >
-                <option value="">Select org...</option>
+                <option value="">בחר ארגון...</option>
                 {orgs.map((org) => (
                   <option key={org.id} value={org.id}>
                     {org.name}
@@ -398,17 +398,17 @@ export default function AdminPage() {
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">Role</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">תפקיד</label>
               <select
                 value={userRole}
                 onChange={(e) => setUserRole(e.target.value)}
                 className="w-full rounded-md bg-white/5 border border-white/10 text-white px-3 py-2 text-sm"
               >
-                <option value="ADMIN">Admin</option>
-                <option value="CEO">CEO</option>
-                <option value="MANAGER">Manager</option>
-                <option value="REP">Rep</option>
-                <option value="VIEWER">Viewer</option>
+                <option value="ADMIN">מנהל</option>
+                <option value="CEO">מנכ&quot;ל</option>
+                <option value="MANAGER">מנהל צוות</option>
+                <option value="REP">נציג</option>
+                <option value="VIEWER">צופה</option>
               </select>
             </div>
 
@@ -416,14 +416,14 @@ export default function AdminPage() {
             {userRole === 'REP' && managersForOrg.length > 0 && (
               <div>
                 <label className="text-sm font-medium text-white/70 mb-1 block">
-                  Assign Manager
+                  שיוך מנהל
                 </label>
                 <select
                   value={userManagerId}
                   onChange={(e) => setUserManagerId(e.target.value)}
                   className="w-full rounded-md bg-white/5 border border-white/10 text-white px-3 py-2 text-sm"
                 >
-                  <option value="">No manager</option>
+                  <option value="">ללא מנהל</option>
                   {managersForOrg.map((m) => (
                     <option key={m.id} value={m.id}>
                       {m.name} ({m.role})
@@ -442,14 +442,14 @@ export default function AdminPage() {
                 className="rounded border-white/10"
               />
               <label htmlFor="isAdmin" className="text-sm text-white/70">
-                System Admin (can manage all orgs & users)
+                מנהל מערכת (יכול לנהל את כל הארגונים והמשתמשים)
               </label>
             </div>
             {userError && (
               <p className="text-sm text-red-400">{userError}</p>
             )}
             <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white">
-              Create User
+              יצירת משתמש
             </Button>
           </form>
         </DialogContent>

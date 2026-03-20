@@ -1,11 +1,10 @@
-import { Worker, Job } from 'bullmq'
-const connection = {
-  host: new URL(process.env.REDIS_URL || 'redis://localhost:6379').hostname || 'localhost',
-  port: parseInt(new URL(process.env.REDIS_URL || 'redis://localhost:6379').port || '6379'),
-}
+import { Worker, Job, Queue } from 'bullmq'
+import { connection } from '@/lib/queue'
 import { db } from '@/lib/db'
 import { transcribeAudio, formatTranscript } from '@/lib/deepgram'
 import { getSignedAudioUrl } from '@/lib/r2'
+
+const analysisQueue = new Queue('call-analysis', { connection })
 
 interface TranscribeJobData {
   callId: string
@@ -49,6 +48,18 @@ async function processTranscription(job: Job<TranscribeJobData>) {
         duration,
       },
     })
+
+    // Enqueue analysis job
+    await analysisQueue.add(
+      'analyze-call',
+      { callId, orgId },
+      {
+        attempts: 3,
+        backoff: { type: 'exponential', delay: 5000 },
+        removeOnComplete: { age: 86400 },
+        removeOnFail: { age: 604800 },
+      }
+    )
 
     return { callId, wordCount: text.split(/\s+/).length }
   } catch (error) {

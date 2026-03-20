@@ -76,7 +76,7 @@ export function RepRankingsTable({ reps }: RepRankingsTableProps) {
                 <td className="px-6 py-3">
                   <span className={cn(
                     'text-sm font-bold',
-                    i === 0 ? 'text-amber-400' : 'text-white/30'
+                    i === 0 ? 'text-amber-400' : 'text-white/50'
                   )}>
                     {i + 1}
                   </span>

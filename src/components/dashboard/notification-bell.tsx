@@ -162,6 +162,8 @@ export function NotificationBell() {
         size="icon"
         className="relative text-white/50 hover:text-white/80 hover:bg-white/5"
         onClick={() => setOpen(!open)}
+        onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false) }}
+        aria-expanded={open}
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
@@ -172,7 +174,7 @@ export function NotificationBell() {
       </Button>
 
       {open && (
-        <div className="absolute left-0 top-full mt-2 w-80 rounded-xl bg-[#141420] border border-white/10 shadow-2xl z-50 overflow-hidden">
+        <div role="menu" className="absolute left-0 top-full mt-2 w-80 rounded-xl bg-[#141420] border border-white/10 shadow-2xl z-50 overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
             <h3 className="text-sm font-semibold text-white">התראות</h3>
@@ -190,7 +192,7 @@ export function NotificationBell() {
           {/* Notification list */}
           <div className="max-h-96 overflow-y-auto">
             {loading && notifications.length === 0 && (
-              <div className="p-4 text-center text-sm text-white/30">
+              <div className="p-4 text-center text-sm text-white/50">
                 טוען...
               </div>
             )}
@@ -198,7 +200,7 @@ export function NotificationBell() {
             {!loading && notifications.length === 0 && (
               <div className="p-8 text-center">
                 <Bell className="h-8 w-8 text-white/10 mx-auto mb-2" />
-                <p className="text-sm text-white/30">אין התראות</p>
+                <p className="text-sm text-white/50">אין התראות</p>
               </div>
             )}
 
@@ -237,7 +239,7 @@ export function NotificationBell() {
                     <p className="text-xs text-white/40 truncate mt-0.5">
                       {notification.body}
                     </p>
-                    <p className="text-[10px] text-white/20 mt-1">
+                    <p className="text-[10px] text-white/40 mt-1">
                       {timeAgo(notification.createdAt)}
                     </p>
                   </div>
@@ -247,7 +249,7 @@ export function NotificationBell() {
                         e.stopPropagation()
                         handleMarkRead(notification.id)
                       }}
-                      className="mt-0.5 shrink-0 text-white/20 hover:text-white/50 transition-colors"
+                      className="mt-0.5 shrink-0 text-white/40 hover:text-white/50 transition-colors"
                       title="סמן כנקרא"
                     >
                       <Check className="h-3.5 w-3.5" />

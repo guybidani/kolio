@@ -36,7 +36,7 @@ export function ScoreTrendChart({ data, targetScore = 75 }: ScoreTrendChartProps
   return (
     <div className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-6">
       <h3 className="text-base font-semibold text-white mb-6">מגמת ציון צוות</h3>
-      <div className="h-[280px]">
+      <div className="h-[280px]" dir="ltr">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
             <defs>

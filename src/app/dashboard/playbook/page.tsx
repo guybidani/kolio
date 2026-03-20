@@ -138,12 +138,12 @@ export default function PlaybookPage() {
 
         <TabsContent value="objections" className="mt-6 space-y-4">
           <div className="relative">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
             <Input
               placeholder="חיפוש התנגדות..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pr-10 bg-white/5 border-white/10 text-white placeholder:text-white/30"
+              className="pr-10 bg-white/5 border-white/10 text-white placeholder:text-white/50"
             />
           </div>
 
@@ -167,7 +167,7 @@ export default function PlaybookPage() {
                       </p>
                       <p className="text-sm text-emerald-300/80">{obj.bestResponse}</p>
                     </div>
-                    <div className="flex items-center gap-4 mt-2 text-xs text-white/30">
+                    <div className="flex items-center gap-4 mt-2 text-xs text-white/50">
                       <span>שימושים: {obj.usedCount}</span>
                       <span>הצלחה: {obj.effectiveness}%</span>
                     </div>

@@ -29,7 +29,8 @@ export function FinalCTA() {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
-            <Link href="https://wa.me/972500000000">
+            {/* TODO: Replace with actual WhatsApp number */}
+            <Link href="https://wa.me/9720000000000">
               <Button variant="outline" size="lg" className="text-lg px-8 border-white/10 text-white/80 hover:bg-white/5">
                 דברו איתנו בווטסאפ
               </Button>

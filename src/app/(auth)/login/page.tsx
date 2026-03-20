@@ -31,7 +31,7 @@ function LoginForm() {
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error || 'Login failed')
+        setError(data.error || 'ההתחברות נכשלה')
         setLoading(false)
         return
       }
@@ -39,7 +39,7 @@ function LoginForm() {
       router.push(redirect)
       router.refresh()
     } catch {
-      setError('Something went wrong. Please try again.')
+      setError('משהו השתבש. נסה שוב.')
       setLoading(false)
     }
   }
@@ -48,7 +48,7 @@ function LoginForm() {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label htmlFor="email" className="text-sm font-medium text-white/70 mb-1.5 block">
-          Email
+          אימייל
         </label>
         <Input
           id="email"
@@ -58,13 +58,13 @@ function LoginForm() {
           placeholder="you@company.com"
           required
           autoComplete="email"
-          className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-indigo-500/50 focus:ring-indigo-500/20"
+          className="bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-indigo-500/50 focus:ring-indigo-500/20"
         />
       </div>
 
       <div>
         <label htmlFor="password" className="text-sm font-medium text-white/70 mb-1.5 block">
-          Password
+          סיסמה
         </label>
         <Input
           id="password"
@@ -74,7 +74,7 @@ function LoginForm() {
           placeholder="••••••••"
           required
           autoComplete="current-password"
-          className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-indigo-500/50 focus:ring-indigo-500/20"
+          className="bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-indigo-500/50 focus:ring-indigo-500/20"
         />
       </div>
 
@@ -90,7 +90,7 @@ function LoginForm() {
         className="w-full bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_4px_14px_rgba(99,102,241,0.3)] disabled:opacity-50"
         size="lg"
       >
-        {loading ? 'Signing in...' : 'Sign in'}
+        {loading ? 'מתחבר...' : 'התחבר'}
       </Button>
     </form>
   )
@@ -114,8 +114,8 @@ export default function LoginPage() {
         {/* Glass card */}
         <div className="rounded-2xl bg-white/[0.05] backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/20 p-8">
           <div className="text-center mb-6">
-            <h1 className="text-xl font-bold text-white">Welcome back</h1>
-            <p className="text-sm text-white/40 mt-1">Sign in to your account</p>
+            <h1 className="text-xl font-bold text-white">ברוך הבא</h1>
+            <p className="text-sm text-white/40 mt-1">התחבר לחשבון שלך</p>
           </div>
 
           <Suspense fallback={<div className="h-48" />}>
@@ -123,8 +123,8 @@ export default function LoginPage() {
           </Suspense>
         </div>
 
-        <p className="text-center text-xs text-white/20 mt-6">
-          Contact your administrator to get an account
+        <p className="text-center text-xs text-white/40 mt-6">
+          פנה למנהל המערכת לקבלת חשבון
         </p>
       </div>
     </div>

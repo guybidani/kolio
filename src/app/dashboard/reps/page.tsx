@@ -147,7 +147,7 @@ export default function RepsPage() {
             {sorted.map((rep, i) => (
               <Link key={rep.id} href={`/dashboard/reps/${rep.id}`}>
                 <div className="flex items-center gap-4 p-3 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
-                  <span className="text-sm font-bold w-6 text-center text-white/30">
+                  <span className="text-sm font-bold w-6 text-center text-white/50">
                     {i + 1}
                   </span>
                   <Avatar className="h-10 w-10">
@@ -157,7 +157,7 @@ export default function RepsPage() {
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-white">{rep.name}</p>
-                    <div className="flex items-center gap-3 text-xs text-white/30">
+                    <div className="flex items-center gap-3 text-xs text-white/50">
                       <span className="flex items-center gap-1">
                         <Phone className="h-3 w-3" />
                         {rep.totalCalls} שיחות
@@ -169,23 +169,23 @@ export default function RepsPage() {
                   </div>
                   <div className="hidden sm:grid grid-cols-5 gap-4 text-center">
                     <div>
-                      <p className="text-xs text-white/30">דיסקברי</p>
+                      <p className="text-xs text-white/50">דיסקברי</p>
                       <p className="text-sm font-medium text-white">{rep.avgDiscovery.toFixed(1)}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-white/30">סגירה</p>
+                      <p className="text-xs text-white/50">סגירה</p>
                       <p className="text-sm font-medium text-white">{rep.avgClosing.toFixed(1)}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-white/30">התנגדויות</p>
+                      <p className="text-xs text-white/50">התנגדויות</p>
                       <p className="text-sm font-medium text-white">{rep.avgObjectionHandling.toFixed(1)}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-white/30">ראפור</p>
+                      <p className="text-xs text-white/50">ראפור</p>
                       <p className="text-sm font-medium text-white">{rep.avgRapport.toFixed(1)}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-white/30">ערך</p>
+                      <p className="text-xs text-white/50">ערך</p>
                       <p className="text-sm font-medium text-white">{rep.avgValue.toFixed(1)}</p>
                     </div>
                   </div>

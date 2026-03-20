@@ -113,7 +113,7 @@ export function CoachingPanel({ analysis }: CoachingPanelProps) {
             </div>
           ))}
           {(!retention_points || retention_points.length === 0) && (
-            <p className="text-sm text-white/30 text-center py-4">
+            <p className="text-sm text-white/50 text-center py-4">
               אין נקודות חוזק לשיחה זו
             </p>
           )}
@@ -161,7 +161,7 @@ export function CoachingPanel({ analysis }: CoachingPanelProps) {
             </div>
           ))}
           {(!improvement_points || improvement_points.length === 0) && (
-            <p className="text-sm text-white/30 text-center py-4">
+            <p className="text-sm text-white/50 text-center py-4">
               אין נקודות לשיפור לשיחה זו
             </p>
           )}
@@ -212,7 +212,7 @@ export function CoachingPanel({ analysis }: CoachingPanelProps) {
             </div>
           ))}
           {(!objections_detected || objections_detected.length === 0) && (
-            <p className="text-sm text-white/30 text-center py-4">
+            <p className="text-sm text-white/50 text-center py-4">
               לא זוהו התנגדויות בשיחה
             </p>
           )}

@@ -28,7 +28,7 @@ function getInitials(name: string) {
 function TrendIcon({ trend }: { trend: number }) {
   if (trend > 0.3) return <TrendingUp className="h-3 w-3 text-emerald-400" />
   if (trend < -0.3) return <TrendingDown className="h-3 w-3 text-red-400" />
-  return <Minus className="h-3 w-3 text-white/30" />
+  return <Minus className="h-3 w-3 text-white/50" />
 }
 
 export function RepLeaderboard({ reps }: RepLeaderboardProps) {
@@ -57,7 +57,7 @@ export function RepLeaderboard({ reps }: RepLeaderboardProps) {
                     ? 'text-white/40'
                     : i === 2
                     ? 'text-amber-600'
-                    : 'text-white/20'
+                    : 'text-white/40'
                 }`}
               >
                 {i + 1}
@@ -72,7 +72,7 @@ export function RepLeaderboard({ reps }: RepLeaderboardProps) {
 
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-white truncate">{rep.name}</p>
-                <p className="text-xs text-white/30">
+                <p className="text-xs text-white/50">
                   {rep.totalCalls} שיחות
                 </p>
               </div>
@@ -85,7 +85,7 @@ export function RepLeaderboard({ reps }: RepLeaderboardProps) {
           ))}
 
           {sorted.length === 0 && (
-            <p className="text-sm text-white/30 text-center py-4">
+            <p className="text-sm text-white/50 text-center py-4">
               אין נתונים עדיין
             </p>
           )}

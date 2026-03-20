@@ -86,7 +86,7 @@ export function TalkRatioGauge({ repRatio, customerRatio, repName }: TalkRatioGa
         </div>
 
         {/* Ideal range note */}
-        <p className="text-xs text-white/30 text-center">
+        <p className="text-xs text-white/50 text-center">
           אזור ירוק: 40-60% דיבור נציג
         </p>
       </div>

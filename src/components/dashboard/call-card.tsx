@@ -73,7 +73,7 @@ export function CallCard({
             {summary && (
               <p className="text-sm text-white/40 line-clamp-2">{summary}</p>
             )}
-            <div className="flex items-center gap-4 mt-2 text-xs text-white/30">
+            <div className="flex items-center gap-4 mt-2 text-xs text-white/50">
               {repName && <span>{repName}</span>}
               <span className="flex items-center gap-1">
                 <Clock className="h-3 w-3" />

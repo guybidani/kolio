@@ -34,15 +34,15 @@ interface NavItem {
 }
 
 const allNavItems: NavItem[] = [
-  { href: '/dashboard', label: 'Overview', icon: LayoutDashboard, section: 'dashboard' },
-  { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3, section: 'analytics' },
-  { href: '/dashboard/executive', label: 'Executive', icon: Crown, section: 'dashboard' },
-  { href: '/dashboard/calls', label: 'Calls', icon: Phone, section: 'calls' },
-  { href: '/dashboard/reps', label: 'Reps', icon: Users, section: 'reps' },
-  { href: '/dashboard/playbook', label: 'Playbook', icon: BookOpen, section: 'playbook' },
-  { href: '/dashboard/upload', label: 'Upload Call', icon: Upload, section: 'upload' },
-  { href: '/dashboard/settings', label: 'Settings', icon: Settings, section: 'settings' },
-  { href: '/dashboard/admin', label: 'Admin', icon: Shield, section: 'admin' },
+  { href: '/dashboard', label: 'סקירה כללית', icon: LayoutDashboard, section: 'dashboard' },
+  { href: '/dashboard/analytics', label: 'אנליטיקס', icon: BarChart3, section: 'analytics' },
+  { href: '/dashboard/executive', label: 'דשבורד מנהלים', icon: Crown, section: 'dashboard' },
+  { href: '/dashboard/calls', label: 'שיחות', icon: Phone, section: 'calls' },
+  { href: '/dashboard/reps', label: 'נציגים', icon: Users, section: 'reps' },
+  { href: '/dashboard/playbook', label: 'תסריט מכירה', icon: BookOpen, section: 'playbook' },
+  { href: '/dashboard/upload', label: 'העלאת שיחה', icon: Upload, section: 'upload' },
+  { href: '/dashboard/settings', label: 'הגדרות', icon: Settings, section: 'settings' },
+  { href: '/dashboard/admin', label: 'ניהול מערכת', icon: Shield, section: 'admin' },
 ]
 
 const ROLE_COLORS: Record<string, string> = {
@@ -54,11 +54,11 @@ const ROLE_COLORS: Record<string, string> = {
 }
 
 const ROLE_LABELS: Record<string, string> = {
-  ADMIN: 'Admin',
-  CEO: 'CEO',
-  MANAGER: 'Manager',
-  REP: 'Rep',
-  VIEWER: 'Viewer',
+  ADMIN: 'מנהל',
+  CEO: 'מנכ"ל',
+  MANAGER: 'מנהל צוות',
+  REP: 'נציג',
+  VIEWER: 'צופה',
 }
 
 interface UserInfo {
@@ -151,7 +151,7 @@ function NavContent() {
                   {ROLE_LABELS[user.role] || user.role}
                 </Badge>
               </div>
-              <p className="text-xs text-white/30 truncate">{user.email}</p>
+              <p className="text-xs text-white/50 truncate">{user.email}</p>
             </div>
             <Button
               variant="ghost"
