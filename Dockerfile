@@ -19,10 +19,9 @@ COPY . .
 # Generate Prisma client
 RUN npx prisma generate --schema=./prisma/schema.prisma
 
-# Build Next.js
+# Build Next.js (NODE_ENV must be development during build so devDeps are available)
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_ENV=production
-RUN npm run build
+RUN NODE_ENV=production npm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
