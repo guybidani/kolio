@@ -8,7 +8,9 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 COPY prisma ./prisma/
 COPY prisma.config.ts ./
-RUN npm ci
+
+# Install ALL dependencies (including devDependencies needed for build)
+RUN npm ci --include=dev
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -19,9 +21,9 @@ COPY . .
 # Generate Prisma client
 RUN npx prisma generate --schema=./prisma/schema.prisma
 
-# Build Next.js (NODE_ENV must be development during build so devDeps are available)
+# Build Next.js
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN NODE_ENV=production npm run build
+RUN npm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
@@ -35,11 +37,9 @@ RUN adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
 
-# Set the correct permission for prerender cache
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
 
-# Automatically leverage output traces to reduce image size
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
