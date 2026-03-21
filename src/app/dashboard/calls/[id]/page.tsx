@@ -5,7 +5,8 @@ import { useParams } from 'next/navigation'
 import { CallPlayer } from '@/components/dashboard/call-player'
 import { CoachingPanel } from '@/components/dashboard/coaching-panel'
 import { ScoreBadge } from '@/components/dashboard/score-badge'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
 import {
   ArrowRight,
@@ -88,9 +89,9 @@ export default function CallDetailPage() {
           <AlertCircle className="h-8 w-8 text-muted-foreground" />
         </div>
         <h3 className="text-lg font-semibold text-foreground mb-2">{error || 'שיחה לא נמצאה'}</h3>
-        <Button asChild variant="outline" className="mt-4">
-          <Link href="/dashboard/calls">חזרה לשיחות</Link>
-        </Button>
+        <Link href="/dashboard/calls" className={cn(buttonVariants({ variant: "outline" }), "mt-4")}>
+          חזרה לשיחות
+        </Link>
       </div>
     )
   }

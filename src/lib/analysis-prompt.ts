@@ -1,3 +1,100 @@
+interface PlaybookForPrompt {
+  name: string
+  stages: unknown
+  objectionBank: unknown
+  keywords: unknown
+  techniques?: unknown
+  scripts?: unknown
+}
+
+/**
+ * Build a customized analysis prompt based on the org's playbook.
+ * If no playbook is provided, falls back to the default SPIN + Challenger framework.
+ */
+export function buildAnalysisPrompt(playbook?: PlaybookForPrompt | null): string {
+  if (!playbook) return ANALYSIS_SYSTEM_PROMPT
+
+  const stages = Array.isArray(playbook.stages) ? playbook.stages : []
+  const objections = Array.isArray(playbook.objectionBank) ? playbook.objectionBank : []
+  const techniques = Array.isArray(playbook.techniques) ? playbook.techniques : []
+  const keywords = (playbook.keywords && typeof playbook.keywords === 'object') ? playbook.keywords as Record<string, unknown> : {}
+  const scripts = Array.isArray(playbook.scripts) ? playbook.scripts : []
+
+  let playbookSection = `
+
+## Organization Playbook: ${playbook.name}
+
+**IMPORTANT:** Score and evaluate this call based on the organization's custom playbook below, NOT generic methodology. Reference specific playbook stages, techniques, and objection responses in your feedback.
+
+### Custom Sales Stages
+The organization defines these sales stages. Evaluate how well the rep followed each stage:
+`
+  if (stages.length > 0) {
+    stages.forEach((s: Record<string, unknown>, i: number) => {
+      playbookSection += `${i + 1}. **${s.name}** (weight: ${s.weight}/10): ${s.criteria}\n`
+    })
+  }
+
+  if (objections.length > 0) {
+    playbookSection += `
+### Known Objections & Ideal Responses
+Compare the rep's objection handling to these approved responses:
+`
+    objections.forEach((o: Record<string, unknown>) => {
+      playbookSection += `- **"${o.objection}"** (${o.category}): ${o.idealResponse}\n`
+    })
+  }
+
+  if (techniques.length > 0) {
+    playbookSection += `
+### Sales Techniques to Detect
+Award points when the rep uses these techniques. Note in feedback which were used and which were missed:
+`
+    techniques.forEach((t: Record<string, unknown>) => {
+      playbookSection += `- **${t.name}**: ${t.description} (example: "${t.example}")\n`
+    })
+  }
+
+  if (keywords && (Array.isArray(keywords.positive) || Array.isArray(keywords.negative))) {
+    playbookSection += `
+### Keywords
+`
+    if (Array.isArray(keywords.positive) && keywords.positive.length > 0) {
+      playbookSection += `- **Positive keywords** (reward usage): ${keywords.positive.join(', ')}\n`
+    }
+    if (Array.isArray(keywords.negative) && keywords.negative.length > 0) {
+      playbookSection += `- **Negative keywords** (penalize usage): ${keywords.negative.join(', ')}\n`
+    }
+  }
+
+  if (scripts.length > 0) {
+    playbookSection += `
+### Reference Call Scripts
+Compare the rep's actual conversation flow to these reference scripts:
+`
+    scripts.forEach((s: Record<string, unknown>) => {
+      const content = typeof s.content === 'string' ? s.content.slice(0, 2000) : ''
+      if (content) {
+        playbookSection += `#### ${s.name}\n${content}\n\n`
+      }
+    })
+  }
+
+  // Insert the playbook section before "## Output Format"
+  const outputFormatIndex = ANALYSIS_SYSTEM_PROMPT.indexOf('## Output Format')
+  if (outputFormatIndex > 0) {
+    return (
+      ANALYSIS_SYSTEM_PROMPT.slice(0, outputFormatIndex) +
+      playbookSection +
+      '\n' +
+      ANALYSIS_SYSTEM_PROMPT.slice(outputFormatIndex)
+    )
+  }
+
+  // Fallback: append at the end
+  return ANALYSIS_SYSTEM_PROMPT + playbookSection
+}
+
 export const ANALYSIS_SYSTEM_PROMPT = `You are an expert Israeli sales coach specializing in digital marketing agency sales. You analyze Hebrew sales call transcripts and provide structured, actionable coaching feedback.
 
 ## Context

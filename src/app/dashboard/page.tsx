@@ -7,7 +7,8 @@ import { RepLeaderboard } from '@/components/dashboard/rep-leaderboard'
 import { CallCard } from '@/components/dashboard/call-card'
 import { BadgesDisplay } from '@/components/dashboard/badges'
 import { StreaksDisplay } from '@/components/dashboard/streaks'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { Phone, Upload, Users, Loader2 } from 'lucide-react'
 
 interface CallData {
@@ -166,12 +167,10 @@ export default function DashboardPage() {
                   <p className="text-sm text-muted-foreground mb-6 max-w-sm">
                     העלו את השיחה הראשונה שלכם לניתוח AI
                   </p>
-                  <Button asChild className="bg-indigo-600 hover:bg-indigo-500 text-white">
-                    <Link href="/dashboard/upload">
-                      <Upload className="h-4 w-4 ml-2" />
-                      העלה שיחה ראשונה
-                    </Link>
-                  </Button>
+                  <Link href="/dashboard/upload" className={cn(buttonVariants(), "bg-indigo-600 hover:bg-indigo-500 text-white")}>
+                    <Upload className="h-4 w-4 ml-2" />
+                    העלה שיחה ראשונה
+                  </Link>
                 </div>
               )}
             </div>
@@ -194,9 +193,9 @@ export default function DashboardPage() {
                 <p className="text-sm text-muted-foreground mb-6 max-w-sm">
                   הוסיפו נציגים כדי לעקוב אחר הביצועים שלהם
                 </p>
-                <Button asChild variant="outline" className="border-border text-muted-foreground hover:bg-muted/50">
-                  <Link href="/dashboard/admin">הוסף נציג</Link>
-                </Button>
+                <Link href="/dashboard/admin" className={cn(buttonVariants({ variant: "outline" }), "border-border text-muted-foreground hover:bg-muted/50")}>
+                  הוסף נציג
+                </Link>
               </div>
             </div>
           )}

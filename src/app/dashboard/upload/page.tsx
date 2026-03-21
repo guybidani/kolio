@@ -1,25 +1,31 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { Upload, FileAudio, X, CheckCircle, Loader2 } from 'lucide-react'
+import { Upload, FileAudio, X, CheckCircle, Loader2, AlertCircle } from 'lucide-react'
 
 interface UploadedFile {
   id: string
+  file: File
   name: string
   size: number
   status: 'pending' | 'uploading' | 'processing' | 'done' | 'error'
   progress: number
   repName?: string
+  callId?: string
+  error?: string
 }
 
 export default function UploadPage() {
+  const router = useRouter()
   const [files, setFiles] = useState<UploadedFile[]>([])
   const [dragActive, setDragActive] = useState(false)
   const [defaultRep, setDefaultRep] = useState('')
+  const abortControllers = useRef<Map<string, AbortController>>(new Map())
 
   const handleFiles = useCallback(
     (fileList: FileList) => {
@@ -27,6 +33,7 @@ export default function UploadPage() {
         .filter((f) => f.type.startsWith('audio/') || f.name.match(/\.(mp3|wav|m4a|ogg|webm|flac)$/i))
         .map((f) => ({
           id: Math.random().toString(36).slice(2),
+          file: f,
           name: f.name,
           size: f.size,
           status: 'pending' as const,
@@ -50,33 +57,78 @@ export default function UploadPage() {
   )
 
   const removeFile = (id: string) => {
+    const controller = abortControllers.current.get(id)
+    if (controller) controller.abort()
     setFiles((prev) => prev.filter((f) => f.id !== id))
   }
 
-  const startUpload = async () => {
-    // In production, this would upload to R2 and enqueue processing
-    for (const file of files.filter((f) => f.status === 'pending')) {
-      setFiles((prev) =>
-        prev.map((f) => (f.id === file.id ? { ...f, status: 'uploading' as const, progress: 0 } : f))
-      )
+  const uploadSingleFile = async (uploadFile: UploadedFile) => {
+    const controller = new AbortController()
+    abortControllers.current.set(uploadFile.id, controller)
 
-      // Simulate upload progress
-      for (let i = 0; i <= 100; i += 20) {
-        await new Promise((r) => setTimeout(r, 200))
+    setFiles((prev) =>
+      prev.map((f) => (f.id === uploadFile.id ? { ...f, status: 'uploading' as const, progress: 10 } : f))
+    )
+
+    try {
+      const formData = new FormData()
+      formData.append('file', uploadFile.file)
+      formData.append('direction', 'UNKNOWN')
+
+      // Simulate progress during upload
+      const progressInterval = setInterval(() => {
         setFiles((prev) =>
-          prev.map((f) => (f.id === file.id ? { ...f, progress: i } : f))
+          prev.map((f) => {
+            if (f.id === uploadFile.id && f.status === 'uploading' && f.progress < 90) {
+              return { ...f, progress: f.progress + 10 }
+            }
+            return f
+          })
         )
+      }, 300)
+
+      const res = await fetch('/api/calls/upload', {
+        method: 'POST',
+        body: formData,
+        signal: controller.signal,
+      })
+
+      clearInterval(progressInterval)
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({ error: 'Upload failed' }))
+        throw new Error(errData.error || 'Upload failed')
       }
 
-      setFiles((prev) =>
-        prev.map((f) => (f.id === file.id ? { ...f, status: 'processing' as const, progress: 100 } : f))
-      )
+      const data = await res.json()
 
-      // Simulate processing
-      await new Promise((r) => setTimeout(r, 1000))
       setFiles((prev) =>
-        prev.map((f) => (f.id === file.id ? { ...f, status: 'done' as const } : f))
+        prev.map((f) =>
+          f.id === uploadFile.id
+            ? { ...f, status: 'done' as const, progress: 100, callId: data.callId }
+            : f
+        )
       )
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') return
+
+      setFiles((prev) =>
+        prev.map((f) =>
+          f.id === uploadFile.id
+            ? { ...f, status: 'error' as const, error: err instanceof Error ? err.message : 'שגיאה בהעלאה' }
+            : f
+        )
+      )
+    } finally {
+      abortControllers.current.delete(uploadFile.id)
+    }
+  }
+
+  const startUpload = async () => {
+    const pendingFiles = files.filter((f) => f.status === 'pending')
+    // Upload files sequentially to avoid overwhelming the server
+    for (const file of pendingFiles) {
+      await uploadSingleFile(file)
     }
   }
 
@@ -86,6 +138,7 @@ export default function UploadPage() {
   }
 
   const pendingCount = files.filter((f) => f.status === 'pending').length
+  const doneFiles = files.filter((f) => f.status === 'done')
 
   return (
     <div className="space-y-6">
@@ -154,12 +207,32 @@ export default function UploadPage() {
             <h3 className="text-base font-semibold text-foreground">
               קבצים ({files.length})
             </h3>
-            {pendingCount > 0 && (
-              <Button onClick={startUpload} className="bg-indigo-600 hover:bg-indigo-500 text-white">
-                <Upload className="h-4 w-4 ml-2" />
-                העלה {pendingCount} קבצים
-              </Button>
-            )}
+            <div className="flex gap-2">
+              {doneFiles.length === 1 && doneFiles[0].callId && (
+                <Button
+                  variant="outline"
+                  className="border-border text-muted-foreground hover:bg-muted/50"
+                  onClick={() => router.push(`/dashboard/calls/${doneFiles[0].callId}`)}
+                >
+                  צפה בשיחה
+                </Button>
+              )}
+              {doneFiles.length > 1 && (
+                <Button
+                  variant="outline"
+                  className="border-border text-muted-foreground hover:bg-muted/50"
+                  onClick={() => router.push('/dashboard/calls')}
+                >
+                  צפה בשיחות
+                </Button>
+              )}
+              {pendingCount > 0 && (
+                <Button onClick={startUpload} className="bg-indigo-600 hover:bg-indigo-500 text-white">
+                  <Upload className="h-4 w-4 ml-2" />
+                  העלה {pendingCount} קבצים
+                </Button>
+              )}
+            </div>
           </div>
           <div className="px-5 pb-5 space-y-3">
             {files.map((file) => (
@@ -180,6 +253,9 @@ export default function UploadPage() {
                   )}
                   {file.repName && (
                     <p className="text-xs text-muted-foreground">נציג: {file.repName}</p>
+                  )}
+                  {file.error && (
+                    <p className="text-xs text-red-400 mt-1">{file.error}</p>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
@@ -205,9 +281,12 @@ export default function UploadPage() {
                     </Badge>
                   )}
                   {file.status === 'error' && (
-                    <Badge className="bg-red-500/10 text-red-400 border border-red-500/20">שגיאה</Badge>
+                    <Badge className="bg-red-500/10 text-red-400 border border-red-500/20">
+                      <AlertCircle className="h-3 w-3 ml-1" />
+                      שגיאה
+                    </Badge>
                   )}
-                  {file.status === 'pending' && (
+                  {(file.status === 'pending' || file.status === 'error') && (
                     <Button
                       variant="ghost"
                       size="icon"

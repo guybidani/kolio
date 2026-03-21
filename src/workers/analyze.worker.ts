@@ -3,6 +3,7 @@ import { connection } from '@/lib/queue'
 import { db } from '@/lib/db'
 import { Prisma } from '@prisma/client'
 import { analyzeCallTranscript } from '@/lib/openai'
+import { buildAnalysisPrompt } from '@/lib/analysis-prompt'
 import { checkAndAwardBadges } from '@/lib/badges'
 import { updateStreaks } from '@/lib/streaks'
 import { notifyCallEvent } from '@/lib/notifications'
@@ -35,13 +36,19 @@ async function processAnalysis(job: Job<AnalyzeJobData>) {
       where: { orgId, isDefault: true, isActive: true },
     })
 
-    let playbookContext = ''
-    if (playbook) {
-      playbookContext = `## Playbook: ${playbook.name}
-Stages: ${JSON.stringify(playbook.stages)}
-Objection Bank: ${JSON.stringify(playbook.objectionBank)}
-Keywords: ${JSON.stringify(playbook.keywords)}`
-    }
+    // Build customized system prompt from org's playbook
+    const customSystemPrompt = buildAnalysisPrompt(
+      playbook
+        ? {
+            name: playbook.name,
+            stages: playbook.stages,
+            objectionBank: playbook.objectionBank,
+            keywords: playbook.keywords,
+            techniques: (playbook as Record<string, unknown>).techniques,
+            scripts: (playbook as Record<string, unknown>).scripts,
+          }
+        : null
+    )
 
     const analysis = (await analyzeCallTranscript(
       call.transcriptText,
@@ -50,7 +57,8 @@ Keywords: ${JSON.stringify(playbook.keywords)}`
       call.recordedAt.toISOString().split('T')[0],
       Math.round(call.duration / 60),
       call.direction,
-      playbookContext
+      undefined,
+      customSystemPrompt
     )) as unknown as CallAnalysis
 
     // Store analysis results - use JSON roundtrip to ensure Prisma-compatible types

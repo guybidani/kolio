@@ -8,26 +8,51 @@ import {
   Settings,
   Link2,
   Shield,
+  Loader2,
 } from 'lucide-react'
 import PbxIntegrations from '@/components/dashboard/pbx-integrations'
 
+interface OrgInfo {
+  id: string
+  name: string
+  slug: string
+}
+
 export default function SettingsPage() {
   const [orgId, setOrgId] = useState<string | null>(null)
+  const [org, setOrg] = useState<OrgInfo | null>(null)
+  const [orgName, setOrgName] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     async function loadSession() {
+      setLoading(true)
       try {
         const res = await fetch('/api/auth/me')
         if (res.ok) {
           const data = await res.json()
-          setOrgId(data.org?.id || null)
+          const orgData = data.org || null
+          setOrgId(orgData?.id || null)
+          setOrg(orgData)
+          setOrgName(orgData?.name || '')
         }
       } catch {
         // silently fail
+      } finally {
+        setLoading(false)
       }
     }
     loadSession()
   }, [])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -56,16 +81,30 @@ export default function SettingsPage() {
             <div className="px-5 pb-5 space-y-4">
               <div>
                 <label className="text-sm font-medium text-foreground mb-1 block">שם הארגון</label>
-                <Input defaultValue="סוכנות Project Adam" className="bg-muted/50 border-border text-foreground" />
+                <Input
+                  value={orgName}
+                  onChange={(e) => setOrgName(e.target.value)}
+                  className="bg-muted/50 border-border text-foreground"
+                />
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-1 block">Slug</label>
-                <Input defaultValue="project-adam" disabled className="bg-muted/30 border-border text-muted-foreground" />
+                <Input
+                  value={org?.slug || ''}
+                  disabled
+                  className="bg-muted/30 border-border text-muted-foreground"
+                />
                 <p className="text-xs text-muted-foreground mt-1">
                   לא ניתן לשנות את ה-slug
                 </p>
               </div>
-              <Button className="bg-indigo-600 hover:bg-indigo-500 text-white">שמור שינויים</Button>
+              <Button
+                className="bg-indigo-600 hover:bg-indigo-500 text-white"
+                disabled={saving}
+              >
+                {saving ? <Loader2 className="h-4 w-4 ml-2 animate-spin" /> : null}
+                שמור שינויים
+              </Button>
             </div>
           </div>
 

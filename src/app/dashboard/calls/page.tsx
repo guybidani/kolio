@@ -6,7 +6,14 @@ import { CallCard } from '@/components/dashboard/call-card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Search, Filter, Upload, Phone, Loader2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { Search, Filter, Upload, Phone, Loader2, ChevronLeft, ChevronRight, Users } from 'lucide-react'
+
+interface RepOption {
+  id: string
+  name: string
+}
 
 interface CallData {
   id: string
@@ -43,8 +50,17 @@ export default function CallsPage() {
   const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 20, total: 0, pages: 0 })
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [repFilter, setRepFilter] = useState('all')
+  const [reps, setReps] = useState<RepOption[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch('/api/reps')
+      .then((res) => res.ok ? res.json() : [])
+      .then((data: RepOption[]) => setReps(Array.isArray(data) ? data : []))
+      .catch(() => setReps([]))
+  }, [])
 
   const fetchCalls = useCallback(async (page: number) => {
     setLoading(true)
@@ -52,6 +68,7 @@ export default function CallsPage() {
     try {
       const params = new URLSearchParams({ page: String(page), limit: '20' })
       if (statusFilter !== 'all') params.set('status', statusFilter)
+      if (repFilter !== 'all') params.set('repId', repFilter)
       if (search.trim()) params.set('search', search.trim())
 
       const res = await fetch(`/api/calls?${params}`)
@@ -66,14 +83,14 @@ export default function CallsPage() {
     } finally {
       setLoading(false)
     }
-  }, [statusFilter, search])
+  }, [statusFilter, repFilter, search])
 
   useEffect(() => {
     fetchCalls(1)
   }, [fetchCalls])
 
-  const hasNoCalls = !loading && calls.length === 0 && !search && statusFilter === 'all'
-  const hasNoResults = !loading && calls.length === 0 && (search || statusFilter !== 'all')
+  const hasNoCalls = !loading && calls.length === 0 && !search && statusFilter === 'all' && repFilter === 'all'
+  const hasNoResults = !loading && calls.length === 0 && (search || statusFilter !== 'all' || repFilter !== 'all')
 
   return (
     <div className="space-y-6">
@@ -82,12 +99,10 @@ export default function CallsPage() {
           <h1 className="text-2xl font-bold text-foreground">שיחות</h1>
           <p className="text-muted-foreground">כל שיחות הצוות במקום אחד</p>
         </div>
-        <Button asChild className="bg-indigo-600 hover:bg-indigo-500 text-white">
-          <Link href="/dashboard/upload">
-            <Upload className="h-4 w-4 ml-2" />
-            העלה שיחה
-          </Link>
-        </Button>
+        <Link href="/dashboard/upload" className={cn(buttonVariants(), "bg-indigo-600 hover:bg-indigo-500 text-white")}>
+          <Upload className="h-4 w-4 ml-2" />
+          העלה שיחה
+        </Link>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4">
@@ -101,7 +116,7 @@ export default function CallsPage() {
             className="pr-10 bg-muted/50 border-border text-foreground placeholder:text-muted-foreground"
           />
         </div>
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap items-center">
           {STATUS_FILTERS.map((f) => (
             <Badge
               key={f.value}
@@ -116,6 +131,26 @@ export default function CallsPage() {
               {f.label}
             </Badge>
           ))}
+          {reps.length > 0 && (
+            <div className="relative">
+              <Users className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+              <select
+                value={repFilter}
+                onChange={(e) => setRepFilter(e.target.value)}
+                className={cn(
+                  "appearance-none pr-8 pl-3 py-1 text-xs rounded-full border cursor-pointer transition-colors",
+                  "bg-muted/50 text-muted-foreground border-border hover:bg-muted",
+                  "focus:outline-none focus:ring-1 focus:ring-indigo-500/30",
+                  repFilter !== 'all' && "bg-indigo-500/15 text-indigo-400 border-indigo-500/20"
+                )}
+              >
+                <option value="all">כל הנציגים</option>
+                {reps.map((rep) => (
+                  <option key={rep.id} value={rep.id}>{rep.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
       </div>
 
@@ -161,12 +196,10 @@ export default function CallsPage() {
               <p className="text-sm text-muted-foreground mb-6 max-w-sm">
                 העלו קבצי אודיו של שיחות מכירה ו-Kolio ינתח אותם עבורכם
               </p>
-              <Button asChild className="bg-indigo-600 hover:bg-indigo-500 text-white">
-                <Link href="/dashboard/upload">
-                  <Upload className="h-4 w-4 ml-2" />
-                  העלה שיחה ראשונה
-                </Link>
-              </Button>
+              <Link href="/dashboard/upload" className={cn(buttonVariants(), "bg-indigo-600 hover:bg-indigo-500 text-white")}>
+                <Upload className="h-4 w-4 ml-2" />
+                העלה שיחה ראשונה
+              </Link>
             </div>
           )}
 

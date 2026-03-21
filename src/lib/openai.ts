@@ -11,7 +11,8 @@ export async function analyzeCallTranscript(
   callDate: string,
   durationMinutes: number,
   direction: string,
-  playbookContext?: string
+  playbookContext?: string,
+  customSystemPrompt?: string
 ): Promise<Record<string, unknown>> {
   const userMessage = `נתח את תמלול שיחת המכירה הבאה:
 
@@ -27,7 +28,13 @@ ${playbookContext || ''}
 ${transcript}
 ---`
 
-  const { ANALYSIS_SYSTEM_PROMPT } = await import('./analysis-prompt')
+  let systemPrompt: string
+  if (customSystemPrompt) {
+    systemPrompt = customSystemPrompt
+  } else {
+    const { ANALYSIS_SYSTEM_PROMPT } = await import('./analysis-prompt')
+    systemPrompt = ANALYSIS_SYSTEM_PROMPT
+  }
 
   const response = await openai.chat.completions.create({
     model: 'gpt-4o',
@@ -35,7 +42,7 @@ ${transcript}
     temperature: 0.3,
     response_format: { type: 'json_object' },
     messages: [
-      { role: 'system', content: ANALYSIS_SYSTEM_PROMPT },
+      { role: 'system', content: systemPrompt },
       { role: 'user', content: userMessage },
     ],
   })

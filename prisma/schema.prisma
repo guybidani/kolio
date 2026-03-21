@@ -213,6 +213,8 @@ model Playbook {
   stages      Json     @default("[]")
   objectionBank Json   @default("[]")
   keywords    Json     @default("{}")
+  techniques  Json     @default("[]")
+  scripts     Json     @default("[]")
   scoringWeights Json  @default("{}")
   isDefault   Boolean  @default(false)
   isActive    Boolean  @default(true)
