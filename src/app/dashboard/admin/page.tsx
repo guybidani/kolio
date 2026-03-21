@@ -24,6 +24,14 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+const ROLE_LABELS: Record<string, string> = {
+  ADMIN: 'מנהל ראשי',
+  CEO: 'מנכ״ל',
+  MANAGER: 'מנהל צוות',
+  REP: 'נציג מכירות',
+  VIEWER: 'צופה בלבד',
+}
+
 const ROLE_COLORS: Record<string, string> = {
   ADMIN: 'bg-red-500/10 text-red-400 border-red-500/20',
   CEO: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
@@ -457,7 +465,7 @@ export default function AdminPage() {
                           ROLE_COLORS[user.role] || ROLE_COLORS.VIEWER
                         )}
                       >
-                        {user.role}
+                        {ROLE_LABELS[user.role] || user.role}
                       </Badge>
                       {user.isAdmin && (
                         <Badge className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs">
@@ -663,11 +671,11 @@ export default function AdminPage() {
               <select
                 value={userRole}
                 onChange={(e) => setUserRole(e.target.value)}
-                className="w-full rounded-md bg-white/5 border border-white/10 text-white px-3 py-2 text-sm"
+                className="w-full rounded-md bg-[#1a1a2e] border border-white/10 text-white px-3 py-2.5 text-sm [&>option]:bg-[#1a1a2e] [&>option]:text-white [&>option]:py-2"
               >
                 {availableRoles.map((r) => (
                   <option key={r} value={r}>
-                    {r}
+                    {ROLE_LABELS[r] || r}
                   </option>
                 ))}
               </select>
@@ -740,11 +748,11 @@ export default function AdminPage() {
               <select
                 value={editUserRole}
                 onChange={(e) => setEditUserRole(e.target.value)}
-                className="w-full rounded-md bg-white/5 border border-white/10 text-white px-3 py-2 text-sm"
+                className="w-full rounded-md bg-[#1a1a2e] border border-white/10 text-white px-3 py-2.5 text-sm [&>option]:bg-[#1a1a2e] [&>option]:text-white [&>option]:py-2"
               >
                 {availableRoles.map((r) => (
                   <option key={r} value={r}>
-                    {r}
+                    {ROLE_LABELS[r] || r}
                   </option>
                 ))}
               </select>

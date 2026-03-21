@@ -1,70 +1,124 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { StatsOverview } from '@/components/dashboard/stats-overview'
 import { RepLeaderboard } from '@/components/dashboard/rep-leaderboard'
 import { CallCard } from '@/components/dashboard/call-card'
 import { BadgesDisplay } from '@/components/dashboard/badges'
 import { StreaksDisplay } from '@/components/dashboard/streaks'
+import { Button } from '@/components/ui/button'
+import { Phone, Upload, Users, Loader2 } from 'lucide-react'
 
-// Mock data for development - in production, queries hit the real DB
-const MOCK_CALLS = [
-  {
-    id: 'call-1',
-    prospectName: 'דני כהן',
-    prospectBusiness: 'קוסמטיקאית - Beauty by Dani',
-    repName: 'גיא בידני',
-    overallScore: 7.5,
-    status: 'COMPLETE',
-    direction: 'OUTBOUND',
-    duration: 480,
-    recordedAt: new Date().toISOString(),
-    summary: 'שיחת מכירה ראשונה - הלקוחה מתעניינת בניהול קמפיינים לפייסבוק ואינסטגרם. ציינה שעבדה עם סוכנות קודמת ולא הייתה מרוצה.',
-  },
-  {
-    id: 'call-2',
-    prospectName: 'שרון לוי',
-    prospectBusiness: 'קבלן שיפוצים',
-    repName: 'מיכל דוד',
-    overallScore: 5.2,
-    status: 'COMPLETE',
-    direction: 'INBOUND',
-    duration: 320,
-    recordedAt: new Date(Date.now() - 86400000).toISOString(),
-    summary: 'ליד נכנס - מתעניין בבוט לווטסאפ. לא הצלחנו לסגור, צריך לחזור.',
-  },
-  {
-    id: 'call-3',
-    prospectName: null,
-    prospectBusiness: null,
-    repName: 'גיא בידני',
-    overallScore: null,
-    status: 'TRANSCRIBING',
-    direction: 'OUTBOUND',
-    duration: 195,
-    recordedAt: new Date(Date.now() - 3600000).toISOString(),
-    summary: null,
-  },
-]
+interface CallData {
+  id: string
+  prospectName: string | null
+  prospectBusiness: string | null
+  rep?: { id: string; name: string } | null
+  repName?: string | null
+  overallScore: number | null
+  status: string
+  direction: string
+  duration: number
+  recordedAt: string
+  summary: string | null
+}
 
-const MOCK_REPS = [
-  { id: 'rep-1', name: 'גיא בידני', avatarUrl: null, totalCalls: 45, avgScore: 7.8, trend: 0.5 },
-  { id: 'rep-2', name: 'מיכל דוד', avatarUrl: null, totalCalls: 38, avgScore: 6.9, trend: -0.2 },
-  { id: 'rep-3', name: 'יוסי אברהם', avatarUrl: null, totalCalls: 52, avgScore: 8.1, trend: 1.2 },
-  { id: 'rep-4', name: 'נועה שמיר', avatarUrl: null, totalCalls: 29, avgScore: 6.2, trend: 0.8 },
-]
+interface RepData {
+  id: string
+  name: string
+  avatarUrl?: string | null
+  totalCalls: number
+  avgScore: number
+  trend: number
+}
 
-// Mock badges data
-const MOCK_BADGES = [
-  { type: 'FIRST_CALL', name: 'שיחה ראשונה', description: 'העלית את השיחה הראשונה שלך לניתוח', earnedAt: new Date(Date.now() - 30 * 86400000).toISOString() },
-  { type: 'PERFECT_SCORE', name: 'ציון מושלם', description: 'קיבלת ציון 90+ בשיחה', earnedAt: new Date(Date.now() - 7 * 86400000).toISOString() },
-  { type: 'STREAK_7', name: 'רצף שבועי', description: '7 ימים רצופים של שיחות', earnedAt: new Date(Date.now() - 3 * 86400000).toISOString() },
-]
+interface BadgeData {
+  type: string
+  name: string
+  description: string
+  earnedAt: string
+}
 
-// Mock streaks data
-const MOCK_STREAKS = [
-  { type: 'DAILY_CALLS', currentCount: 5, bestCount: 12, isAtRisk: false },
-  { type: 'HIGH_SCORE', currentCount: 3, bestCount: 8, isAtRisk: false },
-]
+interface StreakData {
+  type: string
+  currentCount: number
+  bestCount: number
+  isAtRisk: boolean
+}
 
-export default async function DashboardPage() {
+export default function DashboardPage() {
+  const [calls, setCalls] = useState<CallData[]>([])
+  const [reps, setReps] = useState<RepData[]>([])
+  const [badges, setBadges] = useState<BadgeData[]>([])
+  const [streaks, setStreaks] = useState<StreakData[]>([])
+  const [totalCalls, setTotalCalls] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true)
+      setError(null)
+      try {
+        const [callsRes, repsRes, badgesRes] = await Promise.all([
+          fetch('/api/calls?limit=5'),
+          fetch('/api/reps'),
+          fetch('/api/badges'),
+        ])
+
+        if (callsRes.ok) {
+          const callsData = await callsRes.json()
+          setCalls(callsData.calls || [])
+          setTotalCalls(callsData.pagination?.total || 0)
+        }
+
+        if (repsRes.ok) {
+          const repsData = await repsRes.json()
+          setReps(Array.isArray(repsData) ? repsData : [])
+        }
+
+        if (badgesRes.ok) {
+          const badgesData = await badgesRes.json()
+          setBadges(badgesData.badges || [])
+        }
+
+        // Streaks require a repId - skip for now on dashboard overview
+        // They will show on individual rep pages
+      } catch (err) {
+        console.error('Error fetching dashboard data:', err)
+        setError('שגיאה בטעינת נתונים')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
+
+  // Compute stats from real data
+  const avgScore = reps.length > 0
+    ? Math.round((reps.reduce((sum, r) => sum + r.avgScore, 0) / reps.length) * 10) / 10
+    : 0
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <p className="text-sm text-red-400 mb-4">{error}</p>
+        <Button variant="outline" onClick={() => window.location.reload()}>
+          נסה שוב
+        </Button>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -73,11 +127,11 @@ export default async function DashboardPage() {
       </div>
 
       <StatsOverview
-        totalCalls={164}
-        avgScore={7.2}
-        totalReps={4}
-        callsThisWeek={23}
-        scoreChange={0.4}
+        totalCalls={totalCalls}
+        avgScore={avgScore}
+        totalReps={reps.length}
+        callsThisWeek={0}
+        scoreChange={0}
       />
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -87,20 +141,70 @@ export default async function DashboardPage() {
               <h3 className="text-base font-semibold text-foreground">שיחות אחרונות</h3>
             </div>
             <div className="px-5 pb-5 space-y-3">
-              {MOCK_CALLS.map((call) => (
-                <CallCard key={call.id} {...call} />
-              ))}
+              {calls.length > 0 ? (
+                calls.map((call) => (
+                  <CallCard
+                    key={call.id}
+                    id={call.id}
+                    prospectName={call.prospectName}
+                    prospectBusiness={call.prospectBusiness}
+                    repName={call.rep?.name || call.repName || null}
+                    overallScore={call.overallScore}
+                    status={call.status}
+                    direction={call.direction}
+                    duration={call.duration}
+                    recordedAt={call.recordedAt}
+                    summary={call.summary}
+                  />
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center py-16 text-center">
+                  <div className="rounded-full bg-muted/50 p-4 mb-4">
+                    <Phone className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">עדיין אין שיחות</h3>
+                  <p className="text-sm text-muted-foreground mb-6 max-w-sm">
+                    העלו את השיחה הראשונה שלכם לניתוח AI
+                  </p>
+                  <Button asChild className="bg-indigo-600 hover:bg-indigo-500 text-white">
+                    <Link href="/dashboard/upload">
+                      <Upload className="h-4 w-4 ml-2" />
+                      העלה שיחה ראשונה
+                    </Link>
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         <div className="space-y-6">
-          <RepLeaderboard reps={MOCK_REPS} />
-          <StreaksDisplay streaks={MOCK_STREAKS} />
+          {reps.length > 0 ? (
+            <RepLeaderboard reps={reps} />
+          ) : (
+            <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden">
+              <div className="p-5 pb-3">
+                <h3 className="text-base font-semibold text-foreground">לידרבורד</h3>
+              </div>
+              <div className="flex flex-col items-center justify-center py-12 text-center px-5 pb-5">
+                <div className="rounded-full bg-muted/50 p-4 mb-4">
+                  <Users className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">עדיין אין נציגים</h3>
+                <p className="text-sm text-muted-foreground mb-6 max-w-sm">
+                  הוסיפו נציגים כדי לעקוב אחר הביצועים שלהם
+                </p>
+                <Button asChild variant="outline" className="border-border text-muted-foreground hover:bg-muted/50">
+                  <Link href="/dashboard/admin">הוסף נציג</Link>
+                </Button>
+              </div>
+            </div>
+          )}
+          <StreaksDisplay streaks={streaks} />
         </div>
       </div>
 
-      <BadgesDisplay earned={MOCK_BADGES} />
+      <BadgesDisplay earned={badges} />
     </div>
   )
 }
