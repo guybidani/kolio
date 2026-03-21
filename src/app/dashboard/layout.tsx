@@ -1,5 +1,6 @@
 import { Sidebar, MobileSidebar } from '@/components/dashboard/sidebar'
 import { NotificationBell } from '@/components/dashboard/notification-bell'
+import { SearchCommand } from '@/components/dashboard/search-command'
 import { Logo } from '@/components/ui/logo'
 
 export default function DashboardLayout({
@@ -12,14 +13,16 @@ export default function DashboardLayout({
       <Sidebar />
       <div className="flex-1 flex flex-col">
         {/* Desktop top bar */}
-        <header className="sticky top-0 z-40 hidden lg:flex h-14 items-center justify-end border-b border-border glass px-6">
+        <header className="sticky top-0 z-40 hidden lg:flex h-14 items-center justify-end gap-2 border-b border-border glass px-6">
+          <SearchCommand />
           <NotificationBell />
         </header>
         {/* Mobile top bar */}
         <header className="sticky top-0 z-40 flex h-14 items-center gap-4 border-b border-border glass px-4 lg:hidden">
           <MobileSidebar />
           <Logo size="sm" />
-          <div className="ms-auto">
+          <div className="ms-auto flex items-center gap-1">
+            <SearchCommand />
             <NotificationBell />
           </div>
         </header>

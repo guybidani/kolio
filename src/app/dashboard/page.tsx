@@ -10,6 +10,7 @@ import { StreaksDisplay } from '@/components/dashboard/streaks'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { Phone, Upload, Users, Loader2 } from 'lucide-react'
+import { OnboardingWizard } from '@/components/dashboard/onboarding-wizard'
 
 interface CallData {
   id: string
@@ -48,6 +49,14 @@ interface StreakData {
   isAtRisk: boolean
 }
 
+interface OnboardingState {
+  hasReps: boolean
+  hasCalls: boolean
+  hasPlaybook: boolean
+  hasIntegration: boolean
+  isComplete: boolean
+}
+
 export default function DashboardPage() {
   const [calls, setCalls] = useState<CallData[]>([])
   const [reps, setReps] = useState<RepData[]>([])
@@ -56,17 +65,26 @@ export default function DashboardPage() {
   const [totalCalls, setTotalCalls] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [onboarding, setOnboarding] = useState<OnboardingState | null>(null)
+  const [showOnboarding, setShowOnboarding] = useState(false)
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true)
       setError(null)
       try {
-        const [callsRes, repsRes, badgesRes] = await Promise.all([
+        const [callsRes, repsRes, badgesRes, onboardingRes] = await Promise.all([
           fetch('/api/calls?limit=5'),
           fetch('/api/reps'),
           fetch('/api/badges'),
+          fetch('/api/onboarding'),
         ])
+
+        if (onboardingRes.ok) {
+          const onboardingData: OnboardingState = await onboardingRes.json()
+          setOnboarding(onboardingData)
+          setShowOnboarding(!onboardingData.isComplete)
+        }
 
         if (callsRes.ok) {
           const callsData = await callsRes.json()
@@ -122,6 +140,18 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {showOnboarding && onboarding && (
+        <OnboardingWizard
+          initialState={{
+            hasReps: onboarding.hasReps,
+            hasCalls: onboarding.hasCalls,
+            hasPlaybook: onboarding.hasPlaybook,
+            hasIntegration: onboarding.hasIntegration,
+          }}
+          onDismiss={() => setShowOnboarding(false)}
+        />
+      )}
+
       <div>
         <h1 className="text-2xl font-bold text-foreground">סקירה כללית</h1>
         <p className="text-muted-foreground">ברוכים הבאים ל-Kolio</p>

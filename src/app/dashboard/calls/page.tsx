@@ -3,12 +3,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { CallCard } from '@/components/dashboard/call-card'
+import { TranscriptSearch } from '@/components/dashboard/transcript-search'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { Search, Filter, Upload, Phone, Loader2, ChevronLeft, ChevronRight, Users } from 'lucide-react'
+import { Search, Filter, Upload, Phone, Loader2, ChevronLeft, ChevronRight, Users, FileSearch } from 'lucide-react'
 
 interface RepOption {
   id: string
@@ -54,6 +55,7 @@ export default function CallsPage() {
   const [reps, setReps] = useState<RepOption[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<'calls' | 'search'>('calls')
 
   useEffect(() => {
     fetch('/api/reps')
@@ -105,6 +107,43 @@ export default function CallsPage() {
         </Link>
       </div>
 
+      {/* Tab switcher */}
+      <div className="flex gap-1 p-1 rounded-lg bg-muted/50 border border-border w-fit">
+        <button
+          onClick={() => setActiveTab('calls')}
+          className={cn(
+            'px-4 py-1.5 rounded-md text-sm font-medium transition-colors',
+            activeTab === 'calls'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
+        >
+          <Phone className="h-3.5 w-3.5 inline ml-1.5" />
+          שיחות
+        </button>
+        <button
+          onClick={() => setActiveTab('search')}
+          className={cn(
+            'px-4 py-1.5 rounded-md text-sm font-medium transition-colors',
+            activeTab === 'search'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
+        >
+          <FileSearch className="h-3.5 w-3.5 inline ml-1.5" />
+          חיפוש בתמלולים
+        </button>
+      </div>
+
+      {/* Transcript search tab */}
+      {activeTab === 'search' && (
+        <div className="rounded-xl border border-border bg-card/50 p-4">
+          <TranscriptSearch />
+        </div>
+      )}
+
+      {/* Calls list tab */}
+      {activeTab === 'calls' && <>
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -239,6 +278,7 @@ export default function CallsPage() {
           )}
         </div>
       )}
+      </>}
     </div>
   )
 }

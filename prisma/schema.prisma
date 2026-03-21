@@ -190,6 +190,9 @@ model Call {
   energyScore         Float?
   nextStepsScore      Float?
 
+  // Manager comments (JSON array of comment objects)
+  comments            Json?
+
   source         CallSource    @default(MANUAL_UPLOAD)
   externalId     String?
   pbxType        String?

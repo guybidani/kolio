@@ -70,15 +70,29 @@ interface UserInfo {
   org: { name: string }
 }
 
+interface OnboardingProgress {
+  hasReps: boolean
+  hasCalls: boolean
+  hasPlaybook: boolean
+  hasIntegration: boolean
+  isComplete: boolean
+}
+
 function NavContent() {
   const pathname = usePathname()
   const router = useRouter()
   const [user, setUser] = useState<UserInfo | null>(null)
+  const [onboarding, setOnboarding] = useState<OnboardingProgress | null>(null)
 
   useEffect(() => {
     fetch('/api/auth/me')
       .then((r) => (r.ok ? r.json() : null))
       .then(setUser)
+      .catch(() => {})
+
+    fetch('/api/onboarding')
+      .then((r) => (r.ok ? r.json() : null))
+      .then(setOnboarding)
       .catch(() => {})
   }, [])
 
@@ -134,6 +148,33 @@ function NavContent() {
           )
         })}
       </nav>
+
+      {onboarding && !onboarding.isComplete && (
+        <div className="px-4 pb-2">
+          <Link
+            href="/dashboard"
+            className="block rounded-lg bg-indigo-500/10 border border-indigo-500/20 px-3 py-2.5 transition-colors hover:bg-indigo-500/15"
+          >
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-xs font-medium text-indigo-400">הגדרה</span>
+              <span className="text-xs text-indigo-400 tabular-nums">
+                {[onboarding.hasReps, onboarding.hasCalls, onboarding.hasPlaybook, onboarding.hasIntegration].filter(Boolean).length}/4
+              </span>
+            </div>
+            <div className="flex gap-1">
+              {[onboarding.hasReps, onboarding.hasPlaybook, onboarding.hasIntegration, onboarding.hasCalls].map((done, i) => (
+                <div
+                  key={i}
+                  className={cn(
+                    'h-1 flex-1 rounded-full transition-colors',
+                    done ? 'bg-indigo-500' : 'bg-indigo-500/20'
+                  )}
+                />
+              ))}
+            </div>
+          </Link>
+        </div>
+      )}
 
       <div className="px-4 py-2">
         <ThemeToggle />
