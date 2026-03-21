@@ -15,7 +15,7 @@ function getJwtSecret(): Uint8Array {
 const JWT_SECRET = getJwtSecret()
 const COOKIE_NAME = 'kolio_session'
 
-const publicPaths = ['/', '/login', '/api/auth/login', '/api/auth/logout', '/api/webhooks', '/api/health']
+const publicPaths = ['/', '/login', '/register', '/api/auth/login', '/api/auth/logout', '/api/auth/register', '/api/webhooks', '/api/health']
 
 function isPublicPath(pathname: string): boolean {
   return publicPaths.some(

@@ -24,7 +24,7 @@ export default function MarketingLayout({
             <Link href="/login">
               <Button variant="ghost">התחברות</Button>
             </Link>
-            <Link href="/login">
+            <Link href="/register">
               <Button>התחילו בחינם</Button>
             </Link>
           </nav>

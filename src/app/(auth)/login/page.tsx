@@ -123,8 +123,11 @@ export default function LoginPage() {
           </Suspense>
         </div>
 
-        <p className="text-center text-xs text-muted-foreground mt-6">
-          פנה למנהל המערכת לקבלת חשבון
+        <p className="text-center text-sm text-muted-foreground mt-6">
+          אין לך חשבון?{' '}
+          <a href="/register" className="text-indigo-400 hover:text-indigo-300 font-medium">
+            צור חשבון חדש
+          </a>
         </p>
       </div>
     </div>
