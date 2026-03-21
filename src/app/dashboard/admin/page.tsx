@@ -209,7 +209,7 @@ export default function AdminPage() {
 
     const orgId = isSystemAdmin ? userOrgId : currentUser?.orgId
     if (!orgId) {
-      setUserError('No organization selected')
+      setUserError('לא נבחר ארגון')
       return
     }
 
@@ -280,7 +280,7 @@ export default function AdminPage() {
     const targetUser = users.find((u) => u.id === userId)
     if (!targetUser) return
 
-    if (!confirm('Are you sure you want to deactivate this user?')) return
+    if (!confirm('האם אתה בטוח שברצונך להשבית משתמש זה?')) return
 
     const orgId = targetUser.orgId
     const res = await fetch(`/api/orgs/${orgId}/users/${userId}`, {
@@ -289,7 +289,7 @@ export default function AdminPage() {
 
     if (!res.ok) {
       const data = await res.json()
-      alert(data.error || 'Failed to deactivate user')
+      alert(data.error || 'השבתת המשתמש נכשלה')
       return
     }
 
@@ -346,7 +346,7 @@ export default function AdminPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-white/40">Loading...</div>
+        <div className="text-white/40">טוען...</div>
       </div>
     )
   }
@@ -359,12 +359,12 @@ export default function AdminPage() {
         <Shield className="h-6 w-6 text-indigo-400" />
         <div>
           <h1 className="text-2xl font-bold text-white">
-            {isSystemAdmin ? 'System Administration' : 'Organization Management'}
+            {isSystemAdmin ? 'ניהול מערכת' : 'ניהול ארגון'}
           </h1>
           <p className="text-white/40">
             {isSystemAdmin
-              ? 'Manage all organizations and users'
-              : 'Manage your organization users and reps'}
+              ? 'ניהול כל הארגונים והמשתמשים'
+              : 'ניהול משתמשים ונציגים בארגון שלך'}
           </p>
         </div>
       </div>
@@ -376,7 +376,7 @@ export default function AdminPage() {
             <div className="p-5 pb-3 flex items-center justify-between">
               <h3 className="text-base font-semibold text-white flex items-center gap-2">
                 <Building2 className="h-4 w-4 text-indigo-400" />
-                Organizations ({orgs.length})
+                ארגונים ({orgs.length})
               </h3>
               <Button
                 size="sm"
@@ -384,12 +384,12 @@ export default function AdminPage() {
                 onClick={() => setShowNewOrg(true)}
               >
                 <Plus className="h-4 w-4 ml-1" />
-                New Organization
+                ארגון חדש
               </Button>
             </div>
             <div className="px-5 pb-5">
               {orgs.length === 0 ? (
-                <p className="text-sm text-white/50 text-center py-4">No organizations yet</p>
+                <p className="text-sm text-white/50 text-center py-4">אין ארגונים עדיין</p>
               ) : (
                 <div className="space-y-2">
                   {orgs.map((org) => (
@@ -400,8 +400,8 @@ export default function AdminPage() {
                       <div>
                         <p className="text-sm font-medium text-white">{org.name}</p>
                         <p className="text-xs text-white/50">
-                          {org.slug} | {org._count.users} users | {org._count.calls} calls |{' '}
-                          {org._count.reps} reps
+                          {org.slug} | {org._count.users} משתמשים | {org._count.calls} שיחות |{' '}
+                          {org._count.reps} נציגים
                         </p>
                       </div>
                       <Badge className="bg-white/5 text-white/50 border border-white/10">
@@ -423,7 +423,7 @@ export default function AdminPage() {
         <div className="p-5 pb-3 flex items-center justify-between">
           <h3 className="text-base font-semibold text-white flex items-center gap-2">
             <Users className="h-4 w-4 text-indigo-400" />
-            Users ({users.length})
+            משתמשים ({users.length})
           </h3>
           <Button
             size="sm"
@@ -435,12 +435,12 @@ export default function AdminPage() {
             }}
           >
             <UserPlus className="h-4 w-4 ml-1" />
-            New User
+            משתמש חדש
           </Button>
         </div>
         <div className="px-5 pb-5">
           {users.length === 0 ? (
-            <p className="text-sm text-white/50 text-center py-4">No users yet</p>
+            <p className="text-sm text-white/50 text-center py-4">אין משתמשים עדיין</p>
           ) : (
             <div className="space-y-2">
               {users.map((user) => (
@@ -461,12 +461,12 @@ export default function AdminPage() {
                       </Badge>
                       {user.isAdmin && (
                         <Badge className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs">
-                          System Admin
+                          מנהל מערכת
                         </Badge>
                       )}
                       {!user.isActive && (
                         <Badge className="bg-red-500/10 text-red-400 border border-red-500/20 text-xs">
-                          Inactive
+                          לא פעיל
                         </Badge>
                       )}
                     </div>
@@ -474,7 +474,7 @@ export default function AdminPage() {
                       {user.email}
                       {isSystemAdmin && user.org && <> | {user.org.name}</>}
                       {user.managedReps?.length > 0 && (
-                        <> | Manages: {user.managedReps.map((r) => r.name).join(', ')}</>
+                        <> | מנהל: {user.managedReps.map((r) => r.name).join(', ')}</>
                       )}
                     </p>
                   </div>
@@ -513,7 +513,7 @@ export default function AdminPage() {
             <div className="p-5 pb-3 flex items-center justify-between">
               <h3 className="text-base font-semibold text-white flex items-center gap-2">
                 <Phone className="h-4 w-4 text-indigo-400" />
-                Reps ({reps.length})
+                נציגים ({reps.length})
               </h3>
             </div>
             <div className="px-5 pb-5">
@@ -529,14 +529,14 @@ export default function AdminPage() {
                         <p className="text-sm font-medium text-white">{rep.name}</p>
                         {!rep.isActive && (
                           <Badge className="bg-red-500/10 text-red-400 border border-red-500/20 text-xs">
-                            Inactive
+                            לא פעיל
                           </Badge>
                         )}
                       </div>
                       <p className="text-xs text-white/50">
-                        {rep.callCount} calls
-                        {rep.avgScore !== null && <> | Avg: {rep.avgScore}</>}
-                        {rep.manager && <> | Manager: {rep.manager.name}</>}
+                        {rep.callCount} שיחות
+                        {rep.avgScore !== null && <> | ממוצע: {rep.avgScore}</>}
+                        {rep.manager && <> | מנהל: {rep.manager.name}</>}
                       </p>
                     </div>
                     <Button
@@ -562,27 +562,27 @@ export default function AdminPage() {
       <Dialog open={showNewOrg} onOpenChange={setShowNewOrg}>
         <DialogContent className="bg-card border-border text-foreground">
           <DialogHeader>
-            <DialogTitle>Create Organization</DialogTitle>
+            <DialogTitle>יצירת ארגון</DialogTitle>
           </DialogHeader>
           <form onSubmit={createOrg} className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">Name</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">שם</label>
               <Input
                 value={orgName}
                 onChange={(e) => setOrgName(e.target.value)}
-                placeholder="Acme Corp"
+                placeholder="שם הארגון"
                 required
                 className="bg-white/5 border-white/10 text-white"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">Slug</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">מזהה (Slug)</label>
               <Input
                 value={orgSlug}
                 onChange={(e) =>
                   setOrgSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))
                 }
-                placeholder="acme-corp"
+                placeholder="slug-name"
                 required
                 className="bg-white/5 border-white/10 text-white"
               />
@@ -592,7 +592,7 @@ export default function AdminPage() {
               type="submit"
               className="w-full bg-indigo-600 hover:bg-indigo-500 text-white"
             >
-              Create
+              צור ארגון
             </Button>
           </form>
         </DialogContent>
@@ -602,37 +602,37 @@ export default function AdminPage() {
       <Dialog open={showNewUser} onOpenChange={setShowNewUser}>
         <DialogContent className="bg-card border-border text-foreground">
           <DialogHeader>
-            <DialogTitle>Create User</DialogTitle>
+            <DialogTitle>יצירת משתמש</DialogTitle>
           </DialogHeader>
           <form onSubmit={createUser} className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">Name</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">שם</label>
               <Input
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
-                placeholder="John Doe"
+                placeholder="שם מלא"
                 required
                 className="bg-white/5 border-white/10 text-white"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">Email</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">אימייל</label>
               <Input
                 type="email"
                 value={userEmail}
                 onChange={(e) => setUserEmail(e.target.value)}
-                placeholder="john@company.com"
+                placeholder="user@company.com"
                 required
                 className="bg-white/5 border-white/10 text-white"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">Password</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">סיסמה</label>
               <Input
                 type="password"
                 value={userPassword}
                 onChange={(e) => setUserPassword(e.target.value)}
-                placeholder="Minimum 8 characters"
+                placeholder="מינימום 8 תווים"
                 required
                 minLength={8}
                 className="bg-white/5 border-white/10 text-white"
@@ -641,7 +641,7 @@ export default function AdminPage() {
             {isSystemAdmin && (
               <div>
                 <label className="text-sm font-medium text-white/70 mb-1 block">
-                  Organization
+                  ארגון
                 </label>
                 <select
                   value={userOrgId}
@@ -649,7 +649,7 @@ export default function AdminPage() {
                   required
                   className="w-full rounded-md bg-white/5 border border-white/10 text-white px-3 py-2 text-sm"
                 >
-                  <option value="">Select organization...</option>
+                  <option value="">בחר ארגון...</option>
                   {orgs.map((org) => (
                     <option key={org.id} value={org.id}>
                       {org.name}
@@ -659,7 +659,7 @@ export default function AdminPage() {
               </div>
             )}
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">Role</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">תפקיד</label>
               <select
                 value={userRole}
                 onChange={(e) => setUserRole(e.target.value)}
@@ -677,14 +677,14 @@ export default function AdminPage() {
             {userRole === 'REP' && managersForOrg.length > 0 && (
               <div>
                 <label className="text-sm font-medium text-white/70 mb-1 block">
-                  Assign Manager
+                  שיוך מנהל
                 </label>
                 <select
                   value={userManagerId}
                   onChange={(e) => setUserManagerId(e.target.value)}
                   className="w-full rounded-md bg-white/5 border border-white/10 text-white px-3 py-2 text-sm"
                 >
-                  <option value="">No manager</option>
+                  <option value="">ללא מנהל</option>
                   {managersForOrg.map((m) => (
                     <option key={m.id} value={m.id}>
                       {m.name} ({m.role})
@@ -704,7 +704,7 @@ export default function AdminPage() {
                   className="rounded border-white/10"
                 />
                 <label htmlFor="isAdmin" className="text-sm text-white/70">
-                  System admin (can manage all organizations and users)
+                  מנהל מערכת (יכול לנהל את כל הארגונים והמשתמשים)
                 </label>
               </div>
             )}
@@ -713,7 +713,7 @@ export default function AdminPage() {
               type="submit"
               className="w-full bg-indigo-600 hover:bg-indigo-500 text-white"
             >
-              Create User
+              צור משתמש
             </Button>
           </form>
         </DialogContent>
@@ -723,11 +723,11 @@ export default function AdminPage() {
       <Dialog open={showEditUser} onOpenChange={setShowEditUser}>
         <DialogContent className="bg-card border-border text-foreground">
           <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
+            <DialogTitle>עריכת משתמש</DialogTitle>
           </DialogHeader>
           <form onSubmit={saveEditUser} className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">Name</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">שם</label>
               <Input
                 value={editUserName}
                 onChange={(e) => setEditUserName(e.target.value)}
@@ -736,7 +736,7 @@ export default function AdminPage() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">Role</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">תפקיד</label>
               <select
                 value={editUserRole}
                 onChange={(e) => setEditUserRole(e.target.value)}
@@ -758,7 +758,7 @@ export default function AdminPage() {
                 className="rounded border-white/10"
               />
               <label htmlFor="editActive" className="text-sm text-white/70">
-                Active
+                פעיל
               </label>
             </div>
             {editUserError && <p className="text-sm text-red-400">{editUserError}</p>}
@@ -766,7 +766,7 @@ export default function AdminPage() {
               type="submit"
               className="w-full bg-indigo-600 hover:bg-indigo-500 text-white"
             >
-              Save Changes
+              שמור שינויים
             </Button>
           </form>
         </DialogContent>
@@ -776,11 +776,11 @@ export default function AdminPage() {
       <Dialog open={showEditRep} onOpenChange={setShowEditRep}>
         <DialogContent className="bg-card border-border text-foreground">
           <DialogHeader>
-            <DialogTitle>Edit Rep</DialogTitle>
+            <DialogTitle>עריכת נציג</DialogTitle>
           </DialogHeader>
           <form onSubmit={saveEditRep} className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">Name</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">שם</label>
               <Input
                 value={editRepName}
                 onChange={(e) => setEditRepName(e.target.value)}
@@ -789,20 +789,20 @@ export default function AdminPage() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">Phone</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">טלפון</label>
               <Input
                 value={editRepPhone}
                 onChange={(e) => setEditRepPhone(e.target.value)}
-                placeholder="Phone number"
+                placeholder="מספר טלפון"
                 className="bg-white/5 border-white/10 text-white"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-white/70 mb-1 block">Extension</label>
+              <label className="text-sm font-medium text-white/70 mb-1 block">שלוחה</label>
               <Input
                 value={editRepExtension}
                 onChange={(e) => setEditRepExtension(e.target.value)}
-                placeholder="PBX extension"
+                placeholder="שלוחת מרכזיה"
                 className="bg-white/5 border-white/10 text-white"
               />
             </div>
@@ -815,7 +815,7 @@ export default function AdminPage() {
                 className="rounded border-white/10"
               />
               <label htmlFor="editRepActive" className="text-sm text-white/70">
-                Active
+                פעיל
               </label>
             </div>
             {editRepError && <p className="text-sm text-red-400">{editRepError}</p>}
@@ -823,7 +823,7 @@ export default function AdminPage() {
               type="submit"
               className="w-full bg-indigo-600 hover:bg-indigo-500 text-white"
             >
-              Save Changes
+              שמור שינויים
             </Button>
           </form>
         </DialogContent>

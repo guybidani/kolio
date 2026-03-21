@@ -15,7 +15,7 @@ import {
 } from 'lucide-react'
 
 const MOCK_PLAYBOOK = {
-  name: 'Playbook ראשי - סוכנות דיגיטל',
+  name: 'תסריט ראשי - סוכנות דיגיטל',
   stages: [
     { name: 'פתיחה וראפור', tips: ['לפתוח עם משהו אישי', 'להתייחס לעסק שלהם', 'לא לקפוץ ישר למכירה'] },
     { name: 'דיסקברי', tips: ['שאלות מצב: איך מקבלים לקוחות היום?', 'שאלות בעיה: מה לא עובד?', 'שאלות השלכה: מה קורה אם זה נמשך?'] },
@@ -75,6 +75,13 @@ const MOCK_PLAYBOOK = {
   ],
 }
 
+const OBJECTION_TYPE_LABELS: Record<string, string> = {
+  price: 'מחיר',
+  timing: 'תזמון',
+  past_experience: 'ניסיון עבר',
+  authority: 'סמכות',
+}
+
 export default function PlaybookPage() {
   const [search, setSearch] = useState('')
 
@@ -82,7 +89,7 @@ export default function PlaybookPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Playbook</h1>
+          <h1 className="text-2xl font-bold text-foreground">תסריט מכירה</h1>
           <p className="text-muted-foreground">
             {MOCK_PLAYBOOK.name} - טכניקות ותגובות שנלמדו מהשיחות
           </p>
@@ -158,7 +165,7 @@ export default function PlaybookPage() {
                         &ldquo;{obj.objection}&rdquo;
                       </h3>
                       <Badge variant="outline" className="text-xs bg-muted/50 border-border text-muted-foreground">
-                        {obj.type}
+                        {OBJECTION_TYPE_LABELS[obj.type] || obj.type}
                       </Badge>
                     </div>
                     <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-lg p-3">

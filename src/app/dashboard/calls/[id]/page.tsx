@@ -273,7 +273,7 @@ export default function CallDetailPage() {
           utterances={MOCK_UTTERANCES}
           keyMoments={[
             { time: 5, label: 'פתיחה אישית' },
-            { time: 27, label: 'Social Proof' },
+            { time: 27, label: 'הוכחה חברתית' },
             { time: 52, label: 'שאלת מחיר' },
             { time: 68, label: 'התנגדות' },
           ]}

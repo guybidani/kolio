@@ -163,7 +163,7 @@ function NavContent() {
               size="icon"
               className="text-muted-foreground hover:text-foreground hover:bg-muted shrink-0"
               onClick={handleLogout}
-              title="Logout"
+              title="התנתק"
             >
               <LogOut className="h-4 w-4" />
             </Button>

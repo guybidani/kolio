@@ -17,6 +17,13 @@ interface CoachingPanelProps {
   analysis: CallAnalysis
 }
 
+const OBJECTION_TYPE_LABELS: Record<string, string> = {
+  price: 'מחיר',
+  timing: 'תזמון',
+  past_experience: 'ניסיון עבר',
+  authority: 'סמכות',
+}
+
 export function CoachingPanel({ analysis }: CoachingPanelProps) {
   const { scores, retention_points, improvement_points, objections_detected, next_call_prep, spin_analysis } = analysis
 
@@ -105,7 +112,7 @@ export function CoachingPanel({ analysis }: CoachingPanelProps) {
                   {point.playbook_worthy && (
                     <Badge variant="outline" className="mt-2 text-xs bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
                       <BookOpen className="h-3 w-3 ml-1" />
-                      שווה playbook
+                      שווה תסריט
                     </Badge>
                   )}
                 </div>
@@ -175,7 +182,7 @@ export function CoachingPanel({ analysis }: CoachingPanelProps) {
                   <p className="font-medium text-sm text-foreground">{obj.objection}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <Badge variant="outline" className="text-xs bg-muted/50 border-border text-muted-foreground">
-                      {obj.type}
+                      {OBJECTION_TYPE_LABELS[obj.type] || obj.type}
                     </Badge>
                     <Badge
                       variant="outline"
