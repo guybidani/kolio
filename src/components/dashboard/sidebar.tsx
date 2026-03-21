@@ -25,6 +25,7 @@ import { Badge } from '@/components/ui/badge'
 import { useState, useEffect, useMemo } from 'react'
 import { getVisibleNavItems, type NavSection } from '@/lib/permissions'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { PlanBadge } from '@/components/dashboard/plan-status'
 import type { UserRole } from '@/types'
 
 interface NavItem {
@@ -175,6 +176,10 @@ function NavContent() {
           </Link>
         </div>
       )}
+
+      <div className="px-4 pb-2">
+        <PlanBadge />
+      </div>
 
       <div className="px-4 py-2">
         <ThemeToggle />

@@ -1,13 +1,18 @@
 import { Sidebar, MobileSidebar } from '@/components/dashboard/sidebar'
 import { NotificationBell } from '@/components/dashboard/notification-bell'
 import { SearchCommand } from '@/components/dashboard/search-command'
+import { VerifyEmailBanner } from '@/components/dashboard/verify-email-banner'
 import { Logo } from '@/components/ui/logo'
+import { getCurrentUser } from '@/lib/auth'
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const user = await getCurrentUser()
+  const showVerifyBanner = user && !user.emailVerified
+
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar />
@@ -26,6 +31,11 @@ export default function DashboardLayout({
             <NotificationBell />
           </div>
         </header>
+        {showVerifyBanner && (
+          <div className="px-4 pt-4 lg:px-6 lg:pt-6">
+            <VerifyEmailBanner />
+          </div>
+        )}
         <main className="flex-1 p-4 lg:p-6">{children}</main>
       </div>
     </div>

@@ -45,6 +45,8 @@ interface Org {
   name: string
   slug: string
   plan: string
+  planSeats: number
+  trialEndsAt: string | null
   _count: { users: number; calls: number; reps: number }
   createdAt: string
 }
@@ -119,6 +121,15 @@ export default function AdminPage() {
   const [editUserRole, setEditUserRole] = useState('')
   const [editUserActive, setEditUserActive] = useState(true)
   const [editUserError, setEditUserError] = useState('')
+
+  // Plan management form
+  const [showPlanManage, setShowPlanManage] = useState(false)
+  const [planOrgId, setPlanOrgId] = useState('')
+  const [planOrgName, setPlanOrgName] = useState('')
+  const [planValue, setPlanValue] = useState('TRIAL')
+  const [planSeatsValue, setPlanSeatsValue] = useState(5)
+  const [planTrialDays, setPlanTrialDays] = useState(14)
+  const [planError, setPlanError] = useState('')
 
   // Edit rep form
   const [showEditRep, setShowEditRep] = useState(false)
@@ -341,6 +352,53 @@ export default function AdminPage() {
     setShowEditUser(true)
   }
 
+  function openPlanManage(org: Org) {
+    setPlanOrgId(org.id)
+    setPlanOrgName(org.name)
+    setPlanValue(org.plan)
+    setPlanSeatsValue(org.planSeats)
+    // Calculate remaining trial days
+    if (org.trialEndsAt) {
+      const daysLeft = Math.max(0, Math.ceil((new Date(org.trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+      setPlanTrialDays(daysLeft)
+    } else {
+      setPlanTrialDays(14)
+    }
+    setPlanError('')
+    setShowPlanManage(true)
+  }
+
+  async function savePlan(e: React.FormEvent) {
+    e.preventDefault()
+    setPlanError('')
+
+    const body: Record<string, unknown> = {
+      orgId: planOrgId,
+      plan: planValue,
+      planSeats: planSeatsValue,
+    }
+
+    // If extending trial, calculate new end date from now
+    if (planValue === 'TRIAL' && planTrialDays > 0) {
+      body.trialEndsAt = new Date(Date.now() + planTrialDays * 24 * 60 * 60 * 1000).toISOString()
+    }
+
+    const res = await fetch('/api/plan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+
+    const data = await res.json()
+    if (!res.ok) {
+      setPlanError(data.error)
+      return
+    }
+
+    setShowPlanManage(false)
+    fetchData()
+  }
+
   function openEditRep(rep: Rep) {
     setEditRepId(rep.id)
     setEditRepName(rep.name)
@@ -412,9 +470,19 @@ export default function AdminPage() {
                           {org._count.reps} נציגים
                         </p>
                       </div>
-                      <Badge className="bg-white/5 text-white/50 border border-white/10">
-                        {org.plan}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge className="bg-white/5 text-white/50 border border-white/10">
+                          {org.plan}
+                        </Badge>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-white/50 hover:text-white hover:bg-white/10"
+                          onClick={() => openPlanManage(org)}
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -827,6 +895,61 @@ export default function AdminPage() {
               </label>
             </div>
             {editRepError && <p className="text-sm text-red-400">{editRepError}</p>}
+            <Button
+              type="submit"
+              className="w-full bg-indigo-600 hover:bg-indigo-500 text-white"
+            >
+              שמור שינויים
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Plan Management Dialog - system admins only */}
+      <Dialog open={showPlanManage} onOpenChange={setShowPlanManage}>
+        <DialogContent className="bg-card border-border text-foreground">
+          <DialogHeader>
+            <DialogTitle>ניהול תוכנית - {planOrgName}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={savePlan} className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-white/70 mb-1 block">תוכנית</label>
+              <select
+                value={planValue}
+                onChange={(e) => setPlanValue(e.target.value)}
+                className="w-full rounded-md bg-[#1a1a2e] border border-white/10 text-white px-3 py-2.5 text-sm [&>option]:bg-[#1a1a2e] [&>option]:text-white"
+              >
+                <option value="TRIAL">ניסיון (Trial)</option>
+                <option value="STARTER">סטארטר (Starter)</option>
+                <option value="PRO">פרו (Pro)</option>
+                <option value="ENTERPRISE">אנטרפרייז (Enterprise)</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-white/70 mb-1 block">מספר מושבים</label>
+              <Input
+                type="number"
+                min={1}
+                max={999}
+                value={planSeatsValue}
+                onChange={(e) => setPlanSeatsValue(parseInt(e.target.value) || 5)}
+                className="bg-white/5 border-white/10 text-white"
+              />
+            </div>
+            {planValue === 'TRIAL' && (
+              <div>
+                <label className="text-sm font-medium text-white/70 mb-1 block">ימי ניסיון (מהיום)</label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={90}
+                  value={planTrialDays}
+                  onChange={(e) => setPlanTrialDays(parseInt(e.target.value) || 14)}
+                  className="bg-white/5 border-white/10 text-white"
+                />
+              </div>
+            )}
+            {planError && <p className="text-sm text-red-400">{planError}</p>}
             <Button
               type="submit"
               className="w-full bg-indigo-600 hover:bg-indigo-500 text-white"

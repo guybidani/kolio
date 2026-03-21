@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { uploadAudio, getAudioKey } from '@/lib/r2'
 import { enqueueCallProcessing } from '@/lib/queue'
 import { can } from '@/lib/permissions'
+import { checkPlanLimits, canUploadCall } from '@/lib/plan-limits'
 
 export const runtime = 'nodejs'
 
@@ -66,6 +67,13 @@ export async function POST(req: Request) {
     const rbacUser = { id: user.id, role: user.role, orgId: user.orgId, isAdmin: user.isAdmin }
     if (!can(rbacUser, 'calls:upload')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    // Check plan limits before accepting upload
+    const planStatus = await checkPlanLimits(user.orgId)
+    const uploadCheck = canUploadCall(planStatus)
+    if (!uploadCheck.allowed) {
+      return NextResponse.json({ error: uploadCheck.reason }, { status: 403 })
     }
 
     const formData = await req.formData()

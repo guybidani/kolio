@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { requireAuth, hashPassword } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { can, canCreateUserWithRole } from '@/lib/permissions'
+import { checkPlanLimits, canAddUser } from '@/lib/plan-limits'
 import type { UserRole } from '@/types'
 
 export const runtime = 'nodejs'
@@ -86,6 +87,13 @@ export async function POST(
 
     if (!can(rbacUser, 'users:manage')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    // Check plan seat limits before creating user
+    const planStatus = await checkPlanLimits(orgId)
+    const seatCheck = canAddUser(planStatus)
+    if (!seatCheck.allowed) {
+      return NextResponse.json({ error: seatCheck.reason }, { status: 403 })
     }
 
     const { email, password, name, role, managerId } = await req.json()

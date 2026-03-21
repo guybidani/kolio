@@ -21,6 +21,23 @@ COPY . .
 # Generate Prisma client
 RUN npx prisma generate --schema=./prisma/schema.prisma
 
+# Bundle workers into a single JS file
+RUN npx esbuild src/workers/index.ts \
+  --bundle \
+  --platform=node \
+  --outfile=dist/workers/index.js \
+  --alias:@=./src \
+  --external:@prisma/client \
+  --external:@prisma/adapter-pg \
+  --external:pg \
+  --external:bullmq \
+  --external:ioredis \
+  --external:bcryptjs \
+  --external:openai \
+  --external:@aws-sdk/client-s3 \
+  --external:@aws-sdk/s3-request-presigner \
+  --external:socket.io
+
 # Build Next.js
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
@@ -50,6 +67,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+
+# Copy bundled workers
+COPY --from=builder --chown=nextjs:nodejs /app/dist ./dist
 
 # Copy startup script and seed
 COPY --from=builder --chown=nextjs:nodejs /app/start.sh ./start.sh

@@ -24,6 +24,7 @@ export async function GET() {
       name: user.name,
       role: user.role,
       isAdmin: user.isAdmin,
+      emailVerified: user.emailVerified,
       avatarUrl: user.avatarUrl,
       org: user.org,
     })

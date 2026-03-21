@@ -3,6 +3,7 @@ import { db } from '@/lib/db'
 import { parsePbxWebhook } from '@/lib/pbx-adapter'
 import { uploadAudio, getAudioKey } from '@/lib/r2'
 import { enqueueCallProcessing } from '@/lib/queue'
+import { checkPlanLimits, canUploadCall } from '@/lib/plan-limits'
 import crypto from 'crypto'
 
 // Max recording file size from PBX (200MB)
@@ -83,6 +84,13 @@ export async function POST(req: Request) {
     const expectedBuffer = Buffer.from(org.webhookSecret)
     if (secretBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(secretBuffer, expectedBuffer)) {
       return NextResponse.json({ error: 'Invalid org or secret' }, { status: 401 })
+    }
+
+    // Check plan limits before processing call
+    const planStatus = await checkPlanLimits(org.id)
+    const uploadCheck = canUploadCall(planStatus)
+    if (!uploadCheck.allowed) {
+      return NextResponse.json({ error: uploadCheck.reason }, { status: 403 })
     }
 
     const body = await req.json()

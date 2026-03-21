@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import crypto from 'crypto'
 import { db } from '@/lib/db'
 import { hashPassword, createToken, getSessionCookieOptions } from '@/lib/auth'
 
@@ -69,8 +70,13 @@ export async function POST(req: Request) {
         slug,
         plan: 'TRIAL',
         planSeats: 5,
+        trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
       },
     })
+
+    // Generate email verification token
+    const verifyToken = crypto.randomBytes(32).toString('hex')
+    const verifyTokenExp = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
 
     const user = await db.user.create({
       data: {
@@ -80,10 +86,17 @@ export async function POST(req: Request) {
         orgId: org.id,
         role: 'ADMIN',
         isAdmin: false, // org admin, not system admin
+        emailVerified: false,
+        verifyToken,
+        verifyTokenExp,
       },
     })
 
-    // Create JWT and set cookie
+    // Log verification link (no email service yet)
+    const verifyUrl = `https://kolio.projectadam.co.il/verify-email?token=${verifyToken}`
+    console.log(`[EMAIL VERIFY] User ${emailClean} - Verification link: ${verifyUrl}`)
+
+    // Create JWT and set cookie (soft enforcement - user can log in without verification)
     const token = await createToken({
       id: user.id,
       email: user.email,
