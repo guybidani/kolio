@@ -91,6 +91,7 @@ model Organization {
   weeklyReports    WeeklyReport[]
   pbxIntegrations  PbxIntegration[]
   badges           Badge[]
+  streaks          Streak[]
 }
 
 model User {
@@ -205,6 +206,7 @@ model Call {
   @@index([orgId, recordedAt])
   @@index([orgId, status])
   @@index([status])
+  @@index([orgId, externalId])
 }
 
 model Playbook {
@@ -276,16 +278,18 @@ model Badge {
 }
 
 model Streak {
-  id           String     @id @default(cuid())
+  id           String       @id @default(cuid())
   orgId        String
+  org          Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
   repId        String
-  rep          Rep        @relation(fields: [repId], references: [id], onDelete: Cascade)
+  rep          Rep          @relation(fields: [repId], references: [id], onDelete: Cascade)
   type         StreakType
-  currentCount Int        @default(0)
-  bestCount    Int        @default(0)
+  currentCount Int          @default(0)
+  bestCount    Int          @default(0)
   lastDate     DateTime
 
   @@unique([orgId, repId, type])
+  @@index([orgId])
 }
 
 model Notification {
