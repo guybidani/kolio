@@ -23,7 +23,7 @@ export function FinalCTA() {
             התחילו ניסיון חינם של 14 ימים. ללא כרטיס אשראי. בלי התחייבות.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/sign-up">
+            <Link href="/register">
               <Button size="lg" className="text-lg px-8 gap-2 bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_4px_14px_rgba(99,102,241,0.4)]">
                 התחילו בחינם עכשיו
                 <ArrowLeft className="h-5 w-5" />

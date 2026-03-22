@@ -26,11 +26,11 @@ export async function POST(req: Request) {
     const { email, password } = await req.json()
 
     if (!email || !password) {
-      return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
+      return NextResponse.json({ error: 'יש להזין אימייל וסיסמה' }, { status: 400 })
     }
 
     if (!checkLoginRateLimit(email)) {
-      return NextResponse.json({ error: 'Too many login attempts. Please try again later.' }, { status: 429 })
+      return NextResponse.json({ error: 'יותר מדי ניסיונות התחברות. נסה שוב מאוחר יותר.' }, { status: 429 })
     }
 
     const user = await db.user.findUnique({
@@ -39,12 +39,12 @@ export async function POST(req: Request) {
     })
 
     if (!user || !user.isActive) {
-      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
+      return NextResponse.json({ error: 'אימייל או סיסמה שגויים' }, { status: 401 })
     }
 
     const valid = await verifyPassword(password, user.passwordHash)
     if (!valid) {
-      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
+      return NextResponse.json({ error: 'אימייל או סיסמה שגויים' }, { status: 401 })
     }
 
     const token = await createToken({
@@ -79,7 +79,7 @@ export async function POST(req: Request) {
     return response
   } catch (error: unknown) {
     console.error('Login error:', error)
-    const body: Record<string, string> = { error: 'Internal server error' }
+    const body: Record<string, string> = { error: 'שגיאה פנימית בשרת' }
     if (process.env.NODE_ENV !== 'production' && error instanceof Error) {
       body.detail = error.message.slice(0, 200)
     }
