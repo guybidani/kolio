@@ -8,6 +8,7 @@ import { checkAndAwardBadges } from '@/lib/badges'
 import { updateStreaks } from '@/lib/streaks'
 import { notifyCallEvent } from '@/lib/notifications'
 import type { CallAnalysis } from '@/types'
+import { pushToVixyCrm } from '@/lib/vixy-crm'
 
 interface AnalyzeJobData {
   callId: string
@@ -130,6 +131,13 @@ async function processAnalysis(job: Job<AnalyzeJobData>) {
         // Don't fail the analysis if gamification fails
         console.error('[Analyze] Gamification error:', gamificationError)
       }
+    }
+
+    // Push to Vixy CRM (if configured for this org)
+    try {
+      await pushToVixyCrm(callId, orgId)
+    } catch (crmError) {
+      console.error('[Analyze] Vixy CRM push error:', crmError)
     }
 
     return { callId, score: analysis.scores?.overall }

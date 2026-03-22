@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import PbxIntegrations from '@/components/dashboard/pbx-integrations'
 import AutoImportSettings from '@/components/dashboard/auto-import-settings'
+import VixyCrmIntegration from '@/components/dashboard/vixy-crm-integration'
 
 interface OrgInfo {
   id: string
@@ -211,6 +212,8 @@ export default function SettingsPage() {
               <p className="text-sm text-muted-foreground">טוען...</p>
             </div>
           )}
+
+          <VixyCrmIntegration />
 
           <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden">
             <div className="p-5 pb-3">
