@@ -3,6 +3,22 @@ import { getSession } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { openai } from '@/lib/openai'
 
+// Rate limiter: 10 evaluations per user per hour
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
+const RATE_LIMIT_WINDOW_MS = 60 * 60_000
+const RATE_LIMIT_MAX = 10
+
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now()
+  const entry = rateLimitMap.get(userId)
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(userId, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS })
+    return true
+  }
+  entry.count++
+  return entry.count <= RATE_LIMIT_MAX
+}
+
 interface PracticeMessage {
   role: 'user' | 'buyer'
   content: string
@@ -57,6 +73,10 @@ export async function POST(
     const session = await getSession()
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    if (!checkRateLimit(session.id)) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
     }
 
     const { id } = await params

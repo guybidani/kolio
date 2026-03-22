@@ -141,10 +141,10 @@ model Rep {
   avatarUrl  String?
   isActive   Boolean  @default(true)
   managerId  String?
-  manager    User?    @relation("ManagedReps", fields: [managerId], references: [id])
+  manager    User?    @relation("ManagedReps", fields: [managerId], references: [id], onDelete: SetNull)
   teamId     String?
   userId     String?  @unique
-  user       User?    @relation("RepUser", fields: [userId], references: [id])
+  user       User?    @relation("RepUser", fields: [userId], references: [id], onDelete: SetNull)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -162,7 +162,7 @@ model Call {
   orgId          String
   org            Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
   repId          String?
-  rep            Rep?          @relation(fields: [repId], references: [id])
+  rep            Rep?          @relation(fields: [repId], references: [id], onDelete: SetNull)
 
   audioUrl       String
   audioSize      Int?

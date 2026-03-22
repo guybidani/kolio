@@ -47,13 +47,13 @@ export async function POST(req: Request) {
         data: { resetToken, resetTokenExp },
       })
 
-      const resetLink = `https://kolio.projectadam.co.il/reset-password?token=${resetToken}`
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://kolio.projectadam.co.il'
+      const resetLink = `${appUrl}/reset-password?token=${resetToken}`
       console.log(`[PASSWORD RESET] Link for ${emailClean}: ${resetLink}`)
 
-      // Return link in response for development (remove when email is set up)
+      // TODO: Send reset email via sendEmail() when email service is configured
       return NextResponse.json({
         message: 'אם האימייל קיים במערכת, נשלח קישור לאיפוס',
-        resetLink, // TODO: remove when email sending is implemented
       })
     }
 
