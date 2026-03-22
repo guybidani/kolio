@@ -1,21 +1,30 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Settings,
   Link2,
   Shield,
   Loader2,
+  Download,
+  Bell,
 } from 'lucide-react'
 import PbxIntegrations from '@/components/dashboard/pbx-integrations'
+import AutoImportSettings from '@/components/dashboard/auto-import-settings'
 
 interface OrgInfo {
   id: string
   name: string
   slug: string
+}
+
+interface EmailPreferences {
+  emailNotifications: boolean
+  emailDigest: boolean
 }
 
 export default function SettingsPage() {
@@ -24,6 +33,14 @@ export default function SettingsPage() {
   const [orgName, setOrgName] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+
+  // Email notification preferences
+  const [emailPrefs, setEmailPrefs] = useState<EmailPreferences>({
+    emailNotifications: true,
+    emailDigest: true,
+  })
+  const [prefsLoading, setPrefsLoading] = useState(false)
+  const [prefsSaving, setPrefsSaving] = useState(false)
 
   useEffect(() => {
     async function loadSession() {
@@ -45,6 +62,50 @@ export default function SettingsPage() {
     }
     loadSession()
   }, [])
+
+  const loadEmailPreferences = useCallback(async () => {
+    setPrefsLoading(true)
+    try {
+      const res = await fetch('/api/notifications/preferences')
+      if (res.ok) {
+        const data = await res.json()
+        setEmailPrefs({
+          emailNotifications: data.emailNotifications,
+          emailDigest: data.emailDigest,
+        })
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setPrefsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    loadEmailPreferences()
+  }, [loadEmailPreferences])
+
+  async function updateEmailPref(field: keyof EmailPreferences, value: boolean) {
+    setPrefsSaving(true)
+    const prev = { ...emailPrefs }
+    setEmailPrefs((p) => ({ ...p, [field]: value }))
+
+    try {
+      const res = await fetch('/api/notifications/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [field]: value }),
+      })
+      if (!res.ok) {
+        // Revert on failure
+        setEmailPrefs(prev)
+      }
+    } catch {
+      setEmailPrefs(prev)
+    } finally {
+      setPrefsSaving(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -70,6 +131,14 @@ export default function SettingsPage() {
           <TabsTrigger value="integrations" className="data-[state=active]:bg-muted">
             <Link2 className="h-4 w-4 ml-1" />
             אינטגרציות
+          </TabsTrigger>
+          <TabsTrigger value="auto-import" className="data-[state=active]:bg-muted">
+            <Download className="h-4 w-4 ml-1" />
+            יבוא אוטומטי
+          </TabsTrigger>
+          <TabsTrigger value="notifications" className="data-[state=active]:bg-muted">
+            <Bell className="h-4 w-4 ml-1" />
+            התראות
           </TabsTrigger>
         </TabsList>
 
@@ -171,6 +240,75 @@ export default function SettingsPage() {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="auto-import" className="mt-6 space-y-4">
+          <AutoImportSettings />
+        </TabsContent>
+
+        <TabsContent value="notifications" className="mt-6 space-y-4">
+          <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden">
+            <div className="p-5 pb-3">
+              <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
+                <Bell className="h-4 w-4 text-indigo-400" />
+                התראות מייל
+              </h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                בחר אילו התראות תרצה לקבל במייל
+              </p>
+            </div>
+            <div className="px-5 pb-5 space-y-5">
+              {prefsLoading ? (
+                <div className="flex items-center justify-center py-6">
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-muted/30">
+                    <div>
+                      <p className="text-sm font-medium text-foreground">קבל דוחות שבועיים במייל</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        סיכום שבועי של ביצועי הצוות, כולל ציונים, נציג השבוע ושיחות שדורשות תשומת לב
+                      </p>
+                    </div>
+                    <Switch
+                      checked={emailPrefs.emailDigest}
+                      onCheckedChange={(checked) => updateEmailPref('emailDigest', checked)}
+                      disabled={prefsSaving}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-muted/30">
+                    <div>
+                      <p className="text-sm font-medium text-foreground">קבל התראות על ציונים נמוכים</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        קבל מייל כשנציג מקבל ציון נמוך בשיחה ונדרשת תשומת לב
+                      </p>
+                    </div>
+                    <Switch
+                      checked={emailPrefs.emailNotifications}
+                      onCheckedChange={(checked) => updateEmailPref('emailNotifications', checked)}
+                      disabled={prefsSaving}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-muted/30">
+                    <div>
+                      <p className="text-sm font-medium text-foreground">קבל התראות על תגים חדשים</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        קבל מייל כשנציג מרוויח תג חדש כמו &quot;נציג השבוע&quot; או &quot;ציון מושלם&quot;
+                      </p>
+                    </div>
+                    <Switch
+                      checked={emailPrefs.emailNotifications}
+                      onCheckedChange={(checked) => updateEmailPref('emailNotifications', checked)}
+                      disabled={prefsSaving}
+                    />
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </TabsContent>

@@ -1,6 +1,10 @@
 import { db } from './db'
 import { Prisma } from '@prisma/client'
 import type { NotificationType } from '@prisma/client'
+import { sendEmail } from './email'
+import { notificationEmail } from './email-templates'
+
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://kolio.projectadam.co.il'
 
 /**
  * Create a new notification for a user.
@@ -81,8 +85,50 @@ export async function markAllRead(userId: string, orgId: string) {
 }
 
 /**
+ * Send a notification email to a user if their preferences allow it.
+ * Returns true if email was sent (or skipped due to preferences).
+ */
+async function sendNotificationEmail(
+  userId: string,
+  type: NotificationType,
+  title: string,
+  body: string,
+  ctaUrl?: string,
+  ctaText?: string
+) {
+  try {
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: { email: true, name: true, emailNotifications: true },
+    })
+    if (!user || !user.emailNotifications) return
+
+    const unsubscribeUrl = `${appUrl}/dashboard/settings?tab=notifications&uid=${userId}`
+
+    const html = notificationEmail({
+      recipientName: user.name,
+      title,
+      body,
+      ctaText,
+      ctaUrl,
+      appUrl,
+      unsubscribeUrl,
+    })
+
+    await sendEmail({
+      to: user.email,
+      subject: `${title} | Kolio`,
+      html,
+    })
+  } catch (error) {
+    console.error(`[Notifications] Failed to send email to user ${userId}:`, error)
+  }
+}
+
+/**
  * Notify relevant users about a call event (e.g., after analysis).
  * Finds the user linked to the rep, plus the rep's manager if any.
+ * Also sends email notifications based on user preferences.
  */
 export async function notifyCallEvent(
   callId: string,
@@ -164,5 +210,32 @@ export async function notifyCallEvent(
         data: JSON.parse(JSON.stringify(n.data)) as Prisma.InputJsonValue,
       })),
     })
+
+    // Send email notifications asynchronously (don't block the main flow)
+    const callUrl = `${appUrl}/dashboard/calls/${callId}`
+
+    for (const n of notifications) {
+      if (n.type === 'LOW_SCORE') {
+        // Email to manager for low scores
+        sendNotificationEmail(
+          n.userId,
+          n.type,
+          n.title,
+          n.body,
+          callUrl,
+          'צפה בשיחה'
+        )
+      } else if (n.type === 'BADGE_EARNED') {
+        // Email to rep for badges
+        sendNotificationEmail(
+          n.userId,
+          n.type,
+          n.title,
+          n.body,
+          callUrl,
+          'צפה בפרטים'
+        )
+      }
+    }
   }
 }

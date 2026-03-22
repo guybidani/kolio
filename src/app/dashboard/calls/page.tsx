@@ -44,6 +44,7 @@ const STATUS_FILTERS = [
   { value: 'TRANSCRIBING', label: 'בתמלול' },
   { value: 'UPLOADED', label: 'ממתינות' },
   { value: 'FAILED', label: 'נכשלו' },
+  { value: 'TOO_SHORT', label: 'קצרות מדי' },
 ]
 
 export default function CallsPage() {

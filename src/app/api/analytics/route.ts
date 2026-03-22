@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { SALES_BENCHMARKS, classifyBenchmark, gapFromIdeal } from '@/lib/benchmarks'
 
 export async function GET(req: Request) {
   try {
@@ -45,6 +46,7 @@ export async function GET(req: Request) {
         talkRatioCustomer: true,
         energyScore: true,
         nextStepsScore: true,
+        pricingDiscussion: true,
         recordedAt: true,
         rep: { select: { id: true, name: true } },
       },
@@ -147,6 +149,49 @@ export async function GET(req: Request) {
       totalCoachingTips: calls.length * 3, // Approximate
     }
 
+    // 8. Team benchmark comparison (Gong research data)
+    const getPricingMentions = (pd: unknown): number | null => {
+      if (!pd || typeof pd !== 'object') return null
+      const obj = pd as Record<string, unknown>
+      if (typeof obj.count === 'number') return obj.count
+      if (Array.isArray(obj.mentions)) return obj.mentions.length
+      return null
+    }
+    const getPricingTiming = (pd: unknown): number | null => {
+      if (!pd || typeof pd !== 'object') return null
+      const obj = pd as Record<string, unknown>
+      if (typeof obj.firstMentionMinute === 'number') return obj.firstMentionMinute
+      if (typeof obj.timing === 'number') return obj.timing
+      return null
+    }
+
+    const teamBenchmarks = {
+      talkRatio: {
+        value: Math.round(avgAll(calls.map((c) => c.talkRatioRep)) * 10) / 10,
+      },
+      questionsPerCall: {
+        value: Math.round(avgAll(calls.map((c) => c.questionCount)) * 10) / 10,
+      },
+      longestMonologue: {
+        value: Math.round(avgAll(calls.map((c) => c.longestMonologue)) * 10) / 10,
+      },
+      pricingMentions: {
+        value: Math.round(avgAll(calls.map((c) => getPricingMentions(c.pricingDiscussion))) * 10) / 10,
+      },
+      pricingTiming: {
+        value: Math.round(avgAll(calls.map((c) => getPricingTiming(c.pricingDiscussion))) * 10) / 10,
+      },
+    }
+
+    const teamBenchmarkAnalysis = Object.entries(teamBenchmarks).map(([key, { value }]) => ({
+      key,
+      value,
+      zone: classifyBenchmark(key, value),
+      gap: gapFromIdeal(key, value),
+      ideal: SALES_BENCHMARKS[key]?.ideal ?? 0,
+      label: SALES_BENCHMARKS[key]?.label ?? key,
+    }))
+
     return NextResponse.json({
       summary,
       scoresByPeriod,
@@ -154,6 +199,8 @@ export async function GET(req: Request) {
       callVolume,
       scoreDistribution,
       talkRatioDistribution,
+      teamBenchmarks,
+      teamBenchmarkAnalysis,
     })
   } catch (error) {
     console.error('Error fetching analytics:', error)

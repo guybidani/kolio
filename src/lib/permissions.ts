@@ -208,22 +208,22 @@ export function canCreateUserWithRole(creator: RBACUser, targetRole: UserRole): 
 /**
  * Get the list of nav items visible to a role
  */
-export type NavSection = 'dashboard' | 'analytics' | 'calls' | 'reps' | 'playbook' | 'upload' | 'settings' | 'admin' | 'my-calls' | 'my-score' | 'coaching' | 'executive' | 'team-overview' | 'trends'
+export type NavSection = 'dashboard' | 'analytics' | 'calls' | 'reps' | 'playbook' | 'practice' | 'upload' | 'settings' | 'admin' | 'my-calls' | 'my-score' | 'coaching' | 'executive' | 'team-overview' | 'trends'
 
 export function getVisibleNavItems(role: UserRole, isAdmin: boolean): NavSection[] {
   if (isAdmin) {
-    return ['dashboard', 'analytics', 'calls', 'reps', 'playbook', 'upload', 'settings', 'admin']
+    return ['dashboard', 'analytics', 'calls', 'reps', 'playbook', 'practice', 'upload', 'settings', 'admin']
   }
 
   switch (role) {
     case 'ADMIN':
-      return ['dashboard', 'analytics', 'calls', 'reps', 'playbook', 'upload', 'settings', 'admin']
+      return ['dashboard', 'analytics', 'calls', 'reps', 'playbook', 'practice', 'upload', 'settings', 'admin']
     case 'CEO':
       return ['dashboard', 'analytics', 'calls', 'reps', 'playbook', 'settings']
     case 'MANAGER':
-      return ['dashboard', 'analytics', 'calls', 'reps', 'playbook', 'upload', 'settings']
+      return ['dashboard', 'analytics', 'calls', 'reps', 'playbook', 'practice', 'upload', 'settings']
     case 'REP':
-      return ['dashboard', 'calls', 'upload', 'playbook']
+      return ['dashboard', 'calls', 'upload', 'playbook', 'practice']
     case 'VIEWER':
       return ['dashboard', 'analytics', 'calls', 'reps']
     default:

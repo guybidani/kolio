@@ -1,8 +1,8 @@
 export type Plan = 'TRIAL' | 'STARTER' | 'PRO' | 'ENTERPRISE'
 export type UserRole = 'ADMIN' | 'CEO' | 'MANAGER' | 'REP' | 'VIEWER'
 export type CallDirection = 'INBOUND' | 'OUTBOUND' | 'UNKNOWN'
-export type CallStatus = 'UPLOADED' | 'TRANSCRIBING' | 'TRANSCRIBED' | 'ANALYZING' | 'COMPLETE' | 'FAILED'
-export type CallSource = 'PBX_WEBHOOK' | 'MANUAL_UPLOAD' | 'MOBILE_APP' | 'GOOGLE_DRIVE'
+export type CallStatus = 'UPLOADED' | 'TRANSCRIBING' | 'TRANSCRIBED' | 'ANALYZING' | 'COMPLETE' | 'FAILED' | 'TOO_SHORT'
+export type CallSource = 'PBX_WEBHOOK' | 'MANUAL_UPLOAD' | 'MOBILE_APP' | 'GOOGLE_DRIVE' | 'EMAIL_IMPORT' | 'FTP_IMPORT' | 'API_IMPORT'
 
 export interface CallScores {
   overall: number
@@ -73,6 +73,47 @@ export interface CallAnalysis {
     materials_to_prepare: string[]
     objections_to_preempt: string[]
     closing_strategy: string
+  }
+  call_type?: 'discovery' | 'demo' | 'follow-up' | 'closing' | 'support' | 'cold-call'
+  coaching_format?: {
+    wins: Array<{ point: string; evidence: string }>
+    improvements: Array<{ point: string; advice: string }>
+    focus_area: { area: string; tip_hebrew: string }
+  }
+  pricing_discussion_details?: {
+    mentioned: boolean
+    count: number
+    first_mention_minute: number
+    context: string
+  }
+  competitor_mentions_detailed?: Array<{
+    name: string
+    context: string
+    minute_mark: number
+    sentiment: 'positive' | 'negative' | 'neutral'
+  }>
+  questions_analysis?: {
+    total_asked: number
+    open_questions: number
+    closed_questions: number
+    best_question: string
+    question_distribution: 'front-loaded' | 'spread' | 'back-loaded'
+  }
+  buying_signals_enhanced?: Array<{
+    signal: string
+    minute_mark: number
+    strength: 'weak' | 'moderate' | 'strong'
+  }>
+  next_steps_clarity?: {
+    has_next_steps: boolean
+    is_specific: boolean
+    is_scheduled: boolean
+    description: string
+  }
+  benchmark_comparison?: {
+    talk_ratio: { actual: number; benchmark: number; verdict: string }
+    questions_asked: { actual: number; benchmark: number; verdict: string }
+    longest_monologue: { actual: number; benchmark: number; verdict: string }
   }
   advanced_metrics?: {
     talk_ratio_rep: number

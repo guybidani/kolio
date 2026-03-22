@@ -34,6 +34,7 @@ enum CallStatus {
   ANALYZING
   COMPLETE
   FAILED
+  TOO_SHORT
 }
 
 enum CallSource {
@@ -41,6 +42,9 @@ enum CallSource {
   MANUAL_UPLOAD
   MOBILE_APP
   GOOGLE_DRIVE
+  EMAIL_IMPORT
+  FTP_IMPORT
+  API_IMPORT
 }
 
 enum BadgeType {
@@ -82,6 +86,8 @@ model Organization {
   planExpiresAt    DateTime?
   settings         Json     @default("{}")
   webhookSecret    String   @default(uuid())
+  importConfig     Json     @default("{}")
+  apiKey           String?  @unique
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -111,12 +117,15 @@ model User {
   avatarUrl        String?
   resetToken       String?
   resetTokenExp    DateTime?
+  emailNotifications Boolean @default(true)
+  emailDigest      Boolean  @default(true)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  managedReps    Rep[]    @relation("ManagedReps")
-  repProfile     Rep?     @relation("RepUser")
-  notifications  Notification[]
+  managedReps      Rep[]    @relation("ManagedReps")
+  repProfile       Rep?     @relation("RepUser")
+  notifications    Notification[]
+  practiceSessions PracticeSession[]
 
   @@unique([orgId, email])
   @@index([orgId])
@@ -200,6 +209,13 @@ model Call {
   // Manager comments (JSON array of comment objects)
   comments            Json?
 
+  // Enhanced analysis fields
+  callType            String?
+  pricingDetails      Json?
+  buyingSignals       Json?
+  nextStepsClarity    Json?
+  benchmarkComparison Json?
+
   source         CallSource    @default(MANUAL_UPLOAD)
   externalId     String?
   pbxType        String?
@@ -246,6 +262,7 @@ model WeeklyReport {
   topRep      String?
   highlights  Json     @default("[]")
   data        Json     @default("{}")
+  emailSentAt DateTime?
   createdAt   DateTime @default(now())
 
   @@unique([orgId, weekStart])
@@ -312,4 +329,21 @@ model Notification {
 
   @@index([userId, read])
   @@index([orgId, createdAt])
+}
+
+model PracticeSession {
+  id           String   @id @default(cuid())
+  orgId        String
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scenario     String   // discovery, demo, closing, objection-handling
+  difficulty   String   // easy, medium, hard
+  messages     Json     @default("[]")
+  isComplete   Boolean  @default(false)
+  evaluation   Json?
+  overallScore Float?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([orgId, userId])
 }

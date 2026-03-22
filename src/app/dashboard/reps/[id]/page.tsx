@@ -20,7 +20,13 @@ import {
   AlertCircle,
   Loader2,
   Upload,
+  BarChart3,
 } from 'lucide-react'
+import {
+  BenchmarkComparison,
+  BenchmarkSummaryCard,
+  type BenchmarkDataPoint,
+} from '@/components/dashboard/benchmark-comparison'
 
 interface RepDetail {
   id: string
@@ -44,6 +50,16 @@ interface RepDetail {
   streaks: Array<{ type: string; currentCount: number; bestCount: number; isAtRisk: boolean }>
 }
 
+interface BenchmarkMetricData {
+  key: string
+  value: number
+  previousValue?: number
+  zone: string
+  gap: number
+  ideal: number
+  label: string
+}
+
 export default function RepDetailPage() {
   const params = useParams()
   const repId = params.id as string
@@ -51,6 +67,8 @@ export default function RepDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [orgId, setOrgId] = useState<string | null>(null)
+  const [benchmarkData, setBenchmarkData] = useState<BenchmarkDataPoint[]>([])
+  const [benchmarkAnalysis, setBenchmarkAnalysis] = useState<BenchmarkMetricData[]>([])
 
   useEffect(() => {
     async function loadOrgAndRep() {
@@ -73,6 +91,29 @@ export default function RepDetailPage() {
         }
         const repData = await repRes.json()
         setRep(repData)
+
+        // Fetch benchmark analytics for the rep
+        try {
+          const analyticsRes = await fetch(`/api/analytics/rep/${repId}`)
+          if (analyticsRes.ok) {
+            const analyticsData = await analyticsRes.json()
+            if (analyticsData.benchmarkMetrics) {
+              const bData: BenchmarkDataPoint[] = Object.entries(
+                analyticsData.benchmarkMetrics as Record<string, { value: number; previousValue?: number }>
+              ).map(([key, { value, previousValue }]) => ({
+                key,
+                value,
+                previousValue,
+              }))
+              setBenchmarkData(bData)
+            }
+            if (analyticsData.benchmarkAnalysis) {
+              setBenchmarkAnalysis(analyticsData.benchmarkAnalysis)
+            }
+          }
+        } catch {
+          // Non-critical - benchmarks just won't show
+        }
       } catch (err) {
         console.error('Error fetching rep:', err)
         setError(err instanceof Error ? err.message : 'שגיאה בטעינת נציג')
@@ -186,6 +227,64 @@ export default function RepDetailPage() {
       ) : (
         <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border p-8 text-center">
           <p className="text-sm text-muted-foreground">אין עדיין ציונים - העלו שיחות כדי לראות ביצועים</p>
+        </div>
+      )}
+
+      {/* Benchmark Comparison */}
+      {benchmarkData.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-indigo-400" />
+            <h2 className="text-lg font-bold text-foreground">השוואה לסטנדרט</h2>
+            <span className="text-xs text-muted-foreground mr-auto">
+              מבוסס על 20 שיחות אחרונות
+            </span>
+          </div>
+          <div className="grid gap-4 lg:grid-cols-3">
+            <div className="lg:col-span-2">
+              <BenchmarkComparison
+                data={benchmarkData}
+                title="ביצועים מול סטנדרט תעשייתי"
+                showTrends
+              />
+            </div>
+            <div className="space-y-4">
+              <BenchmarkSummaryCard data={benchmarkData} />
+              {/* Gap from ideal details */}
+              {benchmarkAnalysis.length > 0 && (
+                <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border p-5">
+                  <h3 className="text-base font-semibold text-foreground mb-3">
+                    פער מהאידיאל
+                  </h3>
+                  <div className="space-y-2">
+                    {benchmarkAnalysis.map((metric) => (
+                      <div
+                        key={metric.key}
+                        className="flex items-center justify-between text-sm"
+                      >
+                        <span className="text-muted-foreground">{metric.label}</span>
+                        <span
+                          className={`font-medium tabular-nums ${
+                            metric.zone === 'green'
+                              ? 'text-emerald-400'
+                              : metric.zone === 'yellow'
+                              ? 'text-amber-400'
+                              : 'text-red-400'
+                          }`}
+                        >
+                          {metric.gap === 0
+                            ? 'מדויק'
+                            : metric.gap > 0
+                            ? `+${metric.gap}%`
+                            : `${metric.gap}%`}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
 

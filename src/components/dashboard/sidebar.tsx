@@ -14,6 +14,7 @@ import {
   LogOut,
   Shield,
   Crown,
+  Swords,
   type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -42,6 +43,7 @@ const allNavItems: NavItem[] = [
   { href: '/dashboard/calls', label: 'שיחות', icon: Phone, section: 'calls' },
   { href: '/dashboard/reps', label: 'נציגים', icon: Users, section: 'reps' },
   { href: '/dashboard/playbook', label: 'תסריט מכירה', icon: BookOpen, section: 'playbook' },
+  { href: '/dashboard/practice', label: 'תרגול AI', icon: Swords, section: 'practice' },
   { href: '/dashboard/upload', label: 'העלאת שיחה', icon: Upload, section: 'upload' },
   { href: '/dashboard/settings', label: 'הגדרות', icon: Settings, section: 'settings' },
   { href: '/dashboard/admin', label: 'ניהול מערכת', icon: Shield, section: 'admin' },

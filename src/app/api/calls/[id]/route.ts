@@ -46,7 +46,71 @@ export async function GET(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    return NextResponse.json(call)
+    // Assemble the analysis object from individual call fields
+    const scores = call.scores as Record<string, number> | null
+    const hasAnalysis = call.status === 'COMPLETE' && scores
+
+    const analysis = hasAnalysis ? {
+      call_metadata: {
+        prospect_name: call.prospectName || '',
+        prospect_business: call.prospectBusiness || '',
+        prospect_tier: 'unknown',
+        estimated_media_budget: '',
+        call_duration_estimate: call.duration < 300 ? 'short' : call.duration < 900 ? 'medium' : 'long',
+        decision_maker: false,
+        other_stakeholders: null,
+      },
+      call_type: (call.callType as string) || undefined,
+      summary: {
+        prospect_needs: call.summary || '',
+        what_was_offered: '',
+        what_was_agreed: '',
+        current_marketing: '',
+      },
+      scores: scores as { overall: number; discovery: number; objection_handling: number; closing: number; rapport: number; value_communication: number },
+      scores_reasoning: '',
+      coaching_format: call.coachingTips && typeof call.coachingTips === 'object' && !Array.isArray(call.coachingTips)
+        ? call.coachingTips as { wins: Array<{ point: string; evidence: string }>; improvements: Array<{ point: string; advice: string }>; focus_area: { area: string; tip_hebrew: string } }
+        : undefined,
+      buying_signals: [],
+      buying_signals_enhanced: (call.buyingSignals as Array<{ signal: string; minute_mark: number; strength: 'weak' | 'moderate' | 'strong' }>) || undefined,
+      objections_detected: (call.objections as Array<Record<string, unknown>>) || [],
+      pain_points: [],
+      retention_points: (call.retentionPoints as Array<Record<string, unknown>>) || [],
+      improvement_points: (call.improvementPoints as Array<Record<string, unknown>>) || [],
+      next_call_prep: (call.nextCallPrep as Record<string, unknown>) || undefined,
+      pricing_discussion_details: (call.pricingDetails as { mentioned: boolean; count: number; first_mention_minute: number; context: string }) || undefined,
+      // competitorMentions may contain either detailed (with minute_mark/sentiment) or old format (with timestamp)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      competitor_mentions_detailed: Array.isArray(call.competitorMentions) && (call.competitorMentions as any[])[0]?.minute_mark !== undefined
+        ? (call.competitorMentions as Array<{ name: string; context: string; minute_mark: number; sentiment: 'positive' | 'negative' | 'neutral' }>)
+        : undefined,
+      questions_analysis: (call.keyMoments as { total_asked: number; open_questions: number; closed_questions: number; best_question: string; question_distribution: string } | null) || undefined,
+      next_steps_clarity: (call.nextStepsClarity as { has_next_steps: boolean; is_specific: boolean; is_scheduled: boolean; description: string }) || undefined,
+      benchmark_comparison: (call.benchmarkComparison as { talk_ratio: { actual: number; benchmark: number; verdict: string }; questions_asked: { actual: number; benchmark: number; verdict: string }; longest_monologue: { actual: number; benchmark: number; verdict: string } }) || undefined,
+      advanced_metrics: {
+        talk_ratio_rep: call.talkRatioRep ?? 0,
+        talk_ratio_customer: call.talkRatioCustomer ?? 0,
+        filler_word_count: call.fillerWordCount ?? 0,
+        question_count: call.questionCount ?? 0,
+        longest_monologue_seconds: call.longestMonologue ?? 0,
+        silence_gaps: call.silenceGaps ?? 0,
+        energy_score: call.energyScore ?? 0,
+        next_steps_score: call.nextStepsScore ?? 0,
+        competitor_mentions: (call.competitorMentions as Array<{ name: string; context: string; timestamp: string }>) || [],
+        pricing_discussion: (call.pricingDiscussion as { mentioned: boolean; timestamp: string | null; handling: string }) || { mentioned: false, timestamp: null, handling: '' },
+        sentiment_trajectory: (call.sentimentTrajectory as { start: string; middle: string; end: string }) || undefined,
+      },
+      missed_opportunities: [],
+      spin_analysis: (call.spinAnalysis as Record<string, string>) || undefined,
+      _internal: (call.internalInsights as Record<string, unknown>) || undefined,
+    } : null
+
+    return NextResponse.json({
+      ...call,
+      analysis,
+      utterances: call.transcript,
+    })
   } catch (error) {
     console.error('Error fetching call:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

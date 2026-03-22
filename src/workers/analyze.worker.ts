@@ -80,7 +80,8 @@ async function processAnalysis(job: Job<AnalyzeJobData>) {
         nextCallPrep: toJson(analysis.next_call_prep),
         spinAnalysis: toJson(analysis.spin_analysis),
         internalInsights: toJson(analysis._internal),
-        coachingTips: toJson(analysis.improvement_points?.map((p) => p.suggested_behavior)),
+        coachingTips: toJson(analysis.coaching_format ?? analysis.improvement_points?.map((p) => p.suggested_behavior)),
+        keyMoments: toJson(analysis.questions_analysis),
         talkRatio: Prisma.JsonNull,
         // Advanced analytics fields
         fillerWordCount: analysis.advanced_metrics?.filler_word_count ?? null,
@@ -91,9 +92,15 @@ async function processAnalysis(job: Job<AnalyzeJobData>) {
         talkRatioCustomer: analysis.advanced_metrics?.talk_ratio_customer ?? null,
         energyScore: analysis.advanced_metrics?.energy_score ?? null,
         nextStepsScore: analysis.advanced_metrics?.next_steps_score ?? null,
-        competitorMentions: toJson(analysis.advanced_metrics?.competitor_mentions),
+        competitorMentions: toJson(analysis.competitor_mentions_detailed || analysis.advanced_metrics?.competitor_mentions),
         pricingDiscussion: toJson(analysis.advanced_metrics?.pricing_discussion),
         sentimentTrajectory: toJson(analysis.advanced_metrics?.sentiment_trajectory),
+        // Enhanced analysis fields
+        callType: analysis.call_type || null,
+        pricingDetails: toJson(analysis.pricing_discussion_details),
+        buyingSignals: toJson(analysis.buying_signals_enhanced),
+        nextStepsClarity: toJson(analysis.next_steps_clarity),
+        benchmarkComparison: toJson(analysis.benchmark_comparison),
         processedAt: new Date(),
       },
     })

@@ -37,6 +37,25 @@ async function processTranscription(job: Job<TranscribeJobData>) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const duration = Math.round((result as any)?.metadata?.duration || call.duration)
 
+    // Duration filter: skip analysis for calls under 2 minutes (120 seconds)
+    const MIN_DURATION_FOR_ANALYSIS = 120
+
+    if (duration < MIN_DURATION_FOR_ANALYSIS) {
+      await db.call.update({
+        where: { id: callId },
+        data: {
+          status: 'TOO_SHORT',
+          transcript: JSON.parse(JSON.stringify(utterances)),
+          transcriptText: text,
+          language: 'he',
+          duration,
+        },
+      })
+
+      console.log(`[Transcribe] Call ${callId} is too short (${duration}s < ${MIN_DURATION_FOR_ANALYSIS}s), skipping analysis`)
+      return { callId, wordCount: text.split(/\s+/).length, skipped: true, reason: 'TOO_SHORT' }
+    }
+
     // Update call with transcript
     await db.call.update({
       where: { id: callId },

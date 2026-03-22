@@ -10,6 +10,11 @@ import { ScoreDistribution } from '@/components/dashboard/score-distribution'
 import { TalkRatioGauge } from '@/components/dashboard/talk-ratio-gauge'
 import { FillerWords } from '@/components/dashboard/filler-words'
 import { TrendChart } from '@/components/dashboard/trend-chart'
+import {
+  BenchmarkComparison,
+  BenchmarkSummaryCard,
+  type BenchmarkDataPoint,
+} from '@/components/dashboard/benchmark-comparison'
 import { BarChart3, Upload, Loader2 } from 'lucide-react'
 
 interface AnalyticsData {
@@ -42,6 +47,15 @@ interface AnalyticsData {
   callVolume: Array<{ period: string; count: number }>
   scoreDistribution: Array<{ range: string; count: number; color: string }>
   talkRatioDistribution: Array<{ rep: number; customer: number }>
+  teamBenchmarks?: Record<string, { value: number }>
+  teamBenchmarkAnalysis?: Array<{
+    key: string
+    value: number
+    zone: string
+    gap: number
+    ideal: number
+    label: string
+  }>
 }
 
 const EMPTY_DATA: AnalyticsData = {
@@ -59,6 +73,8 @@ const EMPTY_DATA: AnalyticsData = {
   callVolume: [],
   scoreDistribution: [],
   talkRatioDistribution: [],
+  teamBenchmarks: undefined,
+  teamBenchmarkAnalysis: undefined,
 }
 
 export default function AnalyticsPage() {
@@ -198,6 +214,77 @@ export default function AnalyticsPage() {
           </div>
 
           <TrendChart data={trendData} reps={repTrends} />
+
+          {/* Team Benchmark Comparison */}
+          {data.teamBenchmarks && (
+            <div className="grid gap-6 lg:grid-cols-3">
+              <div className="lg:col-span-2">
+                <BenchmarkComparison
+                  data={
+                    Object.entries(data.teamBenchmarks).map(([key, { value }]) => ({
+                      key,
+                      value,
+                    })) as BenchmarkDataPoint[]
+                  }
+                  title="השוואת צוות לסטנדרט תעשייתי"
+                  showTrends={false}
+                />
+              </div>
+              <div className="space-y-4">
+                <BenchmarkSummaryCard
+                  data={
+                    Object.entries(data.teamBenchmarks).map(([key, { value }]) => ({
+                      key,
+                      value,
+                    })) as BenchmarkDataPoint[]
+                  }
+                />
+                {/* Highlight best and worst metrics */}
+                {data.teamBenchmarkAnalysis && data.teamBenchmarkAnalysis.length > 0 && (
+                  <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border p-5">
+                    <h3 className="text-base font-semibold text-foreground mb-3">
+                      דגשים
+                    </h3>
+                    <div className="space-y-3">
+                      {/* Best metric */}
+                      {(() => {
+                        const best = [...data.teamBenchmarkAnalysis]
+                          .sort((a, b) => Math.abs(a.gap) - Math.abs(b.gap))[0]
+                        const worst = [...data.teamBenchmarkAnalysis]
+                          .sort((a, b) => Math.abs(b.gap) - Math.abs(a.gap))[0]
+                        return (
+                          <>
+                            {best && (
+                              <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                                <div className="text-xs text-emerald-400/70 mb-0.5">חוזקה</div>
+                                <div className="text-sm font-medium text-emerald-400">
+                                  {best.label}
+                                </div>
+                                <div className="text-xs text-emerald-400/70 mt-0.5">
+                                  פער של {Math.abs(best.gap)}% מהאידיאל
+                                </div>
+                              </div>
+                            )}
+                            {worst && worst.key !== best?.key && (
+                              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                                <div className="text-xs text-red-400/70 mb-0.5">לשיפור</div>
+                                <div className="text-sm font-medium text-red-400">
+                                  {worst.label}
+                                </div>
+                                <div className="text-xs text-red-400/70 mt-0.5">
+                                  פער של {Math.abs(worst.gap)}% מהאידיאל
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        )
+                      })()}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>

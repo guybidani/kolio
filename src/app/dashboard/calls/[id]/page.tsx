@@ -31,6 +31,11 @@ import {
   MessageSquareQuote,
   DollarSign,
   Users,
+  HelpCircle,
+  Target,
+  CheckCircle2,
+  XCircle,
+  ChevronLeft,
 } from 'lucide-react'
 import Link from 'next/link'
 import type { CallAnalysis } from '@/types'
@@ -142,6 +147,7 @@ export default function CallDetailPage() {
 
   const isProcessing = ['UPLOADED', 'TRANSCRIBING', 'TRANSCRIBED', 'ANALYZING'].includes(call.status)
   const isFailed = call.status === 'FAILED'
+  const isTooShort = call.status === 'TOO_SHORT'
   const isComplete = call.status === 'COMPLETE'
   const DirectionIcon = call.direction === 'INBOUND' ? PhoneIncoming : PhoneOutgoing
   const analysis = call.analysis
@@ -222,6 +228,17 @@ export default function CallDetailPage() {
           <h3 className="text-base font-semibold text-red-400 mb-1">הניתוח נכשל</h3>
           <p className="text-sm text-muted-foreground">
             אירעה שגיאה בעיבוד השיחה. נסו להעלות שוב.
+          </p>
+        </div>
+      )}
+
+      {/* Too short status */}
+      {isTooShort && (
+        <div className="rounded-xl bg-amber-500/5 border border-amber-500/20 p-6 text-center">
+          <Clock className="h-8 w-8 text-amber-400 mx-auto mb-3" />
+          <h3 className="text-base font-semibold text-amber-400 mb-1">שיחה קצרה מדי</h3>
+          <p className="text-sm text-muted-foreground">
+            השיחה קצרה מ-2 דקות ולכן לא נותחה. ההקלטה נשמרה במערכת.
           </p>
         </div>
       )}
@@ -482,8 +499,92 @@ export default function CallDetailPage() {
           {/* Tab 4: Deep Analysis */}
           <TabsContent value="deep" className="mt-6">
             <div className="grid gap-6 lg:grid-cols-2">
-              {/* Advanced metrics */}
+              {/* Left column: Metrics + Benchmarks + Pricing + Competitors */}
               <div className="space-y-4">
+                {/* Benchmark Comparison Bars */}
+                {analysis.benchmark_comparison && (
+                  <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden">
+                    <div className="p-5 pb-3">
+                      <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
+                        <Target className="h-4 w-4 text-indigo-400" />
+                        השוואה לנתוני Gong
+                      </h3>
+                    </div>
+                    <div className="px-5 pb-5 space-y-4">
+                      {/* Talk Ratio */}
+                      <div>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-sm text-muted-foreground">יחס דיבור נציג</span>
+                          <span className="text-xs text-muted-foreground">
+                            {analysis.benchmark_comparison.talk_ratio.actual}% / {analysis.benchmark_comparison.talk_ratio.benchmark}% מומלץ
+                          </span>
+                        </div>
+                        <div className="relative h-3 bg-background/50 rounded-full border border-border overflow-hidden">
+                          <div
+                            className={`absolute inset-y-0 right-0 rounded-full transition-all ${
+                              Math.abs(analysis.benchmark_comparison.talk_ratio.actual - analysis.benchmark_comparison.talk_ratio.benchmark) <= 10
+                                ? 'bg-emerald-500/70' : 'bg-amber-500/70'
+                            }`}
+                            style={{ width: `${Math.min(100, analysis.benchmark_comparison.talk_ratio.actual)}%` }}
+                          />
+                          <div
+                            className="absolute inset-y-0 w-0.5 bg-indigo-400"
+                            style={{ right: `${analysis.benchmark_comparison.talk_ratio.benchmark}%` }}
+                            title={`בנצ'מרק: ${analysis.benchmark_comparison.talk_ratio.benchmark}%`}
+                          />
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">{analysis.benchmark_comparison.talk_ratio.verdict}</p>
+                      </div>
+
+                      {/* Questions Asked */}
+                      <div>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-sm text-muted-foreground">שאלות שנשאלו</span>
+                          <span className="text-xs text-muted-foreground">
+                            {analysis.benchmark_comparison.questions_asked.actual} / {analysis.benchmark_comparison.questions_asked.benchmark} מומלץ
+                          </span>
+                        </div>
+                        <div className="relative h-3 bg-background/50 rounded-full border border-border overflow-hidden">
+                          <div
+                            className={`absolute inset-y-0 right-0 rounded-full transition-all ${
+                              analysis.benchmark_comparison.questions_asked.actual >= analysis.benchmark_comparison.questions_asked.benchmark * 0.7
+                                ? 'bg-emerald-500/70' : 'bg-amber-500/70'
+                            }`}
+                            style={{ width: `${Math.min(100, (analysis.benchmark_comparison.questions_asked.actual / (analysis.benchmark_comparison.questions_asked.benchmark * 1.5)) * 100)}%` }}
+                          />
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">{analysis.benchmark_comparison.questions_asked.verdict}</p>
+                      </div>
+
+                      {/* Longest Monologue */}
+                      <div>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-sm text-muted-foreground">מונולוג ארוך ביותר</span>
+                          <span className="text-xs text-muted-foreground">
+                            {analysis.benchmark_comparison.longest_monologue.actual} שנ׳ / {analysis.benchmark_comparison.longest_monologue.benchmark} שנ׳ מומלץ
+                          </span>
+                        </div>
+                        <div className="relative h-3 bg-background/50 rounded-full border border-border overflow-hidden">
+                          <div
+                            className={`absolute inset-y-0 right-0 rounded-full transition-all ${
+                              analysis.benchmark_comparison.longest_monologue.actual <= analysis.benchmark_comparison.longest_monologue.benchmark
+                                ? 'bg-emerald-500/70' : 'bg-red-500/70'
+                            }`}
+                            style={{ width: `${Math.min(100, (analysis.benchmark_comparison.longest_monologue.actual / (analysis.benchmark_comparison.longest_monologue.benchmark * 2)) * 100)}%` }}
+                          />
+                          <div
+                            className="absolute inset-y-0 w-0.5 bg-indigo-400"
+                            style={{ right: `${(analysis.benchmark_comparison.longest_monologue.benchmark / (analysis.benchmark_comparison.longest_monologue.benchmark * 2)) * 100}%` }}
+                            title={`בנצ'מרק: ${analysis.benchmark_comparison.longest_monologue.benchmark} שניות`}
+                          />
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">{analysis.benchmark_comparison.longest_monologue.verdict}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Advanced metrics grid */}
                 {metrics && (
                   <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden">
                     <div className="p-5 pb-3">
@@ -516,41 +617,107 @@ export default function CallDetailPage() {
                   </div>
                 )}
 
-                {/* Sentiment trajectory */}
-                {metrics?.sentiment_trajectory && (
+                {/* Pricing Tracker Card */}
+                {analysis.pricing_discussion_details?.mentioned && (
                   <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden">
                     <div className="p-5 pb-3">
-                      <h3 className="text-base font-semibold text-foreground">מסלול סנטימנט</h3>
+                      <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
+                        <DollarSign className="h-4 w-4 text-emerald-400" />
+                        מעקב מחירים
+                      </h3>
                     </div>
-                    <div className="px-5 pb-5">
-                      <div className="flex items-center justify-between gap-4">
-                        {(['start', 'middle', 'end'] as const).map((phase) => {
-                          const val = metrics.sentiment_trajectory[phase]
-                          const info = SENTIMENT_LABELS[val] || SENTIMENT_LABELS.neutral
-                          const phaseLabels = { start: 'תחילה', middle: 'אמצע', end: 'סוף' }
-                          return (
-                            <div key={phase} className="flex-1 text-center">
-                              <p className="text-xs text-muted-foreground mb-1">{phaseLabels[phase]}</p>
-                              <div className="rounded-lg p-2 border border-border bg-background/50">
-                                <p className={`text-sm font-medium ${info.color}`}>{info.label}</p>
-                              </div>
-                            </div>
-                          )
-                        })}
+                    <div className="px-5 pb-5 space-y-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="rounded-lg bg-background/50 border border-border p-3 text-center">
+                          <p className="text-2xl font-bold text-emerald-400">{analysis.pricing_discussion_details.count}</p>
+                          <p className="text-xs text-muted-foreground mt-1">פעמים שהוזכר</p>
+                        </div>
+                        <div className="rounded-lg bg-background/50 border border-border p-3 text-center">
+                          <p className="text-2xl font-bold text-foreground">
+                            {analysis.pricing_discussion_details.first_mention_minute > 0
+                              ? `דקה ${analysis.pricing_discussion_details.first_mention_minute}`
+                              : 'תחילת השיחה'}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">אזכור ראשון</p>
+                        </div>
                       </div>
-                      <div className="flex items-center justify-center gap-2 mt-2">
-                        <div className="flex-1 h-0.5 bg-border rounded" />
-                        <span className="text-xs text-muted-foreground">&rarr;</span>
-                        <div className="flex-1 h-0.5 bg-border rounded" />
-                        <span className="text-xs text-muted-foreground">&rarr;</span>
-                        <div className="flex-1 h-0.5 bg-border rounded" />
-                      </div>
+                      {analysis.pricing_discussion_details.context && (
+                        <div className="rounded-lg bg-emerald-500/5 border border-emerald-500/20 p-3">
+                          <p className="text-xs text-muted-foreground mb-1">הקשר</p>
+                          <p className="text-sm text-foreground">{analysis.pricing_discussion_details.context}</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
 
-                {/* Competitor mentions */}
-                {metrics?.competitor_mentions && metrics.competitor_mentions.length > 0 && (
+                {/* Fallback: old pricing discussion */}
+                {!analysis.pricing_discussion_details?.mentioned && metrics?.pricing_discussion?.mentioned && (
+                  <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden">
+                    <div className="p-5 pb-3">
+                      <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
+                        <DollarSign className="h-4 w-4 text-emerald-400" />
+                        דיון מחירים
+                      </h3>
+                    </div>
+                    <div className="px-5 pb-5">
+                      {metrics.pricing_discussion.timestamp && (
+                        <p className="text-xs text-muted-foreground mb-1">
+                          זמן: {metrics.pricing_discussion.timestamp}
+                        </p>
+                      )}
+                      <p className="text-sm text-muted-foreground">{metrics.pricing_discussion.handling}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Competitor Mentions with Timeline */}
+                {analysis.competitor_mentions_detailed && analysis.competitor_mentions_detailed.length > 0 && (
+                  <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden">
+                    <div className="p-5 pb-3">
+                      <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
+                        <Users className="h-4 w-4 text-orange-400" />
+                        אזכורי מתחרים
+                      </h3>
+                    </div>
+                    <div className="px-5 pb-5 space-y-2">
+                      {analysis.competitor_mentions_detailed.map((mention, i) => {
+                        const sentimentConfig = {
+                          positive: { label: 'חיובי', color: 'border-emerald-500/20 bg-emerald-500/5', textColor: 'text-emerald-400' },
+                          negative: { label: 'שלילי', color: 'border-red-500/20 bg-red-500/5', textColor: 'text-red-400' },
+                          neutral: { label: 'ניטרלי', color: 'border-border bg-background/50', textColor: 'text-muted-foreground' },
+                        }
+                        const config = sentimentConfig[mention.sentiment] || sentimentConfig.neutral
+                        return (
+                          <div key={i} className={`rounded-lg border p-3 ${config.color}`}>
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium text-foreground">{mention.name}</span>
+                              <div className="flex items-center gap-2">
+                                <Badge variant="outline" className={`text-[10px] ${config.textColor}`}>
+                                  {config.label}
+                                </Badge>
+                                {mention.minute_mark > 0 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleSeekToTime(mention.minute_mark * 60)}
+                                    className="text-xs text-indigo-400 hover:text-indigo-300"
+                                  >
+                                    דקה {mention.minute_mark}
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">{mention.context}</p>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Fallback: old competitor mentions */}
+                {(!analysis.competitor_mentions_detailed || analysis.competitor_mentions_detailed.length === 0) &&
+                  metrics?.competitor_mentions && metrics.competitor_mentions.length > 0 && (
                   <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden">
                     <div className="p-5 pb-3">
                       <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
@@ -583,29 +750,164 @@ export default function CallDetailPage() {
                   </div>
                 )}
 
-                {/* Pricing discussion */}
-                {metrics?.pricing_discussion?.mentioned && (
+                {/* Sentiment trajectory */}
+                {metrics?.sentiment_trajectory && (
                   <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden">
                     <div className="p-5 pb-3">
-                      <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-emerald-400" />
-                        דיון מחירים
-                      </h3>
+                      <h3 className="text-base font-semibold text-foreground">מסלול סנטימנט</h3>
                     </div>
                     <div className="px-5 pb-5">
-                      {metrics.pricing_discussion.timestamp && (
-                        <p className="text-xs text-muted-foreground mb-1">
-                          זמן: {metrics.pricing_discussion.timestamp}
-                        </p>
-                      )}
-                      <p className="text-sm text-muted-foreground">{metrics.pricing_discussion.handling}</p>
+                      <div className="flex items-center justify-between gap-4">
+                        {(['start', 'middle', 'end'] as const).map((phase) => {
+                          const val = metrics.sentiment_trajectory[phase]
+                          const info = SENTIMENT_LABELS[val] || SENTIMENT_LABELS.neutral
+                          const phaseLabels = { start: 'תחילה', middle: 'אמצע', end: 'סוף' }
+                          return (
+                            <div key={phase} className="flex-1 text-center">
+                              <p className="text-xs text-muted-foreground mb-1">{phaseLabels[phase]}</p>
+                              <div className="rounded-lg p-2 border border-border bg-background/50">
+                                <p className={`text-sm font-medium ${info.color}`}>{info.label}</p>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                      <div className="flex items-center justify-center gap-2 mt-2">
+                        <div className="flex-1 h-0.5 bg-border rounded" />
+                        <span className="text-xs text-muted-foreground"><ChevronLeft className="h-3 w-3 inline" /></span>
+                        <div className="flex-1 h-0.5 bg-border rounded" />
+                        <span className="text-xs text-muted-foreground"><ChevronLeft className="h-3 w-3 inline" /></span>
+                        <div className="flex-1 h-0.5 bg-border rounded" />
+                      </div>
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Right column: Playbook coverage + missed opportunities */}
+              {/* Right column: Questions, Buying Signals, Next Steps, Playbook, Missed Opps */}
               <div className="space-y-4">
+                {/* Question Analysis Breakdown */}
+                {analysis.questions_analysis && (
+                  <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden">
+                    <div className="p-5 pb-3">
+                      <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
+                        <HelpCircle className="h-4 w-4 text-blue-400" />
+                        ניתוח שאלות
+                      </h3>
+                    </div>
+                    <div className="px-5 pb-5 space-y-3">
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="rounded-lg bg-background/50 border border-border p-3 text-center">
+                          <p className="text-2xl font-bold text-foreground">{analysis.questions_analysis.total_asked}</p>
+                          <p className="text-xs text-muted-foreground mt-1">סה״כ</p>
+                        </div>
+                        <div className="rounded-lg bg-background/50 border border-border p-3 text-center">
+                          <p className="text-2xl font-bold text-emerald-400">{analysis.questions_analysis.open_questions}</p>
+                          <p className="text-xs text-muted-foreground mt-1">פתוחות</p>
+                        </div>
+                        <div className="rounded-lg bg-background/50 border border-border p-3 text-center">
+                          <p className="text-2xl font-bold text-amber-400">{analysis.questions_analysis.closed_questions}</p>
+                          <p className="text-xs text-muted-foreground mt-1">סגורות</p>
+                        </div>
+                      </div>
+                      {/* Distribution */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground shrink-0">התפלגות:</span>
+                        <Badge variant="outline" className="text-[10px]">
+                          {analysis.questions_analysis.question_distribution === 'front-loaded' ? 'ריכוז בתחילה' :
+                           analysis.questions_analysis.question_distribution === 'spread' ? 'מפוזר' : 'ריכוז בסוף'}
+                        </Badge>
+                      </div>
+                      {/* Best question */}
+                      {analysis.questions_analysis.best_question && (
+                        <div className="rounded-lg bg-blue-500/5 border border-blue-500/20 p-3">
+                          <p className="text-xs text-blue-400 mb-1">השאלה הטובה ביותר</p>
+                          <p className="text-sm text-foreground">&quot;{analysis.questions_analysis.best_question}&quot;</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Buying Signals Timeline */}
+                {analysis.buying_signals_enhanced && analysis.buying_signals_enhanced.length > 0 && (
+                  <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden">
+                    <div className="p-5 pb-3">
+                      <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
+                        <Zap className="h-4 w-4 text-amber-400" />
+                        סיגנלי קנייה
+                      </h3>
+                    </div>
+                    <div className="px-5 pb-5 space-y-2">
+                      {analysis.buying_signals_enhanced.map((sig, i) => {
+                        const strengthConfig = {
+                          strong: { label: 'חזק', color: 'bg-emerald-500/10 border-emerald-500/20', dot: 'bg-emerald-400' },
+                          moderate: { label: 'בינוני', color: 'bg-amber-500/10 border-amber-500/20', dot: 'bg-amber-400' },
+                          weak: { label: 'חלש', color: 'bg-muted border-border', dot: 'bg-muted-foreground' },
+                        }
+                        const config = strengthConfig[sig.strength] || strengthConfig.weak
+                        return (
+                          <div key={i} className={`flex items-start gap-3 rounded-lg border p-3 ${config.color}`}>
+                            <span className={`mt-1.5 shrink-0 w-2 h-2 rounded-full inline-block ${config.dot}`} />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm text-foreground">{sig.signal}</p>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Badge variant="outline" className="text-[10px]">{config.label}</Badge>
+                                {sig.minute_mark > 0 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleSeekToTime(sig.minute_mark * 60)}
+                                    className="text-xs text-indigo-400 hover:text-indigo-300"
+                                  >
+                                    דקה {sig.minute_mark}
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Next Steps Clarity Indicator */}
+                {analysis.next_steps_clarity && (
+                  <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border overflow-hidden">
+                    <div className="p-5 pb-3">
+                      <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-indigo-400" />
+                        בהירות צעדים הבאים
+                      </h3>
+                    </div>
+                    <div className="px-5 pb-5 space-y-3">
+                      <div className="flex items-center gap-3">
+                        {analysis.next_steps_clarity.has_next_steps ? (
+                          <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0" />
+                        ) : (
+                          <XCircle className="h-5 w-5 text-red-400 shrink-0" />
+                        )}
+                        <span className="text-sm text-foreground">
+                          {analysis.next_steps_clarity.has_next_steps ? 'יש צעדים הבאים' : 'אין צעדים הבאים'}
+                        </span>
+                      </div>
+                      {analysis.next_steps_clarity.has_next_steps && (
+                        <div className="flex gap-2 flex-wrap">
+                          <Badge variant={analysis.next_steps_clarity.is_specific ? 'default' : 'outline'} className="text-xs">
+                            {analysis.next_steps_clarity.is_specific ? 'ספציפי' : 'לא ספציפי'}
+                          </Badge>
+                          <Badge variant={analysis.next_steps_clarity.is_scheduled ? 'default' : 'outline'} className="text-xs">
+                            {analysis.next_steps_clarity.is_scheduled ? 'מתוזמן' : 'לא מתוזמן'}
+                          </Badge>
+                        </div>
+                      )}
+                      {analysis.next_steps_clarity.description && (
+                        <p className="text-sm text-muted-foreground">{analysis.next_steps_clarity.description}</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 <PlaybookCoverage analysis={analysis} />
 
                 {/* Missed opportunities */}
@@ -629,7 +931,7 @@ export default function CallDetailPage() {
                 )}
 
                 {/* No advanced metrics fallback */}
-                {!metrics && (
+                {!metrics && !analysis.benchmark_comparison && !analysis.questions_analysis && (
                   <div className="rounded-xl bg-muted/50 backdrop-blur-xl border border-border p-8 text-center">
                     <BarChart3 className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
                     <h3 className="text-sm font-medium text-foreground mb-1">אין נתונים מתקדמים</h3>

@@ -26,6 +26,7 @@ function getStatusBadge(status: string) {
     ANALYZING: { label: 'מנתחת', className: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
     COMPLETE: { label: 'הושלמה', className: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
     FAILED: { label: 'נכשלה', className: 'bg-red-500/10 text-red-400 border-red-500/20' },
+    TOO_SHORT: { label: 'קצרה מדי', className: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
   }
   const info = map[status] || { label: status, className: 'bg-muted text-muted-foreground border-border' }
   return <Badge variant="outline" className={info.className}>{info.label}</Badge>

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { SALES_BENCHMARKS, classifyBenchmark, gapFromIdeal } from '@/lib/benchmarks'
 
 export async function GET(
   req: Request,
@@ -139,6 +140,78 @@ export async function GET(
     const strengths = sorted.slice(0, 3).map(([key, val]) => ({ category: key, score: val }))
     const weaknesses = sorted.slice(-3).reverse().map(([key, val]) => ({ category: key, score: val }))
 
+    // --- Benchmark comparison ---
+    // Use last 20 calls for benchmark metrics
+    const benchmarkCalls = calls.slice(0, 20)
+    const benchmarkPrevious = calls.slice(20, 40)
+
+    const avgBench = (arr: (number | null | undefined)[]) => {
+      const valid = arr.filter((v): v is number => v != null)
+      return valid.length > 0 ? valid.reduce((a, b) => a + b, 0) / valid.length : 0
+    }
+
+    // Extract pricing mentions count from pricingDiscussion JSON
+    const getPricingMentions = (pd: unknown): number | null => {
+      if (!pd || typeof pd !== 'object') return null
+      const obj = pd as Record<string, unknown>
+      if (typeof obj.count === 'number') return obj.count
+      if (Array.isArray(obj.mentions)) return obj.mentions.length
+      return null
+    }
+
+    // Extract pricing timing (minute when price first mentioned) from pricingDiscussion JSON
+    const getPricingTiming = (pd: unknown): number | null => {
+      if (!pd || typeof pd !== 'object') return null
+      const obj = pd as Record<string, unknown>
+      if (typeof obj.firstMentionMinute === 'number') return obj.firstMentionMinute
+      if (typeof obj.timing === 'number') return obj.timing
+      return null
+    }
+
+    const benchmarkMetrics = {
+      talkRatio: {
+        value: round(avgBench(benchmarkCalls.map((c) => c.talkRatioRep))),
+        previousValue: benchmarkPrevious.length > 0
+          ? round(avgBench(benchmarkPrevious.map((c) => c.talkRatioRep)))
+          : undefined,
+      },
+      questionsPerCall: {
+        value: round(avgBench(benchmarkCalls.map((c) => c.questionCount))),
+        previousValue: benchmarkPrevious.length > 0
+          ? round(avgBench(benchmarkPrevious.map((c) => c.questionCount)))
+          : undefined,
+      },
+      longestMonologue: {
+        value: round(avgBench(benchmarkCalls.map((c) => c.longestMonologue))),
+        previousValue: benchmarkPrevious.length > 0
+          ? round(avgBench(benchmarkPrevious.map((c) => c.longestMonologue)))
+          : undefined,
+      },
+      pricingMentions: {
+        value: round(avgBench(benchmarkCalls.map((c) => getPricingMentions(c.pricingDiscussion)))),
+        previousValue: benchmarkPrevious.length > 0
+          ? round(avgBench(benchmarkPrevious.map((c) => getPricingMentions(c.pricingDiscussion))))
+          : undefined,
+      },
+      pricingTiming: {
+        value: round(avgBench(benchmarkCalls.map((c) => getPricingTiming(c.pricingDiscussion)))),
+        previousValue: benchmarkPrevious.length > 0
+          ? round(avgBench(benchmarkPrevious.map((c) => getPricingTiming(c.pricingDiscussion))))
+          : undefined,
+      },
+    }
+
+    // Build gap analysis
+    const benchmarkAnalysis = Object.entries(benchmarkMetrics).map(([key, { value, previousValue }]) => ({
+      key,
+      value,
+      previousValue,
+      zone: classifyBenchmark(key, value),
+      gap: gapFromIdeal(key, value),
+      ideal: SALES_BENCHMARKS[key]?.ideal ?? 0,
+      label: SALES_BENCHMARKS[key]?.label ?? key,
+    }))
+
     return NextResponse.json({
       rep: { id: rep.id, name: rep.name, avatarUrl: rep.avatarUrl },
       totalCalls: calls.length,
@@ -157,6 +230,8 @@ export async function GET(
       trajectory,
       strengths,
       weaknesses,
+      benchmarkMetrics,
+      benchmarkAnalysis,
     })
   } catch (error) {
     console.error('Error fetching rep analytics:', error)
